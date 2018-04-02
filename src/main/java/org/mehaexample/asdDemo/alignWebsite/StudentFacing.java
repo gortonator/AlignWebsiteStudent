@@ -50,7 +50,7 @@ import org.mehaexample.asdDemo.restModels.EmailToRegister;
 
 import com.lambdaworks.crypto.SCryptUtil;
 
-@Path("student-facing")
+@Path("")
 public class StudentFacing {
 	StudentsDao studentDao = new StudentsDao();
 	ElectivesDao electivesDao = new ElectivesDao();
