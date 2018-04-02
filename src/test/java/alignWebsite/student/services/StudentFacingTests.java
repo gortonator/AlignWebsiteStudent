@@ -35,19 +35,26 @@ public class StudentFacingTests {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void registerStudent(){
-		EmailToRegister emailToRegister = new EmailToRegister("meha@gmail.com");
-		Response res = studentFacing.sendRegistrationEmail(emailToRegister);
-
-		String response = (String) res.getEntity();
-
-		Assert.assertEquals("To Register should be an Align Student!", response);
-
-		Students newStudent = new Students("0000000", "meha@gmail.com", "Tom", "",
+		String email = "abc.def31@gmail.com";
+		
+		String nuid = "3121";
+		Students newStudent = new Students(nuid, email, "Tom", "",
 				"Cat", Gender.M, "F1", "1111111111",
 				"401 Terry Ave", "WA", "Seattle", "98109", Term.FALL, 2015,
 				Term.SPRING, 2017,
 				EnrollmentStatus.FULL_TIME, Campus.SEATTLE, DegreeCandidacy.MASTERS, null, true);
 		
+		Response res = studentFacing.createStudent(newStudent);
+		Assert.assertEquals("Student created successfully", res.getEntity().toString());
+		
+		Response getStudent = studentFacing.getStudentRecord(nuid);
+		Students x = (Students) getStudent.getEntity();
+		System.out.println("x nuid=" + x.getNeuId());
+		Assert.assertEquals(x.getNeuId(), nuid);
+		
+		// now delete the student
+		Response deleteStudent = studentFacing.deleteStudentByNuid(nuid);
+		Assert.assertEquals("Student deleted successfully", deleteStudent.getEntity().toString());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -93,5 +100,4 @@ public class StudentFacingTests {
 
 		Assert.assertEquals("Student is Already Registered!doe.j@husky.neu.edu" , response); 
 	}
-
 }
