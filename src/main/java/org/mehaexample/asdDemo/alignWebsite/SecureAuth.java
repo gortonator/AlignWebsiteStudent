@@ -43,7 +43,11 @@ public class SecureAuth implements ContainerRequestFilter{
 	   !requestContext.getUriInfo().getPath().contains(REGISTER_URL) &&
 	   !requestContext.getUriInfo().getPath().contains(CREATE_URL) && 
 	   !requestContext.getUriInfo().getPath().contains(RESET_URL)){
-	try {	
+	try {
+		String method = requestContext.getMethod();
+		if (method.equals("OPTIONS")){
+			return;
+		}	
 		List<String> authHeader =  requestContext.getHeaders().get(AUTHOIRIZATION_HEADER);
 		if(authHeader.size() > 0){
 			try {
