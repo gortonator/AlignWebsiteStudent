@@ -64,7 +64,29 @@ public class StudentFacing {
 	String studentData = "studentRecord";
 	String projectRecord = "ProjectRecord";
 	String extraExperienceRecord = "extraExperienceRecord";
-
+	
+	/**
+	 * This function creates a new student record
+	 * 
+	 * @param student
+	 */
+	@POST
+	@Path("students/{nuid}/add")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response createStudent(Students student){
+		System.out.println("saving student " + student.getFirstName() + ", " + student.getNeuId());
+		boolean exists = studentDao.ifNuidExists(student.getNeuId());
+		System.out.println("student exists = " + exists);
+		if(exists == false){			
+			studentDao.addStudent(student);
+		}else{
+			System.out.println("The entered NUID exists already");
+		}
+		
+		return Response.status(Response.Status.OK).entity("Student created successfully").build(); 
+	}
+	
+	
 	/**
 	 * This function gets the student details by NUID
 	 * 
@@ -77,6 +99,7 @@ public class StudentFacing {
 	@Path("students/{nuid}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getStudentProfile(@PathParam("nuid") String nuid) {
+		System.out.println("getting student for nuid= " + nuid);
 		if (!studentDao.ifNuidExists(nuid)) {
 
 			return Response.status(Response.Status.NOT_FOUND).entity(nuIdNotFound).build();
