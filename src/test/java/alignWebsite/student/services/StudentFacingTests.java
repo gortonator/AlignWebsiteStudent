@@ -59,17 +59,6 @@ public class StudentFacingTests {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void registerStudent2(){
-		EmailToRegister emailToRegister = new EmailToRegister("test.alignstudent123@gmail.com");
-		Response res = studentFacing.sendRegistrationEmail(emailToRegister);
-
-		String response = (String) res.getEntity();
-
-		Assert.assertEquals("Registration link sent succesfully to test.alignstudent123@gmail.com" , response); 
-	}
-
-	@SuppressWarnings("unchecked")
-	@Test
 	public void registerStudent3(){
 		EmailToRegister emailToRegister = new EmailToRegister("test.alignstudent1231@gmail.com");
 		Response res = studentFacing.sendRegistrationEmail(emailToRegister);
