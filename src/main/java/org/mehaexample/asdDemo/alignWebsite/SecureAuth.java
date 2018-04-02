@@ -9,9 +9,7 @@ import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
@@ -21,8 +19,8 @@ import org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers;
 import org.jose4j.jwe.JsonWebEncryption;
 import org.jose4j.jwe.KeyManagementAlgorithmIdentifiers;
 import org.jose4j.keys.AesKey;
-import org.mehaexample.asdDemo.dao.alignadmin.AdminLoginsDao;
-import org.mehaexample.asdDemo.model.alignadmin.AdminLogins;
+import org.mehaexample.asdDemo.dao.alignprivate.StudentLoginsDao;
+import org.mehaexample.asdDemo.model.alignprivate.StudentLogins;
 
 @Provider
 public class SecureAuth implements ContainerRequestFilter{
@@ -36,7 +34,7 @@ public class SecureAuth implements ContainerRequestFilter{
 	@Context
     private HttpServletRequest sr;
 	
-	AdminLoginsDao adminLoginsDao = new AdminLoginsDao();
+	StudentLoginsDao studentLoginsDao = new StudentLoginsDao();
 	
 	@Override
 	public void filter(ContainerRequestContext requestContext)
@@ -70,21 +68,21 @@ public class SecureAuth implements ContainerRequestFilter{
 			String ipAddress = tokenData.nextToken();
 			String timeValid = tokenData.nextToken();
 			String tokenCheck = timeValid.substring(0,timeValid.length()-6);
-			AdminLogins adminLogins = adminLoginsDao.findAdminLoginsByEmail(email);
-			if(adminLogins == null){
+			StudentLogins studentLogins = studentLoginsDao.findStudentLoginsByEmail(email);
+			if(studentLogins == null){
 				requestContext.abortWith(Response.status(Response.Status.NOT_ACCEPTABLE).
 						entity("Token not valid. Please login again.").build());
 			}
-			String loginTime = adminLogins.getLoginTime().toString();
-			String expireTime = adminLogins.getKeyExpiration().toString();
+			String loginTime = studentLogins.getLoginTime().toString();
+			String expireTime = studentLogins.getKeyExpiration().toString();
 			Timestamp now = new Timestamp(System.currentTimeMillis());
 			Timestamp valid = Timestamp.valueOf(now.toString());
 			Timestamp expire = Timestamp.valueOf(expireTime);
 			String timeLogin = loginTime.substring(0,loginTime.length()-4);
 			if(ip.equals(ipAddress) && timeLogin.equals(tokenCheck) && valid.before(expire)) {
 				Timestamp keyExpiration = new Timestamp(System.currentTimeMillis()+15*60*1000);
-				adminLogins.setKeyExpiration(keyExpiration);
-				adminLoginsDao.updateAdminLogin(adminLogins);
+				studentLogins.setKeyExpiration(keyExpiration);
+				studentLoginsDao.updateStudentLogin(studentLogins);
 				return;
 			} else {
 				requestContext.abortWith(Response.status(Response.Status.NOT_ACCEPTABLE).
@@ -106,13 +104,5 @@ public class SecureAuth implements ContainerRequestFilter{
 		} else {
 			return;
 		}
-	}
-
-	public void filter(ContainerRequestContext requestContext,  ContainerResponseContext responseContext)
-			throws IOException {
-		MultivaluedMap<String, Object> headers = responseContext.getHeaders();
-
-		headers.add("Access-Control-Allow-Origin", "*");
-		headers.add("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT");	
 	}
 }
