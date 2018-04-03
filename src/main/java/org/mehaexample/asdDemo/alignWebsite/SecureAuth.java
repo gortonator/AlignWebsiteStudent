@@ -30,12 +30,12 @@ public class SecureAuth implements ContainerRequestFilter{
 	private static final String REGISTER_URL = "registration";
 	private static final String RESET_URL = "password-reset";
 	private static final String CREATE_URL = "password-create";
-	
+
 	@Context
-    private HttpServletRequest sr;
-	
+	private HttpServletRequest sr;
+
 	StudentLoginsDao studentLoginsDao = new StudentLoginsDao();
-	
+
 	@Override
 	public void filter(ContainerRequestContext requestContext)
 			throws IOException {
@@ -92,19 +92,10 @@ public class SecureAuth implements ContainerRequestFilter{
 				requestContext.abortWith(Response.status(Response.Status.NOT_ACCEPTABLE).
 						entity("Token expired. Please login again.").build());
 			}
-			} catch (Exception e) {
-				requestContext.abortWith(Response.status(Response.Status.NOT_ACCEPTABLE).
-						entity("Token Tampered. Please login again.").build());
+			catch (Exception e) {
+				requestContext.abortWith(Response.status(Response.Status.BAD_REQUEST).
+						entity("Bad Request.").build());
 			}
-		} else {
-			requestContext.abortWith(Response.status(Response.Status.NOT_ACCEPTABLE).
-					entity("Please include authentication token in the Header.").build()); 
-		}
-		}
-		catch (Exception e) {
-			requestContext.abortWith(Response.status(Response.Status.BAD_REQUEST).
-					entity("Bad Request.").build());
-		}
 		} else {
 			return;
 		}
