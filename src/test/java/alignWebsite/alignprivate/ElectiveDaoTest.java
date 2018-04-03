@@ -6,10 +6,6 @@ import org.hibernate.HibernateException;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mehaexample.asdDemo.dao.alignprivate.CoursesDao;
-import org.mehaexample.asdDemo.dao.alignprivate.ElectivesDao;
-import org.mehaexample.asdDemo.dao.alignprivate.PrivaciesDao;
-import org.mehaexample.asdDemo.dao.alignprivate.StudentsDao;
 import org.mehaexample.asdDemo.enums.Campus;
 import org.mehaexample.asdDemo.enums.DegreeCandidacy;
 import org.mehaexample.asdDemo.enums.EnrollmentStatus;
@@ -20,6 +16,10 @@ import org.mehaexample.asdDemo.model.alignprivate.Courses;
 import org.mehaexample.asdDemo.model.alignprivate.Electives;
 import org.mehaexample.asdDemo.model.alignprivate.Privacies;
 import org.mehaexample.asdDemo.model.alignprivate.Students;
+import org.mehaexample.asdDemo.dao.alignprivate.CoursesDao;
+import org.mehaexample.asdDemo.dao.alignprivate.ElectivesDao;
+import org.mehaexample.asdDemo.dao.alignprivate.PrivaciesDao;
+import org.mehaexample.asdDemo.dao.alignprivate.StudentsDao;
 
 public class ElectiveDaoTest {
   private static ElectivesDao electivesDao;

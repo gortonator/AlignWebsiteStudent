@@ -4,14 +4,17 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
 public class StudentSessionFactory {
-  private static SessionFactory factory;
+	private static SessionFactory factory;
 
-  static {
-    factory = new Configuration()
-            .configure("/hibernate.Private.cfg.xml").buildSessionFactory();
-  }
+	private StudentSessionFactory() {
+	}
 
-  public static SessionFactory getFactory() {
-    return factory;
-  }
+	static {
+		factory = new Configuration()
+				.configure("/hibernate.Private.cfg.xml").buildSessionFactory();
+	}
+
+	public static SessionFactory getFactory() {
+		return factory;
+	}
 }

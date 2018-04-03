@@ -2,8 +2,6 @@ package alignWebsite.alignprivate;
 
 import org.hibernate.HibernateException;
 import org.junit.*;
-import org.mehaexample.asdDemo.dao.alignprivate.PriorEducationsDao;
-import org.mehaexample.asdDemo.dao.alignprivate.StudentsDao;
 import org.mehaexample.asdDemo.dao.alignpublic.MultipleValueAggregatedDataDao;
 import org.mehaexample.asdDemo.enums.Campus;
 import org.mehaexample.asdDemo.enums.DegreeCandidacy;
@@ -15,6 +13,8 @@ import org.mehaexample.asdDemo.model.alignadmin.TopBachelor;
 import org.mehaexample.asdDemo.model.alignprivate.PriorEducations;
 import org.mehaexample.asdDemo.model.alignprivate.Students;
 import org.mehaexample.asdDemo.model.alignpublic.MultipleValueAggregatedData;
+import org.mehaexample.asdDemo.dao.alignprivate.PriorEducationsDao;
+import org.mehaexample.asdDemo.dao.alignprivate.StudentsDao;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

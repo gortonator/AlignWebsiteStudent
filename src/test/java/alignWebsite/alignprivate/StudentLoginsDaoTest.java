@@ -2,11 +2,11 @@ package alignWebsite.alignprivate;
 
 import org.hibernate.HibernateException;
 import org.junit.*;
-import org.mehaexample.asdDemo.dao.alignprivate.StudentLoginsDao;
-import org.mehaexample.asdDemo.dao.alignprivate.StudentsDao;
 import org.mehaexample.asdDemo.enums.*;
 import org.mehaexample.asdDemo.model.alignprivate.StudentLogins;
 import org.mehaexample.asdDemo.model.alignprivate.Students;
+import org.mehaexample.asdDemo.dao.alignprivate.StudentLoginsDao;
+import org.mehaexample.asdDemo.dao.alignprivate.StudentsDao;
 
 import java.sql.Timestamp;
 

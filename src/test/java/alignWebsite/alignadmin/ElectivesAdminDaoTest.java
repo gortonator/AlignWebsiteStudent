@@ -4,12 +4,12 @@ import org.hibernate.HibernateException;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mehaexample.asdDemo.dao.alignprivate.CoursesDao;
-import org.mehaexample.asdDemo.dao.alignprivate.StudentsDao;
 import org.mehaexample.asdDemo.dao.alignadmin.ElectivesAdminDao;
 import org.mehaexample.asdDemo.enums.*;
 import org.mehaexample.asdDemo.model.alignprivate.Courses;
 import org.mehaexample.asdDemo.model.alignprivate.Students;
+import org.mehaexample.asdDemo.dao.alignprivate.CoursesDao;
+import org.mehaexample.asdDemo.dao.alignprivate.StudentsDao;
 import org.mehaexample.asdDemo.model.alignadmin.ElectivesAdmin;
 
 import java.util.List;

@@ -5,10 +5,10 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mehaexample.asdDemo.dao.alignadmin.GenderRatioDao;
-import org.mehaexample.asdDemo.dao.alignprivate.StudentsDao;
 import org.mehaexample.asdDemo.enums.*;
 import org.mehaexample.asdDemo.model.alignadmin.GenderRatio;
 import org.mehaexample.asdDemo.model.alignprivate.Students;
+import org.mehaexample.asdDemo.dao.alignprivate.StudentsDao;
 
 import java.util.List;
 

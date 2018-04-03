@@ -1,253 +1,253 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-    <modelVersion>4.0.0</modelVersion>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-    <groupId>org.mehaexample.asdDemo</groupId>
-    <artifactId>alignWebsiteStudent</artifactId>
-    <packaging>war</packaging>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>alignWebsiteStudent</name>
+	<modelVersion>4.0.0</modelVersion>
 
-    <build>
-        <finalName>AlignWebsiteStudent</finalName>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.5.1</version>
-                <inherited>true</inherited>
-                <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
-                </configuration>
-            </plugin>
+	<groupId>org.mehaexample.asdDemo</groupId>
+	<artifactId>alignWebsiteStudent</artifactId>
+	<packaging>war</packaging>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>alignWebsiteStudent</name>
 
-            <!-- Jacoco Coverage Config -->
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.7.6.201602180812</version>
-                <executions>
-                    <execution>
-                        <id>default-prepare-agent</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>default-report</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+	<build>
+		<finalName>AlignWebsiteStudent</finalName>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.5.1</version>
+				<inherited>true</inherited>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
 
-    <dependencyManagement>
-        <dependencies>
-            <!-- https://mvnrepository.com/artifact/org.mockito/mockito-all -->
+			<!-- Jacoco Coverage Config -->
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.7.6.201602180812</version>
+				<executions>
+					<execution>
+						<id>default-prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>default-report</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 
-
-            <dependency>
-                <groupId>org.glassfish.jersey</groupId>
-                <artifactId>jersey-bom</artifactId>
-                <version>${jersey.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
-    <dependencies>
-        <!-- https://mvnrepository.com/artifact/javax.servlet/servlet-api -->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.bitbucket.b_c</groupId>
-            <artifactId>jose4j</artifactId>
-            <version>0.6.3</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.lambdaworks</groupId>
-            <artifactId>scrypt</artifactId>
-            <version>1.4.0</version>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/javax.mail/javax.mail-api -->
-        <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
-            <version>1.5.5</version>
-        </dependency>
+	<dependencyManagement>
+		<dependencies>
+			<!-- https://mvnrepository.com/artifact/org.mockito/mockito-all -->
 
 
-        <dependency>
-            <groupId>org.glassfish.jersey.containers</groupId>
-            <artifactId>jersey-container-servlet-core</artifactId>
-            <!-- use the following artifactId if you don't need servlet 2.x compatibility -->
-            <!-- artifactId>jersey-container-servlet</artifactId -->
-        </dependency>
+			<dependency>
+				<groupId>org.glassfish.jersey</groupId>
+				<artifactId>jersey-bom</artifactId>
+				<version>${jersey.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
-        <!-- https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client -->
-        <dependency>
-            <groupId>org.mariadb.jdbc</groupId>
-            <artifactId>mariadb-java-client</artifactId>
-            <version>1.1.7</version>
-        </dependency>
+	<dependencies>
+		<!-- https://mvnrepository.com/artifact/javax.servlet/servlet-api -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+			<scope>provided</scope>
+		</dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.sonarsource.scanner.maven/sonar-maven-plugin -->
-        <dependency>
-            <groupId>org.sonarsource.scanner.maven</groupId>
-            <artifactId>sonar-maven-plugin</artifactId>
-            <version>3.2</version>
-        </dependency>
+		<dependency>
+			<groupId>org.bitbucket.b_c</groupId>
+			<artifactId>jose4j</artifactId>
+			<version>0.6.3</version>
+		</dependency>
 
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.36</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.inject</groupId>
-            <artifactId>jersey-hk2</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.media</groupId>
-            <artifactId>jersey-media-json-binding</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.8.1</version>
-            <scope>test</scope>
-        </dependency>
+		<dependency>
+			<groupId>com.lambdaworks</groupId>
+			<artifactId>scrypt</artifactId>
+			<version>1.4.0</version>
+		</dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-core -->
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>5.2.11.Final</version>
-        </dependency>
+		<!-- https://mvnrepository.com/artifact/javax.mail/javax.mail-api -->
+		<dependency>
+			<groupId>com.sun.mail</groupId>
+			<artifactId>javax.mail</artifactId>
+			<version>1.5.5</version>
+		</dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-validator -->
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-validator</artifactId>
-            <version>5.4.0.Final</version>
-        </dependency>
 
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>3.1.0</version>
-            <scope>provided</scope>
-        </dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.containers</groupId>
+			<artifactId>jersey-container-servlet-core</artifactId>
+			<!-- use the following artifactId if you don't need servlet 2.x compatibility -->
+			<!-- artifactId>jersey-container-servlet</artifactId -->
+		</dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.json/json -->
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20180130</version>
-        </dependency>
+		<!-- https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client -->
+		<dependency>
+			<groupId>org.mariadb.jdbc</groupId>
+			<artifactId>mariadb-java-client</artifactId>
+			<version>1.1.7</version>
+		</dependency>
 
-    </dependencies>
-    <properties>
-        <jersey.version>2.26</jersey.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+		<!-- https://mvnrepository.com/artifact/org.sonarsource.scanner.maven/sonar-maven-plugin -->
+		<dependency>
+			<groupId>org.sonarsource.scanner.maven</groupId>
+			<artifactId>sonar-maven-plugin</artifactId>
+			<version>3.2</version>
+		</dependency>
 
-    <profiles>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.36</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.inject</groupId>
+			<artifactId>jersey-hk2</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.media</groupId>
+			<artifactId>jersey-media-json-binding</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.8.1</version>
+			<scope>test</scope>
+		</dependency>
 
-        <profile>
-            <id>sonar</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <!-- Optional URL to server. Default value is http://localhost:9000 -->
-                <sonar.host.url>
-                    http://localhost:9000
-                </sonar.host.url>
+		<!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-core -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<version>5.2.11.Final</version>
+		</dependency>
 
-                <!--<sonar.exclusions>/src/main/java/org.mehaexample.asdDemo.model.*</sonar.exclusions>-->
-            </properties>
-        </profile>
+		<!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-validator -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>5.4.0.Final</version>
+		</dependency>
 
-        <profile>
-            <id>dev_env_config</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <test.ip>localhost</test.ip>
-                <database.ip>
-                    localhost
-                </database.ip>
-                <test.port>3307</test.port>
-                <admin.port>3307</admin.port>
-                <public.port>3307</public.port>
-                <private.port>3307</private.port>
-                <test.username>
-                    root
-                </test.username>
-                <test.password>
-                    Turkey#786
-                </test.password>
-                <database.username>
-                    root
-                </database.username>
-                <database.password>
-                    Turkey#786
-                </database.password>
-            </properties>
-        </profile>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.1.0</version>
+			<scope>provided</scope>
+		</dependency>
 
-        <profile>
-            <id>prod_env_config</id>
-            <activation>
-                <property>
-                    <name>env</name>
-                    <value>prod</value>
-                </property>
-            </activation>
-            <properties>
-                <test.ip>test_db</test.ip>
-                <database.ip>
-                    asd3.ccs.neu.edu
-                </database.ip>
-                <test.port>3306</test.port>
-                <admin.port>3307</admin.port>
-                <public.port>3309</public.port>
-                <private.port>3308</private.port>
-                <test.username>
-                    root
-                </test.username>
-                <test.password>
-                </test.password>
-                <database.username>
-                    root
-                </database.username>
-                <database.password>
-                    123456
-                </database.password>
-            </properties>
-        </profile>
-    </profiles>
+		<!-- https://mvnrepository.com/artifact/org.json/json -->
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20180130</version>
+		</dependency>
 
+	</dependencies>
+	<properties>
+		<jersey.version>2.26</jersey.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<profiles>
+
+		<profile>
+			<id>sonar</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<!-- Optional URL to server. Default value is http://localhost:9000 -->
+				<sonar.host.url>
+					http://localhost:9000
+				</sonar.host.url>
+
+				<!--<sonar.exclusions>/src/main/java/org.mehaexample.asdDemo.model.*</sonar.exclusions> -->
+			</properties>
+		</profile>
+
+		<profile>
+			<id>dev_env_config</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<test.ip>localhost</test.ip>
+				<database.ip>
+					localhost
+				</database.ip>
+				<test.port>3307</test.port>
+				<admin.port>3307</admin.port>
+				<public.port>3307</public.port>
+				<private.port>3307</private.port>
+				<test.username>
+					root
+				</test.username>
+				<test.password>
+					Turkey#786
+				</test.password>
+				<database.username>
+					root
+				</database.username>
+				<database.password>
+					Turkey#786
+				</database.password>
+			</properties>
+		</profile>
+
+		<profile>
+			<id>prod_env_config</id>
+			<activation>
+				<property>
+					<name>env</name>
+					<value>prod</value>
+				</property>
+			</activation>
+			<properties>
+				<test.ip>test_db</test.ip>
+				<database.ip>
+					asd3.ccs.neu.edu
+				</database.ip>
+				<test.port>3306</test.port>
+				<admin.port>3307</admin.port>
+				<public.port>3309</public.port>
+				<private.port>3308</private.port>
+				<test.username>
+					root
+				</test.username>
+				<test.password>
+				</test.password>
+				<database.username>
+					root
+				</database.username>
+				<database.password>
+					123456
+				</database.password>
+			</properties>
+		</profile>
+	</profiles>
 </project>
