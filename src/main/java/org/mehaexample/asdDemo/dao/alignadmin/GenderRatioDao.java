@@ -2,10 +2,10 @@ package org.mehaexample.asdDemo.dao.alignadmin;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.mehaexample.asdDemo.dao.alignprivate.StudentSessionFactory;
-import org.mehaexample.asdDemo.dao.alignprivate.StudentTestSessionFactory;
 import org.mehaexample.asdDemo.enums.Campus;
 import org.mehaexample.asdDemo.model.alignadmin.GenderRatio;
+import org.mehaexample.asdDemo.dao.alignprivate.StudentSessionFactory;
+import org.mehaexample.asdDemo.dao.alignprivate.StudentTestSessionFactory;
 
 import java.util.List;
 

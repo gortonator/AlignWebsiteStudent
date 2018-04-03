@@ -6,7 +6,6 @@ import java.util.*;
 
 import org.hibernate.HibernateException;
 import org.junit.*;
-import org.mehaexample.asdDemo.dao.alignprivate.*;
 import org.mehaexample.asdDemo.dao.alignpublic.MultipleValueAggregatedDataDao;
 import org.mehaexample.asdDemo.enums.Campus;
 import org.mehaexample.asdDemo.enums.DegreeCandidacy;
@@ -15,6 +14,7 @@ import org.mehaexample.asdDemo.enums.Gender;
 import org.mehaexample.asdDemo.enums.Term;
 import org.mehaexample.asdDemo.model.alignprivate.*;
 import org.mehaexample.asdDemo.model.alignpublic.MultipleValueAggregatedData;
+import org.mehaexample.asdDemo.dao.alignprivate.*;
 
 public class StudentsDaoTest {
   private static StudentsDao studentdao;

@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.hibernate.HibernateException;
 import org.junit.*;
-import org.mehaexample.asdDemo.dao.alignprivate.CoursesDao;
 import org.mehaexample.asdDemo.model.alignprivate.Courses;
+import org.mehaexample.asdDemo.dao.alignprivate.CoursesDao;
 
 public class CoursesDaoTest {
 

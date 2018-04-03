@@ -5,11 +5,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mehaexample.asdDemo.dao.alignprivate.PrivaciesDao;
-import org.mehaexample.asdDemo.dao.alignprivate.StudentsDao;
 import org.mehaexample.asdDemo.enums.*;
 import org.mehaexample.asdDemo.model.alignprivate.Privacies;
 import org.mehaexample.asdDemo.model.alignprivate.Students;
+import org.mehaexample.asdDemo.dao.alignprivate.PrivaciesDao;
+import org.mehaexample.asdDemo.dao.alignprivate.StudentsDao;
 
 import java.text.ParseException;
 

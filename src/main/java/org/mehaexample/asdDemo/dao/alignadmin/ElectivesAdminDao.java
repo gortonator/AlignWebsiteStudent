@@ -7,8 +7,8 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
-import org.mehaexample.asdDemo.dao.alignprivate.StudentsDao;
 import org.mehaexample.asdDemo.model.alignadmin.ElectivesAdmin;
+import org.mehaexample.asdDemo.dao.alignprivate.StudentsDao;
 
 public class ElectivesAdminDao {
   private SessionFactory factory;

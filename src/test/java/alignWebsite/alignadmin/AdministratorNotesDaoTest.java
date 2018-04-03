@@ -4,7 +4,6 @@ import org.hibernate.HibernateException;
 import org.junit.*;
 import org.mehaexample.asdDemo.dao.alignadmin.AdministratorNotesDao;
 import org.mehaexample.asdDemo.dao.alignadmin.AdministratorsDao;
-import org.mehaexample.asdDemo.dao.alignprivate.StudentsDao;
 import org.mehaexample.asdDemo.enums.Campus;
 import org.mehaexample.asdDemo.enums.DegreeCandidacy;
 import org.mehaexample.asdDemo.enums.EnrollmentStatus;
@@ -13,6 +12,7 @@ import org.mehaexample.asdDemo.enums.Term;
 import org.mehaexample.asdDemo.model.alignadmin.AdministratorNotes;
 import org.mehaexample.asdDemo.model.alignadmin.Administrators;
 import org.mehaexample.asdDemo.model.alignprivate.Students;
+import org.mehaexample.asdDemo.dao.alignprivate.StudentsDao;
 
 import java.util.List;
 
