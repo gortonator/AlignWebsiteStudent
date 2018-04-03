@@ -4,10 +4,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.mehaexample.asdDemo</groupId>
-    <artifactId>AlignWebsiteStudent</artifactId>
+    <artifactId>alignWebsiteStudent</artifactId>
     <packaging>war</packaging>
     <version>0.0.1-SNAPSHOT</version>
-    <name>AlignWebsiteStudent</name>
+    <name>alignWebsiteStudent</name>
 
     <build>
         <finalName>AlignWebsiteStudent</finalName>
