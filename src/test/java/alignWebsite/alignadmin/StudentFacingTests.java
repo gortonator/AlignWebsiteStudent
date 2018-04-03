@@ -1,5 +1,6 @@
-package alignWebsite.student.services;
+package alignWebsite.alignadmin;
 
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -10,11 +11,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mehaexample.asdDemo.alignWebsite.StudentFacing;
+import org.mehaexample.asdDemo.alignWebsite.StudentFacingService;
 import org.mehaexample.asdDemo.dao.alignprivate.CoursesDao;
 import org.mehaexample.asdDemo.dao.alignprivate.ElectivesDao;
 import org.mehaexample.asdDemo.dao.alignprivate.PrivaciesDao;
 import org.mehaexample.asdDemo.dao.alignprivate.ProjectsDao;
+import org.mehaexample.asdDemo.dao.alignprivate.StudentLoginsDao;
 import org.mehaexample.asdDemo.dao.alignprivate.StudentsDao;
 import org.mehaexample.asdDemo.dao.alignprivate.WorkExperiencesDao;
 import org.mehaexample.asdDemo.dao.alignpublic.UndergraduatesPublicDao;
@@ -26,9 +28,12 @@ import org.mehaexample.asdDemo.enums.Term;
 import org.mehaexample.asdDemo.model.alignprivate.ExtraExperiences;
 import org.mehaexample.asdDemo.model.alignprivate.Privacies;
 import org.mehaexample.asdDemo.model.alignprivate.Projects;
+import org.mehaexample.asdDemo.model.alignprivate.StudentLogins;
 import org.mehaexample.asdDemo.model.alignprivate.Students;
 import org.mehaexample.asdDemo.model.alignprivate.WorkExperiences;
 import org.mehaexample.asdDemo.restModels.EmailToRegister;
+import org.mehaexample.asdDemo.restModels.PasswordChangeObject;
+import org.mehaexample.asdDemo.restModels.PasswordResetObject;
 import org.mehaexample.asdDemo.restModels.StudentProfile;
 
 import junit.framework.Assert;
@@ -38,28 +43,28 @@ public class StudentFacingTests {
 	private static String ENDDATE = "2017-01-04";
 	private static String STARTDATE = "2018-01-04";
 
-	private static StudentFacing studentFacing;
+	private static StudentFacingService studentFacing;
 	private static StudentsDao studentsDao;
 	private static ElectivesDao electivesDao;
 	private static CoursesDao coursesDao;
 	private static WorkExperiencesDao workExperiencesDao;
 	private static PrivaciesDao privaciesDao;
 	private static ProjectsDao projectsDao;
-
-
+	private static StudentLoginsDao studentLoginsDao;
 
 	UndergraduatesPublicDao undergraduatesPublicDao = new UndergraduatesPublicDao(true);
 
 	@BeforeClass
 	public static void init() {
 		studentsDao = new StudentsDao();
-		studentFacing = new StudentFacing();
+		studentFacing = new StudentFacingService();
 		electivesDao = new ElectivesDao();
 		coursesDao = new CoursesDao();
 		workExperiencesDao = new WorkExperiencesDao();
 		studentsDao = new StudentsDao();
 		privaciesDao = new PrivaciesDao();
-		projectsDao = new ProjectsDao(true);
+		projectsDao = new ProjectsDao();
+		studentLoginsDao = new StudentLoginsDao();
 	}
 
 	@After
@@ -67,8 +72,6 @@ public class StudentFacingTests {
 		if (studentsDao.ifNuidExists("10101010")) {
 			studentsDao.deleteStudent("10101010");
 		}
-
-
 
 		Response res = studentFacing.getStudentProfile(NEUIDTEST);
 		StudentProfile profile = (StudentProfile) res.getEntity();
@@ -89,6 +92,7 @@ public class StudentFacingTests {
 		studentsDao.deleteStudent("0000000");
 		studentsDao.deleteStudent("1111111");
 		studentsDao.deleteStudent("2222222");
+		//		studentLoginsDao.deleteStudentLogin("tomcat@gmail.com");
 	}
 
 	@Before
@@ -109,6 +113,7 @@ public class StudentFacingTests {
 				Term.FALL, 2017,
 				EnrollmentStatus.DROPPED_OUT, Campus.CHARLOTTE, DegreeCandidacy.MASTERS, null, true);
 
+	
 		newStudent.setScholarship(true);
 		newStudent.setRace("White");
 		newStudent2.setRace("Black");
@@ -162,16 +167,6 @@ public class StudentFacingTests {
 
 	}	
 
-	@SuppressWarnings("unchecked")
-	@Test
-	public void getStudentProfileTest(){
-		Response studentProfileResponse = studentFacing.getStudentProfile(NEUIDTEST);
-		StudentProfile studentProfile = (StudentProfile) studentProfileResponse.getEntity();
-		Assert.assertEquals(studentProfile.getStudentRecord().getNeuId(), NEUIDTEST);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Test
 	public void updateStudentRecordTest(){
 		Students students = studentsDao.getStudentRecord(NEUIDTEST);
 		students.setCity("BOSTON");
@@ -182,7 +177,6 @@ public class StudentFacingTests {
 		Assert.assertEquals(students.getCity(), "BOSTON");
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void getStudentExtraExperienceTest(){
 		Response response = studentFacing.getStudentExtraExperience(NEUIDTEST);
@@ -208,7 +202,6 @@ public class StudentFacingTests {
 	//		Assert.assertEquals(extraExperiencesList.get(0).getCompanyName(), "New Company");
 	//	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void deleteExtraExperienceTest(){
 		Response response = studentFacing.getStudentExtraExperience(NEUIDTEST);
@@ -232,7 +225,6 @@ public class StudentFacingTests {
 	//
 	//	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void getStudentWorkExperiencesTest(){
 		Response response =  studentFacing.getStudentWorkExperiences(NEUIDTEST);
@@ -240,7 +232,6 @@ public class StudentFacingTests {
 		Assert.assertEquals(workExperiencesList.size(), 1);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void updateProjectTest(){
 		Response res = studentFacing.getStudentProfile(NEUIDTEST);
@@ -258,15 +249,13 @@ public class StudentFacingTests {
 		Assert.assertEquals(project.getProjectName(), "NewProject");
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void deleteExtsadraExperienceTestadsf(){
 
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
-	public void registerStudent3(){
+	public void sendRegistrationEmailTest1(){
 		EmailToRegister emailToRegister = new EmailToRegister("test.alignstudent1231@gmail.com");
 		Response res = studentFacing.sendRegistrationEmail(emailToRegister);
 
@@ -275,9 +264,8 @@ public class StudentFacingTests {
 		Assert.assertEquals("To Register should be an Align Student!" , response); 
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
-	public void registerStudent4(){
+	public void sendRegistrationEmailTest2(){
 		EmailToRegister emailToRegister = new EmailToRegister("");
 		Response res = studentFacing.sendRegistrationEmail(emailToRegister);
 
@@ -286,4 +274,105 @@ public class StudentFacingTests {
 		Assert.assertEquals("Email Id can't be null or empty" , response); 
 	}
 
+	@Test
+	public void sendRegistrationEmailTest3(){
+		EmailToRegister emailToRegister = new EmailToRegister("tomcat@gmail.com");
+		Response res = studentFacing.sendRegistrationEmail(emailToRegister);
+
+		String response = (String) res.getEntity();
+
+		Assert.assertEquals("Registration link sent succesfully to tomcat@gmail.com" , response); 
+	}
+
+	@Test
+	public void sendEmailForPasswordResetStudentTest1(){
+		
+		StudentLogins studentLogins = new StudentLogins("tomcat3@gmail.com",
+				"password",
+				"key",
+				Timestamp.valueOf("2017-09-23 10:10:10.0"),
+				Timestamp.valueOf("2017-09-23 10:10:10.0"),
+				true);
+		studentLoginsDao.createStudentLogin(studentLogins);
+
+		PasswordResetObject passwordResetObject = new PasswordResetObject("tomcat3@gmail.com");
+		
+		Response res = studentFacing.sendEmailForPasswordResetStudent(passwordResetObject);
+
+		String response = (String) res.getEntity();
+
+		Assert.assertEquals("Password Reset link sent succesfully!" , response); 
+		
+		studentLoginsDao.deleteStudentLogin("tomcat3@gmail.com");
+	}
+
+	@Test
+	public void sendEmailForPasswordResetStudentTest2(){
+		
+		StudentLogins studentLogins = new StudentLogins("tomcat3@gmail.com",
+				"password",
+				"key",
+				Timestamp.valueOf("2017-09-23 10:10:10.0"),
+				Timestamp.valueOf("2017-09-23 10:10:10.0"),
+				false);
+		studentLoginsDao.createStudentLogin(studentLogins);
+
+		PasswordResetObject passwordResetObject = new PasswordResetObject("tomcat3@gmail.com");
+		
+		Response res = studentFacing.sendEmailForPasswordResetStudent(passwordResetObject);
+
+		String response = (String) res.getEntity();
+
+		Assert.assertEquals("Password can't be reset....Please create password and register first: " , response); 
+		
+		studentLoginsDao.deleteStudentLogin("tomcat3@gmail.com");
+	}
+	
+	@Test
+	public void sendEmailForPasswordResetStudentTest3(){
+		
+		PasswordResetObject passwordResetObject = new PasswordResetObject(null);
+		
+		Response res = studentFacing.sendEmailForPasswordResetStudent(passwordResetObject);
+
+		String response = (String) res.getEntity();
+
+		Assert.assertEquals("Email Id can't be null" , response); 
+	}
+	
+	@Test
+	public void sendEmailForPasswordResetStudentTest4(){
+		
+		PasswordResetObject passwordResetObject = new PasswordResetObject("meha@gmail.com");
+		
+		Response res = studentFacing.sendEmailForPasswordResetStudent(passwordResetObject);
+
+		String response = (String) res.getEntity();
+
+		Assert.assertEquals("Email doesn't exist, Please enter a valid Email Id null" , response); 
+	}
+	
+	@Test
+	public void changeUserPassword1(){
+		
+		StudentLogins studentLogins = new StudentLogins("tomcat3@gmail.com",
+				"password",
+				"key",
+				Timestamp.valueOf("2017-09-23 10:10:10.0"),
+				Timestamp.valueOf("2017-09-23 10:10:10.0"),
+				true);
+		studentLoginsDao.createStudentLogin(studentLogins);
+		
+		System.out.println("password " + studentLogins.getStudentPassword()); 
+		
+		PasswordChangeObject passwordChangeObject = new PasswordChangeObject("tomcat3@gmail.com","password", "password1");
+		
+		Response res = studentFacing.changeUserPassword(passwordChangeObject);
+
+		String response = (String) res.getEntity();
+
+		Assert.assertEquals("Incorrect Password" , response); 
+		
+		studentLoginsDao.deleteStudentLogin("tomcat3@gmail.com");
+	}
 }

@@ -50,7 +50,7 @@ import org.mehaexample.asdDemo.utils.MailClient;
 import com.lambdaworks.crypto.SCryptUtil;
 
 @Path("")
-public class StudentFacing {
+public class StudentFacingService {
 	StudentsDao studentDao = new StudentsDao();
 	ElectivesDao electivesDao = new ElectivesDao();
 	CoursesDao coursesDao = new CoursesDao();
@@ -59,7 +59,10 @@ public class StudentFacing {
 	ProjectsDao projectsDao = new ProjectsDao();
 	StudentLoginsDao studentLoginsDao = new StudentLoginsDao(); 
 	private static String NUIDNOTFOUND = "No Student record exists with given ID"; 
+	private static String INCORRECTPASS = "Incorrect Password";
 
+	public StudentFacingService(){}
+	
 	/**
 	 * This function creates a new student record
 	 * 
@@ -553,7 +556,7 @@ public class StudentFacing {
 		} catch (Exception e){
 
 			return Response.status(Response.Status.UNAUTHORIZED).
-					entity("Incorrect Password").build();
+					entity(INCORRECTPASS).build();
 		}
 
 		if(matched){
@@ -590,7 +593,7 @@ public class StudentFacing {
 		}else{
 
 			return Response.status(Response.Status.UNAUTHORIZED).
-					entity("Incorrect Password").build();
+					entity(INCORRECTPASS).build();
 		}
 	}
 
@@ -834,7 +837,7 @@ public class StudentFacing {
 		} catch (Exception e){
 
 			return Response.status(Response.Status.UNAUTHORIZED).
-					entity("Incorrect Password").build();
+					entity(INCORRECTPASS).build();
 		}
 
 		// check if the entered old password is correct
@@ -868,7 +871,7 @@ public class StudentFacing {
 	@Path("/password-reset")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response sendEmailForPasswordResetStudent2(PasswordResetObject passwordResetObject){
+	public Response sendEmailForPasswordResetStudent(PasswordResetObject passwordResetObject){
 
 		String studentEmail = passwordResetObject.getEmail();
 
