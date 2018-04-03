@@ -13,7 +13,7 @@
         </property>
 
         <property name="hibernate.connection.url">
-            jdbc:mariadb://${test.ip}:${test.port}/AlignPublic
+            jdbc:mariadb://${test.ip}:${test.port}/AlignPublic7
         </property>
 
         <property name="hibernate.connection.username">

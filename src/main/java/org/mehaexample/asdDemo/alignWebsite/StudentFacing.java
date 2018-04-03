@@ -159,7 +159,7 @@ public class StudentFacing {
 		Students studentRecord = null;
 		if (!studentDao.ifNuidExists(nuid)) {
 
-			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
+			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND + ":" + nuid).build();
 		} else {
 			try{
 				studentRecord = studentDao.getStudentRecord(nuid);
