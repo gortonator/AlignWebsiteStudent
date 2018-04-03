@@ -1,5 +1,10 @@
 package alignWebsite.student.services;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+import javax.swing.Spring;
 import javax.ws.rs.core.Response;
 
 import org.junit.After;
@@ -14,12 +19,17 @@ import org.mehaexample.asdDemo.enums.DegreeCandidacy;
 import org.mehaexample.asdDemo.enums.EnrollmentStatus;
 import org.mehaexample.asdDemo.enums.Gender;
 import org.mehaexample.asdDemo.enums.Term;
+import org.mehaexample.asdDemo.model.alignprivate.ExtraExperiences;
 import org.mehaexample.asdDemo.model.alignprivate.Students;
 import org.mehaexample.asdDemo.restModels.EmailToRegister;
+import org.mehaexample.asdDemo.restModels.StudentProfile;
 
 import junit.framework.Assert;
 
 public class StudentFacingTests {
+	private static String NEUIDTEST = "0000000";
+	private static String ENDDATE = "2017-01-04";
+	private static String STARTDATE = "2018-01-04";
 
 	private static StudentFacing studentFacing;
 	private static StudentsDao studentsDao;
@@ -72,36 +82,57 @@ public class StudentFacingTests {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void studentCRUDServiceTest(){
-		// Step 1: Create a student
-		String email = "abc.def31@gmail.com";		
-		String nuid = "3121";
-
-		Students newStudent = new Students(nuid, email, "Tom", "",
-				"Cat", Gender.M, "F1", "1111111111",
-				"401 Terry Ave", "WA", "Seattle", "98109", Term.FALL, 2015,
-				Term.SPRING, 2017,
-				EnrollmentStatus.FULL_TIME, Campus.SEATTLE, DegreeCandidacy.MASTERS, null, true);
-
-		studentsDao.addStudent(newStudent);
-
-		// Step 2:1- Get the created Student
-		Response getStudent = studentFacing.getStudentRecord(nuid);
-		Students x = (Students) getStudent.getEntity();
-		System.out.println("x nuid=" + x.getNeuId());
-		Assert.assertEquals(x.getNeuId(), nuid);
-
-		// Step 2:2- Get the student profile
-		//		getStudentProfile
-
-		// Step 3: Update student
-
-		// Step 4: Get the updated student
-
-		// Step 5: now delete the student
-		Response deleteStudent = studentFacing.deleteStudentByNuid(nuid);
-		Assert.assertEquals("Student deleted successfully", deleteStudent.getEntity().toString());
+	public void getStudentProfileTest(){
+		Response studentProfileResponse = studentFacing.getStudentProfile(NEUIDTEST);
+		StudentProfile studentProfile = (StudentProfile) studentProfileResponse.getEntity();
+		Assert.assertEquals(studentProfile.getStudentRecord().getNeuId(), NEUIDTEST);
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void updateStudentRecordTest(){
+		Students students = studentsDao.getStudentRecord(NEUIDTEST);
+		students.setCity("BOSTON");
+		
+		studentFacing.updateStudentRecord(NEUIDTEST, students);
+		students = studentsDao.getStudentRecord(NEUIDTEST);
+		
+		Assert.assertEquals(students.getCity(), "BOSTON");
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void addExtraExperienceTest() throws Exception{
+		Students students = studentsDao.getStudentRecord(NEUIDTEST);
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd");
+		Date startdate = formatter.parse(STARTDATE);
+		Date enddate = formatter.parse(ENDDATE);
+		ExtraExperiences extraExperiences = new ExtraExperiences(NEUIDTEST, "companyName", startdate, 
+				enddate, "title", "description"	);
+		
+		studentFacing.addExtraExperience(NEUIDTEST, extraExperiences);
+		
+		// now get the profile
+		Response studentProfileResponse = studentFacing.getStudentProfile(NEUIDTEST);
+		StudentProfile studentProfile = (StudentProfile) studentProfileResponse.getEntity();
+		
+		Assert.assertEquals(studentProfile.getStudentRecord().getNeuId(), NEUIDTEST);
+		List<ExtraExperiences> ex = studentProfile.getExtraExperiences();
+		Assert.assertEquals(ex.size(), 1);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void updateStudentRecordTestd(){
+		
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void updateStudentRecdordTest(){
+		
+	}
+	
 
 	@SuppressWarnings("unchecked")
 	@Test

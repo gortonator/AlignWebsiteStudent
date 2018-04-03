@@ -76,7 +76,10 @@ public class SecureAuth implements ContainerRequestFilter{
 						if(studentLogins == null){
 							requestContext.abortWith(Response.status(Response.Status.NOT_ACCEPTABLE).
 									entity("Token not valid. Please login again.").build());
+							
+							return;
 						}
+						
 						String loginTime = studentLogins.getLoginTime().toString();
 						String expireTime = studentLogins.getKeyExpiration().toString();
 						Timestamp now = new Timestamp(System.currentTimeMillis());
