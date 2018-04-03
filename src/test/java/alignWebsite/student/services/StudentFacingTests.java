@@ -71,13 +71,11 @@ public class StudentFacingTests {
 
 
 		Response res = studentFacing.getStudentProfile(NEUIDTEST);
-		System.out.println("pppp==" + res.getEntity().toString());
 		StudentProfile profile = (StudentProfile) res.getEntity();
 		List<WorkExperiences> workExperiences = profile.getWorkExperiencesRecord();
 		List<Projects> projects= profile.getProjects();
 
 		workExperiencesDao.deleteWorkExperienceByNeuId(NEUIDTEST);
-		System.out.println("---" + projects.get(0).getProjectId());
 		projectsDao.deleteProjectById(projects.get(0).getProjectId());
 
 		// delete course and experience
@@ -162,7 +160,6 @@ public class StudentFacingTests {
 				dateFormat2.parse("2018-04-01"), "My Project");
 		projectsDao.createProject(project);
 
-		System.out.println(" ghdhyqfged" + project.getProjectId());
 	}	
 
 	@SuppressWarnings("unchecked")

@@ -218,7 +218,6 @@ public class PriorEducationsDaoTest {
     // create new work experience
     priorEducationsDao.createPriorEducation(newPriorEducation);
     PriorEducations foundPriorEducation = priorEducationsDao.getPriorEducationsByNeuId("111234567").get(0);
-    System.out.println(foundPriorEducation.getGpa());
     assertTrue(foundPriorEducation.getGpa() == 4.00f);
     assertTrue(foundPriorEducation.getInstitutionName().equals("Stanford University"));
 

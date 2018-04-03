@@ -507,7 +507,6 @@ public class StudentFacing {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addProject(@PathParam("nuId") String neuId, Projects project) throws ParseException {
-		System.out.println("begin");
 		if (!studentDao.ifNuidExists(neuId)) {
 
 			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
@@ -724,11 +723,9 @@ public class StudentFacing {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response createPassword(PasswordCreateObject passwordCreateObject){
-		System.out.println("hi1");
 		String email = passwordCreateObject.getEmail();
 		String password = passwordCreateObject.getPassword();
 		String registrationKey = passwordCreateObject.getRegistrationKey();
-		System.out.println(email + password + registrationKey); 
 
 		// before create password, a student login should exist
 		StudentLogins studentLoginsExisting = studentLoginsDao.findStudentLoginsByEmail(email);
@@ -741,21 +738,14 @@ public class StudentFacing {
 		String databaseRegistrationKey = studentLoginsExisting.getRegistrationKey();
 		Timestamp databaseTimestamp = studentLoginsExisting.getKeyExpiration();
 
-		System.out.println("hi2");
-
 		// check if the entered registration key matches 
 		if((databaseRegistrationKey.equals(registrationKey))){
-			System.out.println("hi3");
-
 			// if registration key matches, then check if its valid or not
 			Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
 
 			String successMessage = "Congratulations Password created and Student registered successfully!";
 
 			if(studentLoginsExisting.isConfirmed()){
-
-				System.out.println("hi4");
-
 				successMessage = "Password Reset successfully";
 			}
 
@@ -765,7 +755,6 @@ public class StudentFacing {
 				String setPassword = password+saltnewStr;
 				String hashedPassword = SCryptUtil.scrypt(setPassword, 16, 16, 16);
 
-				System.out.println("salt, setp, hash="+saltnewStr + ", " + setPassword+", "+hashedPassword);
 				studentLoginsExisting.setStudentPassword(hashedPassword);
 				studentLoginsExisting.setConfirmed(true);
 
@@ -824,7 +813,6 @@ public class StudentFacing {
 
 		String enteredNewPassword = passwordChangeObject.getNewPassword();
 
-		System.out.println("enterold,enternenew="+enteredOldPassword + ", " + enteredNewPassword);
 		if(enteredOldPassword.equals(enteredNewPassword)){
 
 			return Response.status(Response.Status.NOT_ACCEPTABLE).
@@ -836,8 +824,6 @@ public class StudentFacing {
 		String setPassword = enteredOldPassword + saltnewStr;
 
 		String convertOldPasswordToHash = SCryptUtil.scrypt(setPassword, 16, 16, 16);
-		System.out.println("salt, setPassword="+ saltnewStr +", " + setPassword);
-		System.out.println("convertOldPasswordToHash: " + convertOldPasswordToHash);
 
 		boolean matched = false;
 		try{
@@ -867,9 +853,6 @@ public class StudentFacing {
 			return Response.status(Response.Status.OK).
 					entity("Password Changed Succesfully!" ).build();
 		}else{
-			System.out.println("Old password from database: " + studentLogins.getStudentPassword()); 
-			System.out.println("Old password entered by user: " + convertOldPasswordToHash);
-
 			return Response.status(Response.Status.BAD_REQUEST).
 					entity("Incorrect old Password: ").build();
 		}
@@ -928,7 +911,6 @@ public class StudentFacing {
 			boolean studentLoginUpdated = studentLoginsDao.updateStudentLogin(studentLoginsNew);
 
 			if(studentLoginUpdated) {
-				System.out.println("Registration key: " + registrationKey);
 				// after generation, send email
 				MailClient.sendPasswordResetEmail(studentEmail, registrationKey);
 
