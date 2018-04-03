@@ -34,10 +34,11 @@ public class StudentFacingTests {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void registerStudent(){
-		String email = "abc.def31@gmail.com";
-		
+	public void studentCRUDServiceTest(){
+		// Step 1: Create a student
+		String email = "abc.def31@gmail.com";		
 		String nuid = "3121";
+		
 		Students newStudent = new Students(nuid, email, "Tom", "",
 				"Cat", Gender.M, "F1", "1111111111",
 				"401 Terry Ave", "WA", "Seattle", "98109", Term.FALL, 2015,
@@ -47,12 +48,17 @@ public class StudentFacingTests {
 		Response res = studentFacing.createStudent(newStudent);
 		Assert.assertEquals("Student created successfully", res.getEntity().toString());
 		
+		// Step 2: Get the created Student
 		Response getStudent = studentFacing.getStudentRecord(nuid);
 		Students x = (Students) getStudent.getEntity();
 		System.out.println("x nuid=" + x.getNeuId());
 		Assert.assertEquals(x.getNeuId(), nuid);
 		
-		// now delete the student
+		// Step 3: Update student
+		
+		// Step 4: Get the updated student
+		
+		// Step 5: now delete the student
 		Response deleteStudent = studentFacing.deleteStudentByNuid(nuid);
 		Assert.assertEquals("Student deleted successfully", deleteStudent.getEntity().toString());
 	}
@@ -79,14 +85,14 @@ public class StudentFacingTests {
 		Assert.assertEquals("Email Id can't be null or empty" , response); 
 	}
 
-	@SuppressWarnings("unchecked")
-	@Test
-	public void registerStudent5(){
-		EmailToRegister emailToRegister = new EmailToRegister("doe.j@husky.neu.edu");
-		Response res = studentFacing.sendRegistrationEmail(emailToRegister);
-
-		String response = (String) res.getEntity();
-
-		Assert.assertEquals("Student is Already Registered!doe.j@husky.neu.edu" , response); 
-	}
+//	@SuppressWarnings("unchecked")
+//	@Test
+//	public void registerStudent5(){
+//		EmailToRegister emailToRegister = new EmailToRegister("doe.j@husky.neu.edu");
+//		Response res = studentFacing.sendRegistrationEmail(emailToRegister);
+//
+//		String response = (String) res.getEntity();
+//
+//		Assert.assertEquals("Student is Already Registered!doe.j@husky.neu.edu" , response); 
+//	}
 }

@@ -2,7 +2,6 @@ package org.mehaexample.asdDemo.alignWebsite;
 
 import java.sql.Timestamp;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -41,16 +40,17 @@ import org.mehaexample.asdDemo.model.alignprivate.Projects;
 import org.mehaexample.asdDemo.model.alignprivate.StudentLogins;
 import org.mehaexample.asdDemo.model.alignprivate.Students;
 import org.mehaexample.asdDemo.model.alignprivate.WorkExperiences;
+import org.mehaexample.asdDemo.restModels.EmailToRegister;
 import org.mehaexample.asdDemo.restModels.PasswordChangeObject;
 import org.mehaexample.asdDemo.restModels.PasswordCreateObject;
 import org.mehaexample.asdDemo.restModels.PasswordResetObject;
+import org.mehaexample.asdDemo.restModels.StudentProfile;
 import org.mehaexample.asdDemo.utils.MailClient;
 import org.mehaexample.asdDemo.utils.StringUtils;
-import org.mehaexample.asdDemo.restModels.EmailToRegister;
 
 import com.lambdaworks.crypto.SCryptUtil;
 
-@Path("student-facing")
+@Path("")
 public class StudentFacing {
 	StudentsDao studentDao = new StudentsDao();
 	ElectivesDao electivesDao = new ElectivesDao();
@@ -59,61 +59,90 @@ public class StudentFacing {
 	ExtraExperiencesDao extraExperiencesDao = new ExtraExperiencesDao();
 	ProjectsDao projectsDao = new ProjectsDao();
 	StudentLoginsDao studentLoginsDao = new StudentLoginsDao(); 
-	String nuIdNotFound = "No Student record exists with given ID";
-	String workExperienceRecord = "WorkExperienceRecoed";
-	String studentData = "studentRecord";
-	String projectRecord = "ProjectRecord";
-	String extraExperienceRecord = "extraExperienceRecord";
+	private static String NUID_NOT_FOUND = "No Student record exists with given ID"; 
 
 	/**
 	 * This function creates a new student record
 	 * 
 	 * @param student
+	 * @return 200 Response if the student is created successfully
 	 */
 	@POST
 	@Path("students/{nuid}/add")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response createStudent(Students student){
-		System.out.println("saving student " + student.getFirstName() + ", " + student.getNeuId());
 		boolean exists = studentDao.ifNuidExists(student.getNeuId());
-		System.out.println("student exists = " + exists);
-		if(exists == false){			
-			studentDao.addStudent(student);
+		if(exists == false){
+			try{
+				studentDao.addStudent(student);
+			}catch(Exception ex){
+
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+						entity("Internal server Error: " + ex.toString()).build();
+			}
+
+			return Response.status(Response.Status.OK).entity("Student created successfully").build(); 
 		}else{
-			System.out.println("The entered NUID exists already");
+
 			return Response.status(Response.Status.BAD_REQUEST).entity("The entered NUID exists already").build(); 
 		}
-
-		return Response.status(Response.Status.OK).entity("Student created successfully").build(); 
 	}
-	
+
+	/**
+	 * This function deletes a student record for a given NeuId
+	 * 
+	 * @param nuid
+	 * @return 200 Response if the student record is deleted successfully
+	 */
 	@DELETE
 	@Path("deletestudent/{nuid}")
 	@Produces({ MediaType.APPLICATION_JSON})
 	public Response deleteStudentByNuid(@PathParam("nuid") String nuid)
 	{
-		System.out.println("nuid to be deleted is: " + nuid);
 		boolean exists = studentDao.ifNuidExists(nuid);
-		System.out.println("exists = " + exists);
-		if(exists == true){
+
+		if(exists == false){
+
+			return Response.status(Response.Status.BAD_REQUEST).entity("This nuid doesn't exist").build(); 	
+		}
+
+		try{
 			studentDao.deleteStudent(nuid);
 			return Response.status(Response.Status.OK).entity("Student deleted successfully").build(); 
-		}else{
-			System.out.println("This nuid doesn't exist");
-			return Response.status(Response.Status.BAD_REQUEST).entity("This nuid doesn't exist").build(); 
-		}
+		}catch(Exception ex){
+
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+					entity("Internal server Error: " + ex.toString()).build();
+		}		
 	} 
 
-	// Template method for fetching a student record by email
-	// http://localhost:8080/alignWebsite/webapi/studentresource/123
+	/**
+	 * This function gets the student by NeuId
+	 * 
+	 * @param nuid
+	 * @return 200 Response if the student is returned successfully 
+	 */
 	@GET
 	@Path("getstudents/{nuid}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getStudentRecord(@PathParam("nuid") String nuid){
-		System.out.println("getting student for nuid = " + nuid);
-		Students studentRecord = studentDao.getStudentRecord(nuid);
-		
-		return Response.status(Response.Status.OK).entity(studentRecord).build(); 
+	public Response getStudentRecord(@PathParam("nuid") String nuid) { 
+		boolean exists = studentDao.ifNuidExists(nuid);
+
+		if(exists == false){
+
+			return Response.status(Response.Status.BAD_REQUEST).entity("This nuid doesn't exist").build(); 	
+		}
+
+		try{
+			Students studentRecord = studentDao.getStudentRecord(nuid);
+
+			return Response.status(Response.Status.OK).entity(studentRecord).build(); 
+		}catch(Exception ex){
+
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+					entity("Internal server Error: " + ex.toString()).build();
+		}
+
 	}
 
 	/**
@@ -128,22 +157,32 @@ public class StudentFacing {
 	@Path("students/{nuid}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getStudentProfile(@PathParam("nuid") String nuid) {
-		System.out.println("getting student for nuid= " + nuid);
+		Students studentRecord = null;
 		if (!studentDao.ifNuidExists(nuid)) {
 
-			return Response.status(Response.Status.NOT_FOUND).entity(nuIdNotFound).build();
+			return Response.status(Response.Status.NOT_FOUND).entity(NUID_NOT_FOUND).build();
 		} else {
-			Students studentRecord = studentDao.getStudentRecord(nuid);
+			try{
+				studentRecord = studentDao.getStudentRecord(nuid);
+			}catch(Exception ex){
+
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+						entity("Internal server Error: " + ex.toString()).build();
+			}
+
+			if(studentRecord == null){
+
+				return Response.status(Response.Status.NOT_FOUND).entity(NUID_NOT_FOUND).build();
+			}
+
 			List<WorkExperiences> workExperiencesRecord = workExperiencesDao.getWorkExperiencesByNeuId(nuid);
 			List<Projects> projects = projectsDao.getProjectsByNeuId(nuid);
 			List<ExtraExperiences> extraExperiences = extraExperiencesDao.getExtraExperiencesByNeuId(nuid);
-			JSONObject jsonObj = new JSONObject(studentRecord);
-			jsonObj.put(studentData, studentRecord);
-			jsonObj.put(workExperienceRecord, workExperiencesRecord);
-			jsonObj.put(projectRecord, projects);
-			jsonObj.put("experience", extraExperiences);
 
-			return Response.status(Response.Status.OK).entity(jsonObj.toString()).build();
+			StudentProfile studentProfile = 
+					new StudentProfile(workExperiencesRecord, projects, extraExperiences, studentRecord);
+
+			return Response.status(Response.Status.OK).entity(studentProfile).build();
 		}
 	}
 
@@ -162,12 +201,16 @@ public class StudentFacing {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateStudentRecord(@PathParam("nuId") String neuId, Students student) {
 		if (!studentDao.ifNuidExists(neuId)) {
-
-			return Response.status(Response.Status.NOT_FOUND).entity(nuIdNotFound).build();
+			return Response.status(Response.Status.NOT_FOUND).entity(NUID_NOT_FOUND).build();
 		}
 
-		student.setNeuId(neuId);
-		studentDao.updateStudentRecord(student);
+		try{
+			studentDao.updateStudentRecord(student);
+		}catch(Exception ex){
+
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+					entity("Internal server Error: " + ex.toString()).build();
+		}
 
 		return Response.status(Response.Status.OK).entity("Student record updated successfully").build();
 	}
@@ -185,22 +228,16 @@ public class StudentFacing {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addExtraExperience(@PathParam("nuId") String neuId, ExtraExperiences extraExperiences) throws ParseException {
-		System.out.println("Extra experience " + extraExperiences); 
 		if (!studentDao.ifNuidExists(neuId)) {
-
-			return Response.status(Response.Status.NOT_FOUND).entity(nuIdNotFound).build();
+			return Response.status(Response.Status.NOT_FOUND).entity(NUID_NOT_FOUND).build();
 		}
-		extraExperiences = new ExtraExperiences();
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		try{
+			extraExperiencesDao.createExtraExperience(extraExperiences);
+		}catch(Exception ex){
 
-		extraExperiences.setExtraExperienceId(89);
-		extraExperiences.setNeuId(neuId);
-		extraExperiences.setCompanyName("zillow");
-		extraExperiences.setEndDate(dateFormat.parse("2017-06-01"));
-		extraExperiences.setStartDate(dateFormat.parse("2017-12-01"));
-		extraExperiences.setTitle("SDE");
-		extraExperiences.setDescription("intern");
-		extraExperiencesDao.createExtraExperience(extraExperiences);
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+					entity("Internal server Error: " + ex.toString()).build();
+		}
 
 		return Response.status(Response.Status.OK).entity("Experience added successfully").build();
 	}
@@ -217,25 +254,27 @@ public class StudentFacing {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateExtraExperience(@PathParam("nuId") String neuId, @PathParam("Id") Integer extraExperienceId) {
-		List<ExtraExperiences> extraExperiencesList;
 		if (!studentDao.ifNuidExists(neuId)) {
 
-			return Response.status(Response.Status.NOT_FOUND).entity(nuIdNotFound).build();
-		} else {
-			extraExperiencesList = extraExperiencesDao.getExtraExperiencesByNeuId(neuId);
-			for (int i = 0; i < extraExperiencesList.size(); i++) {
-				if (extraExperiencesList.get(i).getExtraExperienceId() == extraExperienceId) {
-					extraExperiencesDao.updateExtraExperience(extraExperiencesList.get(i));
+			return Response.status(Response.Status.NOT_FOUND).entity(NUID_NOT_FOUND).build();
+		} 
 
-					return Response.status(Response.Status.OK).entity("Experience updated successfully :)").build();
-				} else {
+		ExtraExperiences extraExperiences =  extraExperiencesDao.getExtraExperienceById(extraExperienceId);
+		if(extraExperiences == null){
 
-					return Response.status(Response.Status.NOT_FOUND).entity("No Experience record exists with given ID").build();
-				}
-			}
+			return Response.status(Response.Status.NOT_FOUND).
+					entity("No Extra Experience record exists for a given Id: " + extraExperienceId).build(); 
 		}
 
-		return Response.status(Response.Status.OK).entity("Experience updated successfully").build();
+		try{
+			extraExperiencesDao.updateExtraExperience(extraExperiences);
+		}catch(Exception ex){
+
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+					entity("Internal server Error: " + ex.toString()).build();
+		}
+
+		return Response.status(Response.Status.OK).entity("Experience updated successfully :)").build(); 
 	}
 
 	/**
@@ -253,14 +292,26 @@ public class StudentFacing {
 		List<ExtraExperiences> extraExperiencesList;
 		if (!studentDao.ifNuidExists(neuId)) {
 
-			return Response.status(Response.Status.NOT_FOUND).entity(nuIdNotFound).build();
-		} else {
-			extraExperiencesList = extraExperiencesDao.getExtraExperiencesByNeuId(neuId);
-		}
-		JSONObject jsonObj = new JSONObject(extraExperiencesList);
-		jsonObj.put(extraExperienceRecord, extraExperiencesList);
+			return Response.status(Response.Status.NOT_FOUND).entity(NUID_NOT_FOUND).build();
+		} 
 
-		return Response.status(Response.Status.OK).entity(jsonObj.toString()).build();
+		try{
+			extraExperiencesList = extraExperiencesDao.getExtraExperiencesByNeuId(neuId);
+
+		}catch(Exception ex){
+
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+					entity("Internal server Error: " + ex.toString()).build();
+		}
+
+		if(extraExperiencesList == null || extraExperiencesList.isEmpty()){
+
+			return Response.status(Response.Status.NOT_FOUND).
+					entity("No Extra Experience record exists for a given NeuId: " + neuId).build();
+
+		}
+
+		return Response.status(Response.Status.OK).entity(extraExperiencesList).build();
 	}
 
 	/**
@@ -275,22 +326,25 @@ public class StudentFacing {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteExtraExperience(@PathParam("nuId") String neuId, @PathParam("Id") Integer extraExperienceId) {
-		List<ExtraExperiences> extraExperiencesList;
+		ExtraExperiences extraExperiences = null;
 		if (!studentDao.ifNuidExists(neuId)) {
+			return Response.status(Response.Status.NOT_FOUND).entity(NUID_NOT_FOUND).build();
+		} 
+		extraExperiences = extraExperiencesDao.getExtraExperienceById(extraExperienceId);
 
-			return Response.status(Response.Status.NOT_FOUND).entity(nuIdNotFound).build();
-		} else {
-			extraExperiencesList = extraExperiencesDao.getExtraExperiencesByNeuId(neuId);
-			for (int i = 0; i < extraExperiencesList.size(); i++) {
-				if (extraExperiencesList.get(i).getExtraExperienceId() == extraExperienceId) {
-					extraExperiencesDao.deleteExtraExperienceById(extraExperienceId);
-					return Response.status(Response.Status.OK).entity("Experience deleted successfully").build();
-				} else {
+		if(extraExperiences == null){
 
-					return Response.status(Response.Status.NOT_FOUND).entity("No Experience record exists with given ID").build();
-				}
-			}
+			return Response.status(Response.Status.NOT_FOUND).entity("No Experience record exists with given ID").build();
 		}
+
+		try{
+			extraExperiencesDao.deleteExtraExperienceById(extraExperienceId);
+		}catch(Exception ex){
+
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+					entity("Internal server Error: " + ex.toString()).build();
+		}
+
 		return Response.status(Response.Status.OK).entity("Experience deleted successfully").build();
 	}
 
@@ -306,17 +360,29 @@ public class StudentFacing {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getStudentCourses(@PathParam("nuId") String neuId) {
 		ArrayList<String> courses = new ArrayList<>();
+		List<Electives> electives;
 		if (!studentDao.ifNuidExists(neuId)) {
+			return Response.status(Response.Status.NOT_FOUND).entity(NUID_NOT_FOUND).build();
+		} 
 
-			return Response.status(Response.Status.NOT_FOUND).entity(nuIdNotFound).build();
-		} else {
-			List<Electives> electives;
+		try{
 			electives = electivesDao.getElectivesByNeuId(neuId);
-			for (int i = 0; i < electives.size(); i++) {
-				Electives elective = electivesDao.getElectiveById(electives.get(i).getElectiveId());
-				Courses course = coursesDao.getCourseById(elective.getCourseId());
-				courses.add(course.getCourseName());
-			}
+		}catch(Exception ex){
+
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+					entity("Internal server Error: " + ex.toString()).build();
+		}
+
+		if(electives == null || electives.isEmpty()){
+
+			return Response.status(Response.Status.NOT_FOUND).
+					entity("No electives were found for the given NeuId").build();
+		}
+
+		for (int i = 0; i < electives.size(); i++) {
+			Electives elective = electivesDao.getElectiveById(electives.get(i).getElectiveId());
+			Courses course = coursesDao.getCourseById(elective.getCourseId());
+			courses.add(course.getCourseName());
 		}
 
 		return Response.status(Response.Status.OK).entity(courses).build();
@@ -333,18 +399,25 @@ public class StudentFacing {
 	@Path("/students/{nuId}/workexperiences")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getStudentWorkExperience(@PathParam("nuId") String neuId, Students student) {
-		List<WorkExperiences> workExperiencesList;
+	public Response getStudentWorkExperiences(@PathParam("nuId") String neuId) {
+		List<WorkExperiences> workExperiencesList = null;
 		if (!studentDao.ifNuidExists(neuId)) {
+			return Response.status(Response.Status.NOT_FOUND).entity(NUID_NOT_FOUND).build();
+		} 
 
-			return Response.status(Response.Status.NOT_FOUND).entity(nuIdNotFound).build();
-		} else {
+		try{
 			workExperiencesList = workExperiencesDao.getWorkExperiencesByNeuId(neuId);
-		}
-		JSONObject jsonObj = new JSONObject(workExperiencesList);
-		jsonObj.put(workExperienceRecord, workExperiencesList);
+		}catch(Exception ex){
 
-		return Response.status(Response.Status.OK).entity(jsonObj.toString()).build();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+					entity("Internal server Error: " + ex.toString()).build();
+		}
+		if(workExperiencesList == null || workExperiencesList.isEmpty()){
+
+			return  Response.status(Response.Status.NOT_FOUND).entity(NUID_NOT_FOUND).build();
+		}
+
+		return Response.status(Response.Status.OK).entity(workExperiencesList).build();
 	}
 
 	/**
@@ -357,26 +430,31 @@ public class StudentFacing {
 	@DELETE
 	@Path("/students/{nuId}/project/{Id}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteProject(@PathParam("nuId") String neuId, @PathParam("Id") Integer projectId) {
-		List<Projects> projectsList;
+	@Produces(MediaType.APPLICATION_JSON) 
+	public Response deleteProject(@PathParam("nuId") String neuId, @PathParam("Id") int projectId) {
+		Projects project = null;
 		if (!studentDao.ifNuidExists(neuId)) {
 
-			return Response.status(Response.Status.NOT_FOUND).entity(nuIdNotFound).build();
-		} else {
-			projectsList = projectsDao.getProjectsByNeuId(neuId);
-			for (int i = 0; i < projectsList.size(); i++) {
-				if (projectsList.get(i).getProjectId() == projectId) {
-					projectsDao.deleteProjectById(projectId);
-					return Response.status(Response.Status.OK).entity("Project deleted successfully").build();
-				} else {
-
-					return Response.status(Response.Status.NOT_FOUND).entity("No project record exists with given ID").build();
-				}
-			}
+			return Response.status(Response.Status.NOT_FOUND).entity(NUID_NOT_FOUND).build();
 		}
 
-		return Response.status(Response.Status.OK).entity("Project deleted successfully").build();
+		try{
+			project = projectsDao.getProjectById(projectId);
+
+		}catch(Exception ex){
+
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+					entity("Internal server Error: " + ex.toString()).build();
+		}
+
+		if(project == null){
+
+			return Response.status(Response.Status.NOT_FOUND).
+					entity("No project record exists with given ID: " + projectId).build();
+		}
+		projectsDao.deleteProjectById(projectId);
+
+		return Response.status(Response.Status.OK).entity("Project deleted successfully").build(); 
 	}
 
 	/**
@@ -390,26 +468,24 @@ public class StudentFacing {
 	@Path("/students/{nuId}/projects/{Id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response updateProject(@PathParam("nuId") String neuId, @PathParam("Id") Integer projectId) {
-		List<Projects> projectsList;
+	public Response updateProject(@PathParam("nuId") String neuId, @PathParam("Id") Integer projectId, Projects project) {
 		if (!studentDao.ifNuidExists(neuId)) {
 
-			return Response.status(Response.Status.NOT_FOUND).entity(nuIdNotFound).build();
+			return Response.status(Response.Status.NOT_FOUND).entity(NUID_NOT_FOUND).build();
 		} else {
-			projectsList = projectsDao.getProjectsByNeuId(neuId);
-			for (int i = 0; i < projectsList.size(); i++) {
-				if (projectsList.get(i).getProjectId() == projectId) {
-					projectsDao.updateProject(projectsList.get(i));
+			project = projectsDao.getProjectById(projectId);
 
-					return Response.status(Response.Status.OK).entity("Project updated successfully :)").build();
-				} else {
+			try{
+				projectsDao.updateProject(project);
 
-					return Response.status(Response.Status.NOT_FOUND).entity("No Project record exists with given ID").build();
-				}
+			}catch(Exception ex) {
+
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+						entity("Internal server Error: " + ex.toString()).build();
 			}
-		}
 
-		return Response.status(Response.Status.OK).entity("Project updated successfully").build();
+			return Response.status(Response.Status.OK).entity("Project updated successfully :)").build();
+		}
 	}
 
 	/**
@@ -425,19 +501,21 @@ public class StudentFacing {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addProject(@PathParam("nuId") String neuId, Projects project) throws ParseException {
+		System.out.println("begin");
 		if (!studentDao.ifNuidExists(neuId)) {
 
-			return Response.status(Response.Status.NOT_FOUND).entity(nuIdNotFound).build();
+			return Response.status(Response.Status.NOT_FOUND).entity(NUID_NOT_FOUND).build();
 		}
-		project = new Projects();
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		project.setProjectId(89);
+
 		project.setNeuId(neuId);
-		project.setProjectName("ASD align project");
-		project.setEndDate(dateFormat.parse("2017-06-01"));
-		project.setStartDate(dateFormat.parse("2017-12-01"));
-		project.setDescription("align website backend team");
-		projectsDao.createProject(project);
+
+		try{
+			projectsDao.createProject(project);
+		}catch(Exception ex) {
+
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+					entity("Internal server Error: " + ex.toString()).build();
+		}
 
 		return Response.status(Response.Status.OK).entity("Project added successfully").build();
 	}
