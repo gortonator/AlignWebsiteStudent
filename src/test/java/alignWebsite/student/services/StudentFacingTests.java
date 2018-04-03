@@ -14,6 +14,7 @@ import org.mehaexample.asdDemo.alignWebsite.StudentFacing;
 import org.mehaexample.asdDemo.dao.alignprivate.CoursesDao;
 import org.mehaexample.asdDemo.dao.alignprivate.ElectivesDao;
 import org.mehaexample.asdDemo.dao.alignprivate.PrivaciesDao;
+import org.mehaexample.asdDemo.dao.alignprivate.ProjectsDao;
 import org.mehaexample.asdDemo.dao.alignprivate.StudentsDao;
 import org.mehaexample.asdDemo.dao.alignprivate.WorkExperiencesDao;
 import org.mehaexample.asdDemo.dao.alignpublic.UndergraduatesPublicDao;
@@ -24,6 +25,7 @@ import org.mehaexample.asdDemo.enums.Gender;
 import org.mehaexample.asdDemo.enums.Term;
 import org.mehaexample.asdDemo.model.alignprivate.ExtraExperiences;
 import org.mehaexample.asdDemo.model.alignprivate.Privacies;
+import org.mehaexample.asdDemo.model.alignprivate.Projects;
 import org.mehaexample.asdDemo.model.alignprivate.Students;
 import org.mehaexample.asdDemo.model.alignprivate.WorkExperiences;
 import org.mehaexample.asdDemo.restModels.EmailToRegister;
@@ -42,6 +44,9 @@ public class StudentFacingTests {
 	private static CoursesDao coursesDao;
 	private static WorkExperiencesDao workExperiencesDao;
 	private static PrivaciesDao privaciesDao;
+	private static ProjectsDao projectsDao;
+
+
 
 	UndergraduatesPublicDao undergraduatesPublicDao = new UndergraduatesPublicDao(true);
 
@@ -52,8 +57,9 @@ public class StudentFacingTests {
 		electivesDao = new ElectivesDao();
 		coursesDao = new CoursesDao();
 		workExperiencesDao = new WorkExperiencesDao();
-	    studentsDao = new StudentsDao();
-	    privaciesDao = new PrivaciesDao();
+		studentsDao = new StudentsDao();
+		privaciesDao = new PrivaciesDao();
+		projectsDao = new ProjectsDao(true);
 	}
 
 	@After
@@ -62,11 +68,18 @@ public class StudentFacingTests {
 			studentsDao.deleteStudent("10101010");
 		}
 
-		studentsDao.deleteStudent("0000000");
-		studentsDao.deleteStudent("1111111");
-		studentsDao.deleteStudent("2222222");
+
+
+		Response res = studentFacing.getStudentProfile(NEUIDTEST);
+		System.out.println("pppp==" + res.getEntity().toString());
+		StudentProfile profile = (StudentProfile) res.getEntity();
+		List<WorkExperiences> workExperiences = profile.getWorkExperiencesRecord();
+		List<Projects> projects= profile.getProjects();
 
 		workExperiencesDao.deleteWorkExperienceByNeuId(NEUIDTEST);
+		System.out.println("---" + projects.get(0).getProjectId());
+		projectsDao.deleteProjectById(projects.get(0).getProjectId());
+
 		// delete course and experience
 		//		Response response = studentFacing.getStudentExtraExperience(NEUIDTEST);
 		//		List<ExtraExperiences> extraExperiencesList = (List<ExtraExperiences>) response.getEntity(); 
@@ -74,6 +87,10 @@ public class StudentFacingTests {
 		//
 		//		electivesDao.deleteElectiveRecord(100);
 		//		coursesDao.deleteCourseById("100");
+
+		studentsDao.deleteStudent("0000000");
+		studentsDao.deleteStudent("1111111");
+		studentsDao.deleteStudent("2222222");
 	}
 
 	@Before
@@ -139,6 +156,13 @@ public class StudentFacingTests {
 		newWorkExperience.setNeuId(NEUIDTEST);
 		newWorkExperience.setCompanyName("Amazon");
 		workExperiencesDao.createWorkExperience(newWorkExperience);
+
+		SimpleDateFormat dateFormat2 = new SimpleDateFormat("yyyy-MM-dd");
+		Projects project = new Projects(NEUIDTEST, "Student Website", dateFormat2.parse("2018-01-01"),
+				dateFormat2.parse("2018-04-01"), "My Project");
+		projectsDao.createProject(project);
+
+		System.out.println(" ghdhyqfged" + project.getProjectId());
 	}	
 
 	@SuppressWarnings("unchecked")
@@ -214,15 +238,27 @@ public class StudentFacingTests {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void getStudentWorkExperiencesTest(){
-		 Response response =  studentFacing.getStudentWorkExperiences(NEUIDTEST);
-		 List<WorkExperiences> workExperiencesList = (List<WorkExperiences>) response.getEntity();
-		 Assert.assertEquals(workExperiencesList.size(), 1);
+		Response response =  studentFacing.getStudentWorkExperiences(NEUIDTEST);
+		List<WorkExperiences> workExperiencesList = (List<WorkExperiences>) response.getEntity();
+		Assert.assertEquals(workExperiencesList.size(), 1);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void deleteExtraExperiencasdkjeTestadsf(){
+	public void updateProjectTest(){
+		Response res = studentFacing.getStudentProfile(NEUIDTEST);
+		StudentProfile profile = (StudentProfile) res.getEntity();
+		Projects project = profile.getProjects().get(0);
 
+		project.setProjectName("NewProject"); 
+		Response response =  studentFacing.updateProject(NEUIDTEST, project.getProjectId(), project);
+
+		// get the project again
+		res = studentFacing.getStudentProfile(NEUIDTEST);
+		profile = (StudentProfile) res.getEntity();
+		project = profile.getProjects().get(0);
+
+		Assert.assertEquals(project.getProjectName(), "NewProject");
 	}
 
 	@SuppressWarnings("unchecked")
