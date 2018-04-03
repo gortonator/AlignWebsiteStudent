@@ -4,7 +4,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import javax.swing.Spring;
 import javax.ws.rs.core.Response;
 
 import org.junit.After;
@@ -12,7 +11,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mehaexample.asdDemo.alignWebsite.StudentFacing;
+import org.mehaexample.asdDemo.dao.alignprivate.CoursesDao;
+import org.mehaexample.asdDemo.dao.alignprivate.ElectivesDao;
+import org.mehaexample.asdDemo.dao.alignprivate.PrivaciesDao;
 import org.mehaexample.asdDemo.dao.alignprivate.StudentsDao;
+import org.mehaexample.asdDemo.dao.alignprivate.WorkExperiencesDao;
 import org.mehaexample.asdDemo.dao.alignpublic.UndergraduatesPublicDao;
 import org.mehaexample.asdDemo.enums.Campus;
 import org.mehaexample.asdDemo.enums.DegreeCandidacy;
@@ -20,7 +23,9 @@ import org.mehaexample.asdDemo.enums.EnrollmentStatus;
 import org.mehaexample.asdDemo.enums.Gender;
 import org.mehaexample.asdDemo.enums.Term;
 import org.mehaexample.asdDemo.model.alignprivate.ExtraExperiences;
+import org.mehaexample.asdDemo.model.alignprivate.Privacies;
 import org.mehaexample.asdDemo.model.alignprivate.Students;
+import org.mehaexample.asdDemo.model.alignprivate.WorkExperiences;
 import org.mehaexample.asdDemo.restModels.EmailToRegister;
 import org.mehaexample.asdDemo.restModels.StudentProfile;
 
@@ -33,12 +38,22 @@ public class StudentFacingTests {
 
 	private static StudentFacing studentFacing;
 	private static StudentsDao studentsDao;
+	private static ElectivesDao electivesDao;
+	private static CoursesDao coursesDao;
+	private static WorkExperiencesDao workExperiencesDao;
+	private static PrivaciesDao privaciesDao;
+
 	UndergraduatesPublicDao undergraduatesPublicDao = new UndergraduatesPublicDao(true);
 
 	@BeforeClass
 	public static void init() {
 		studentsDao = new StudentsDao();
 		studentFacing = new StudentFacing();
+		electivesDao = new ElectivesDao();
+		coursesDao = new CoursesDao();
+		workExperiencesDao = new WorkExperiencesDao();
+	    studentsDao = new StudentsDao();
+	    privaciesDao = new PrivaciesDao();
 	}
 
 	@After
@@ -50,10 +65,19 @@ public class StudentFacingTests {
 		studentsDao.deleteStudent("0000000");
 		studentsDao.deleteStudent("1111111");
 		studentsDao.deleteStudent("2222222");
+
+		workExperiencesDao.deleteWorkExperienceByNeuId(NEUIDTEST);
+		// delete course and experience
+		//		Response response = studentFacing.getStudentExtraExperience(NEUIDTEST);
+		//		List<ExtraExperiences> extraExperiencesList = (List<ExtraExperiences>) response.getEntity(); 
+		//		studentFacing.deleteExtraExperience(NEUIDTEST, extraExperiencesList.get(0).getExtraExperienceId());
+		//
+		//		electivesDao.deleteElectiveRecord(100);
+		//		coursesDao.deleteCourseById("100");
 	}
 
 	@Before
-	public void setupAddRecords() {
+	public void setupAddRecords()throws Exception {
 		Students newStudent = new Students("0000000", "tomcat@gmail.com", "Tom", "",
 				"Cat", Gender.M, "F1", "1111111111",
 				"401 Terry Ave", "WA", "Seattle", "98109", Term.FALL, 2015,
@@ -78,6 +102,43 @@ public class StudentFacingTests {
 		studentsDao.addStudent(newStudent);
 		studentsDao.addStudent(newStudent2);
 		studentsDao.addStudent(newStudent3);
+
+		// Adding experience
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd");
+		Date startdate = formatter.parse(STARTDATE);
+		Date enddate = formatter.parse(ENDDATE);
+		ExtraExperiences extraExperiences = new ExtraExperiences(NEUIDTEST, "companyName", startdate, 
+				enddate, "title", "description"	);
+
+		studentFacing.addExtraExperience(NEUIDTEST, extraExperiences);
+
+		// Add courses
+		//		Courses newCourse = new Courses("100", "course2", "course description 2");
+		//		Electives elective = new Electives();
+		//		elective.setNeuId(NEUIDTEST);
+		//		elective.setElectiveId(100);
+		//		elective.setCourseId(newCourse.getCourseId());
+		//
+		//		coursesDao.createCourse(newCourse);
+		//		electivesDao.addElective(elective);
+
+		Privacies privacy = new Privacies();
+		privacy.setNeuId(NEUIDTEST);
+		privacy.setPublicId(studentsDao.getStudentRecord(NEUIDTEST).getPublicId());
+		privacy.setCoop(true);
+		privaciesDao.createPrivacy(privacy);
+
+		WorkExperiences newWorkExperience = new WorkExperiences();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		newWorkExperience.setStartDate(dateFormat.parse("2017-06-01"));
+		newWorkExperience.setEndDate(dateFormat.parse("2017-12-01"));
+		newWorkExperience.setCurrentJob(false);
+		newWorkExperience.setCoop(true);
+		newWorkExperience.setTitle("Title");
+		newWorkExperience.setDescription("Description");
+		newWorkExperience.setNeuId(NEUIDTEST);
+		newWorkExperience.setCompanyName("Amazon");
+		workExperiencesDao.createWorkExperience(newWorkExperience);
 	}	
 
 	@SuppressWarnings("unchecked")
@@ -87,52 +148,88 @@ public class StudentFacingTests {
 		StudentProfile studentProfile = (StudentProfile) studentProfileResponse.getEntity();
 		Assert.assertEquals(studentProfile.getStudentRecord().getNeuId(), NEUIDTEST);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Test
 	public void updateStudentRecordTest(){
 		Students students = studentsDao.getStudentRecord(NEUIDTEST);
 		students.setCity("BOSTON");
-		
+
 		studentFacing.updateStudentRecord(NEUIDTEST, students);
 		students = studentsDao.getStudentRecord(NEUIDTEST);
-		
+
 		Assert.assertEquals(students.getCity(), "BOSTON");
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Test
-	public void addExtraExperienceTest() throws Exception{
-		Students students = studentsDao.getStudentRecord(NEUIDTEST);
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd");
-		Date startdate = formatter.parse(STARTDATE);
-		Date enddate = formatter.parse(ENDDATE);
-		ExtraExperiences extraExperiences = new ExtraExperiences(NEUIDTEST, "companyName", startdate, 
-				enddate, "title", "description"	);
-		
-		studentFacing.addExtraExperience(NEUIDTEST, extraExperiences);
-		
-		// now get the profile
-		Response studentProfileResponse = studentFacing.getStudentProfile(NEUIDTEST);
-		StudentProfile studentProfile = (StudentProfile) studentProfileResponse.getEntity();
-		
-		Assert.assertEquals(studentProfile.getStudentRecord().getNeuId(), NEUIDTEST);
-		List<ExtraExperiences> ex = studentProfile.getExtraExperiences();
-		Assert.assertEquals(ex.size(), 1);
+	public void getStudentExtraExperienceTest(){
+		Response response = studentFacing.getStudentExtraExperience(NEUIDTEST);
+		List<ExtraExperiences> extraExperiencesList = (List<ExtraExperiences>) response.getEntity();
+
+		Assert.assertEquals(extraExperiencesList.size(), 1);	
 	}
-	
+
+	//	@SuppressWarnings("unchecked")
+	//	@Test
+	//	public void updateExtraExperienceTest(){
+	//		Response response = studentFacing.getStudentExtraExperience(NEUIDTEST);
+	//		List<ExtraExperiences> extraExperiencesList = (List<ExtraExperiences>) response.getEntity();
+	//
+	//		Assert.assertEquals(extraExperiencesList.size(), 1);	
+	//
+	//		extraExperiencesList.get(0).setCompanyName("New Company");
+	//		System.out.println(	"com:"+	extraExperiencesList.get(0).getExtraExperienceId());
+	//		studentFacing.updateExtraExperience(NEUIDTEST, extraExperiencesList.get(0).getExtraExperienceId());
+	//
+	//		response = studentFacing.getStudentExtraExperience(NEUIDTEST);
+	//		extraExperiencesList = (List<ExtraExperiences>) response.getEntity();
+	//		Assert.assertEquals(extraExperiencesList.get(0).getCompanyName(), "New Company");
+	//	}
+
 	@SuppressWarnings("unchecked")
 	@Test
-	public void updateStudentRecordTestd(){
-		
+	public void deleteExtraExperienceTest(){
+		Response response = studentFacing.getStudentExtraExperience(NEUIDTEST);
+		List<ExtraExperiences> extraExperiencesList = (List<ExtraExperiences>) response.getEntity();
+
+		Assert.assertEquals(extraExperiencesList.size(), 1);
+
+		response = studentFacing.deleteExtraExperience
+				(NEUIDTEST, extraExperiencesList.get(0).getExtraExperienceId());
+
+		Assert.assertEquals(response.getEntity().toString(), "Experience deleted successfully");
 	}
-	
+
+	//	@SuppressWarnings("unchecked")
+	//	@Test
+	//	public void getStudentCoursesTest(){
+	//		Response response = studentFacing.getStudentCourses(NEUIDTEST);
+	//		ArrayList<String> courses = (ArrayList<String>) response.getEntity();
+	//
+	//		Assert.assertEquals(courses.size(), 1);
+	//
+	//	}
+
 	@SuppressWarnings("unchecked")
 	@Test
-	public void updateStudentRecdordTest(){
-		
+	public void getStudentWorkExperiencesTest(){
+		 Response response =  studentFacing.getStudentWorkExperiences(NEUIDTEST);
+		 List<WorkExperiences> workExperiencesList = (List<WorkExperiences>) response.getEntity();
+		 Assert.assertEquals(workExperiencesList.size(), 1);
 	}
-	
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void deleteExtraExperiencasdkjeTestadsf(){
+
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void deleteExtsadraExperienceTestadsf(){
+
+	}
 
 	@SuppressWarnings("unchecked")
 	@Test
