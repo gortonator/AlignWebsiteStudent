@@ -13,7 +13,7 @@
         </property>
 
         <property name="hibernate.connection.url">
-            jdbc:mariadb://${test.ip}:${test.port}/AlignAdmin
+            jdbc:mariadb://${test.ip}:${test.port}/AlignAdmin?autoReconnect=true
         </property>
 
         <property name="hibernate.connection.username">
@@ -23,6 +23,12 @@
         <property name="hibernate.connection.password">
             ${test.password}
         </property>
+
+        <property name="hibernate.c3p0.min_size">5</property>
+        <property name="hibernate.c3p0.max_size">20</property>
+        <property name="hibernate.c3p0.timeout">300</property>
+        <property name="hibernate.c3p0.max_statements">50</property>
+        <property name="hibernate.c3p0.idle_test_period">3000</property>
 
         <!-- List of XML mapping files -->
         <mapping resource="ElectivesAdmin.hbm.xml"/>
