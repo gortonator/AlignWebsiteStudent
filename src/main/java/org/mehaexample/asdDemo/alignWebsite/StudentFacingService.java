@@ -125,35 +125,6 @@ public class StudentFacingService {
 	} 
 
 	/**
-	 * This function gets the student by NeuId
-	 * 
-	 * @param nuid
-	 * @return 200 Response if the student is returned successfully 
-	 */
-	@GET
-	@Path("getstudents/{nuid}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getStudentRecord(@PathParam("nuid") String nuid) { 
-		boolean exists = studentDao.ifNuidExists(nuid);
-
-		if(!exists){
-
-			return Response.status(Response.Status.BAD_REQUEST).entity("This nuid doesn't exist").build(); 	
-		}
-
-		try{
-			Students studentRecord = studentDao.getStudentRecord(nuid);
-
-			return Response.status(Response.Status.OK).entity(studentRecord).build(); 
-		}catch(Exception ex){
-
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
-					entity(ex).build();
-		}
-
-	}
-
-	/**
 	 * This function gets the student details by NUID
 	 * 
 	 * http://localhost:8080/student-facing-align-website/webapi/student-facing/students/001234123
@@ -166,32 +137,95 @@ public class StudentFacingService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getStudentProfile(@PathParam("nuid") String nuid) {
 		Students studentRecord = null;
+		Privacies privacy = null;
 		if (!studentDao.ifNuidExists(nuid)) {
 
 			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND + ":" + nuid).build();
-		} else {
-			try{
-				studentRecord = studentDao.getStudentRecord(nuid);
-			}catch(Exception ex){
+		} 
 
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
-						entity(ex).build();
-			}
+		try{
+			studentRecord = studentDao.getStudentRecord(nuid);
+		}catch(Exception ex){
 
-			if(studentRecord == null){
-
-				return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
-			}
-
-			List<WorkExperiences> workExperiencesRecord = workExperiencesDao.getWorkExperiencesByNeuId(nuid);
-			List<Projects> projects = projectsDao.getProjectsByNeuId(nuid);
-			List<ExtraExperiences> extraExperiences = extraExperiencesDao.getExtraExperiencesByNeuId(nuid);
-
-			StudentProfile studentProfile = 
-					new StudentProfile(workExperiencesRecord, projects, extraExperiences, studentRecord);
-
-			return Response.status(Response.Status.OK).entity(studentProfile).build();
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+					entity(ex).build();
 		}
+
+		if(studentRecord == null){
+
+			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
+		}
+
+		try{
+			privacy = privaciesDao.getPrivacyByNeuId(nuid);
+		}catch(Exception ex) {
+
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+					entity(ex).build();
+		}
+
+		if(privacy == null){
+
+			return Response.status(Response.Status.NOT_FOUND).
+					entity("Privacy setting not found for the given student").build();
+		}
+
+		List<WorkExperiences> workExperiencesRecord = workExperiencesDao.getWorkExperiencesByNeuId(nuid);
+		List<Projects> projects = projectsDao.getProjectsByNeuId(nuid);
+		List<ExtraExperiences> extraExperiences = extraExperiencesDao.getExtraExperiencesByNeuId(nuid);
+		List<Courses> courses = new ArrayList<>(); 
+		List<Electives> electives = electivesDao.getElectivesByNeuId(nuid);
+
+		for (int i = 0; i < electives.size(); i++) {
+			Electives elective = electivesDao.getElectiveById(electives.get(i).getElectiveId());
+			Courses course = coursesDao.getCourseById(elective.getCourseId());
+			courses.add(course);
+		}
+
+		StudentProfile studentProfile = 
+				new StudentProfile(workExperiencesRecord, projects, extraExperiences, courses, studentRecord, privacy);
+
+		return Response.status(Response.Status.OK).entity(studentProfile).build();
+	}
+
+	/**
+	 * This function get the courses taken by a student 
+	 * 
+	 * @param neuId
+	 * @return 200 if all the student courses are returned successfully 
+	 */
+	@GET
+	@Path("/students/{nuId}/courses")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getStudentCourses(@PathParam("nuId") String neuId) {
+		ArrayList<String> courses = new ArrayList<>();
+		List<Electives> electives;
+		if (!studentDao.ifNuidExists(neuId)) {
+			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
+		} 
+
+		try{
+			electives = electivesDao.getElectivesByNeuId(neuId);
+		}catch(Exception ex){
+
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+					entity(ex).build();
+		}
+
+		if(electives == null || electives.isEmpty()){
+
+			return Response.status(Response.Status.NOT_FOUND).
+					entity("No electives were found for the given NeuId").build();
+		}
+
+		for (int i = 0; i < electives.size(); i++) {
+			Electives elective = electivesDao.getElectiveById(electives.get(i).getElectiveId());
+			Courses course = coursesDao.getCourseById(elective.getCourseId());
+			courses.add(course.getCourseName());
+		}
+
+		return Response.status(Response.Status.OK).entity(courses).build();
 	}
 
 	/**
@@ -359,45 +393,7 @@ public class StudentFacingService {
 		return Response.status(Response.Status.OK).entity("Experience deleted successfully").build();
 	}
 
-	/**
-	 * This function get the courses taken by a student 
-	 * 
-	 * @param neuId
-	 * @return 200 if all the student courses are returned successfully 
-	 */
-	@GET
-	@Path("/students/{nuId}/courses")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getStudentCourses(@PathParam("nuId") String neuId) {
-		ArrayList<String> courses = new ArrayList<>();
-		List<Electives> electives;
-		if (!studentDao.ifNuidExists(neuId)) {
-			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
-		} 
 
-		try{
-			electives = electivesDao.getElectivesByNeuId(neuId);
-		}catch(Exception ex){
-
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
-					entity(ex).build();
-		}
-
-		if(electives == null || electives.isEmpty()){
-
-			return Response.status(Response.Status.NOT_FOUND).
-					entity("No electives were found for the given NeuId").build();
-		}
-
-		for (int i = 0; i < electives.size(); i++) {
-			Electives elective = electivesDao.getElectiveById(electives.get(i).getElectiveId());
-			Courses course = coursesDao.getCourseById(elective.getCourseId());
-			courses.add(course.getCourseName());
-		}
-
-		return Response.status(Response.Status.OK).entity(courses).build();
-	}
 
 	/**
 	 * This function gets all the Work Experiences for a student
