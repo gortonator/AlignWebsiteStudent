@@ -137,7 +137,7 @@ public class StudentFacingService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getStudentProfile(@PathParam("nuid") String nuid) {
 		Students studentRecord = null;
-		Privacies privacy = null;
+		Privacies privacies = null;
 		if (!studentDao.ifNuidExists(nuid)) {
 
 			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND + ":" + nuid).build();
@@ -157,14 +157,14 @@ public class StudentFacingService {
 		}
 
 		try{
-			privacy = privaciesDao.getPrivacyByNeuId(nuid);
+			privacies = privaciesDao.getPrivacyByNeuId(nuid);
 		}catch(Exception ex) {
 
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
 					entity(ex).build();
 		}
 
-		if(privacy == null){
+		if(privacies == null){
 
 			return Response.status(Response.Status.NOT_FOUND).
 					entity("Privacy setting not found for the given student").build();
@@ -183,7 +183,7 @@ public class StudentFacingService {
 		}
 
 		StudentProfile studentProfile = 
-				new StudentProfile(workExperiencesRecord, projects, extraExperiences, courses, studentRecord, privacy);
+				new StudentProfile(workExperiencesRecord, projects, extraExperiences, courses, studentRecord, privacies);
 
 		return Response.status(Response.Status.OK).entity(studentProfile).build();
 	}
@@ -242,7 +242,10 @@ public class StudentFacingService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateStudentRecord(@PathParam("nuId") String neuId, Students student) {
+		student.setNeuId(neuId);
+
 		if (!studentDao.ifNuidExists(neuId)) {
+			System.out.println("not found "+ neuId);
 			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
 		}
 
@@ -272,6 +275,8 @@ public class StudentFacingService {
 	// check  throws ParseException
 	public Response addExtraExperience(@PathParam("nuId") String neuId, ExtraExperiences extraExperiences) {
 		ExtraExperiences experiences = null;
+		System.out.println("date : " + extraExperiences.getStartDate());
+
 		if (!studentDao.ifNuidExists(neuId)) {
 			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
 		}
@@ -330,8 +335,7 @@ public class StudentFacingService {
 	 * @return 200 response if all the Extra Experiences retrieved successfully 
 	 */
 	@GET
-	@Path("/students/{nuId}/extraexperiences")
-	@Consumes(MediaType.APPLICATION_JSON)
+	@Path("/students/{nuId}/extraexperiences") 
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getStudentExtraExperience(@PathParam("nuId") String neuId) {
 		List<ExtraExperiences> extraExperiencesList;
@@ -342,7 +346,6 @@ public class StudentFacingService {
 
 		try{
 			extraExperiencesList = extraExperiencesDao.getExtraExperiencesByNeuId(neuId);
-
 		}catch(Exception ex){
 
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
@@ -404,7 +407,6 @@ public class StudentFacingService {
 	 */
 	@GET
 	@Path("/students/{nuId}/workexperiences")
-	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getStudentWorkExperiences(@PathParam("nuId") String neuId) {
 		List<WorkExperiences> workExperiencesList = null;
@@ -1038,7 +1040,7 @@ public class StudentFacingService {
 					entity(ex).build();
 		}
 
-		return Response.status(Response.Status.OK).entity("Privacies updated successfully :").build(); 
+		return Response.status(Response.Status.OK).build(); 
 	}
 
 	//	/**

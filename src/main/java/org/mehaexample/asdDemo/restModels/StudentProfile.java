@@ -15,29 +15,29 @@ public class StudentProfile {
 	private List<ExtraExperiences> extraExperiences;
 	private List<Courses> courses;
 	private Students studentRecord;
-	private Privacies privacy;
+	private Privacies privacies;
 	
 	public StudentProfile() {
 		super();
 	}
 
 	public StudentProfile(List<WorkExperiences> workExperiencesRecord, List<Projects> projects,
-			List<ExtraExperiences> extraExperiences, List<Courses> courses, Students studentRecord, Privacies privacy) {
+			List<ExtraExperiences> extraExperiences, List<Courses> courses, Students studentRecord, Privacies privacies) {
 		super();
 		this.workExperiencesRecord = workExperiencesRecord;
 		this.projects = projects;
 		this.extraExperiences = extraExperiences;
 		this.courses = courses;
 		this.studentRecord = studentRecord;
-		this.privacy = privacy;
+		this.privacies = privacies;
 	}
 
 	public Privacies getPrivacy() {
-		return privacy;
+		return privacies;
 	}
 
-	public void setPrivacy(Privacies privacy) {
-		this.privacy = privacy;
+	public void setPrivacy(Privacies privacies) {
+		this.privacies = privacies;
 	}
 
 	public List<Courses> getCourses() {
