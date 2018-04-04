@@ -4,7 +4,9 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,7 +20,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response; 
 
 import org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers;
 import org.jose4j.jwe.JsonWebEncryption;
@@ -28,6 +30,7 @@ import org.json.JSONObject;
 import org.mehaexample.asdDemo.dao.alignprivate.CoursesDao;
 import org.mehaexample.asdDemo.dao.alignprivate.ElectivesDao;
 import org.mehaexample.asdDemo.dao.alignprivate.ExtraExperiencesDao;
+import org.mehaexample.asdDemo.dao.alignprivate.PrivaciesDao;
 import org.mehaexample.asdDemo.dao.alignprivate.ProjectsDao;
 import org.mehaexample.asdDemo.dao.alignprivate.StudentLoginsDao;
 import org.mehaexample.asdDemo.dao.alignprivate.StudentsDao;
@@ -36,6 +39,7 @@ import org.mehaexample.asdDemo.model.alignadmin.LoginObject;
 import org.mehaexample.asdDemo.model.alignprivate.Courses;
 import org.mehaexample.asdDemo.model.alignprivate.Electives;
 import org.mehaexample.asdDemo.model.alignprivate.ExtraExperiences;
+import org.mehaexample.asdDemo.model.alignprivate.Privacies;
 import org.mehaexample.asdDemo.model.alignprivate.Projects;
 import org.mehaexample.asdDemo.model.alignprivate.StudentLogins;
 import org.mehaexample.asdDemo.model.alignprivate.Students;
@@ -44,6 +48,7 @@ import org.mehaexample.asdDemo.restModels.EmailToRegister;
 import org.mehaexample.asdDemo.restModels.PasswordChangeObject;
 import org.mehaexample.asdDemo.restModels.PasswordCreateObject;
 import org.mehaexample.asdDemo.restModels.PasswordResetObject;
+import org.mehaexample.asdDemo.restModels.SearchOtherStudents;
 import org.mehaexample.asdDemo.restModels.StudentProfile;
 import org.mehaexample.asdDemo.utils.MailClient;
 
@@ -58,11 +63,12 @@ public class StudentFacingService {
 	ExtraExperiencesDao extraExperiencesDao = new ExtraExperiencesDao();
 	ProjectsDao projectsDao = new ProjectsDao();
 	StudentLoginsDao studentLoginsDao = new StudentLoginsDao(); 
+	PrivaciesDao privaciesDao = new PrivaciesDao();
 	private static String NUIDNOTFOUND = "No Student record exists with given ID"; 
 	private static String INCORRECTPASS = "Incorrect Password";
 
 	public StudentFacingService(){}
-	
+
 	/**
 	 * This function creates a new student record
 	 * 
@@ -207,7 +213,7 @@ public class StudentFacingService {
 		}
 
 		try{
-			 studentDao.updateStudentRecord(student);
+			studentDao.updateStudentRecord(student);
 		}catch(Exception ex){
 
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
@@ -231,19 +237,20 @@ public class StudentFacingService {
 	@Produces(MediaType.APPLICATION_JSON)
 	// check  throws ParseException
 	public Response addExtraExperience(@PathParam("nuId") String neuId, ExtraExperiences extraExperiences) {
+		ExtraExperiences experiences = null;
 		if (!studentDao.ifNuidExists(neuId)) {
 			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
 		}
-		
+
 		try{
-			extraExperiencesDao.createExtraExperience(extraExperiences);
+			experiences = extraExperiencesDao.createExtraExperience(extraExperiences);
 		}catch(Exception ex){
 
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
 					entity(ex).build();
 		}
 
-		return Response.status(Response.Status.OK).entity(extraExperiences).build();
+		return Response.status(Response.Status.OK).entity(experiences.getExtraExperienceId()).build();
 	}
 
 	/**
@@ -478,9 +485,9 @@ public class StudentFacingService {
 			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
 		} else {
 			Projects projects = projectsDao.getProjectById(projectId);
-			
+
 			if(projects == null){
-				
+
 				return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
 			}
 
@@ -510,6 +517,7 @@ public class StudentFacingService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addProject(@PathParam("nuId") String neuId, Projects project) throws ParseException {
+		Projects projects = null;
 		if (!studentDao.ifNuidExists(neuId)) {
 
 			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
@@ -518,14 +526,14 @@ public class StudentFacingService {
 		project.setNeuId(neuId);
 
 		try{
-			projectsDao.createProject(project);
+			projects = projectsDao.createProject(project);
 		}catch(Exception ex) {
 
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
 					entity(ex).build();
 		}
 
-		return Response.status(Response.Status.OK).entity("Project added successfully").build();
+		return Response.status(Response.Status.OK).entity(projects.getProjectId()).build();
 	}
 
 	/**
@@ -925,6 +933,218 @@ public class StudentFacingService {
 					entity("Something Went Wrong" + studentEmail).build();
 		}
 	}
+
+
+
+	/**
+	 * This function adds privacy for a given student
+	 * 
+	 * @param privacy
+	 * @return 200 Response if the privacy is created successfully for the given student
+	 */
+	@POST
+	@Path("/students/{NUID}/privacies/")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response addPrivacy(@PathParam("NUID") String neuId, Privacies privacy){
+		Privacies privacies = null;
+
+		Students student = studentDao.getStudentRecord(neuId);
+
+		if (!studentDao.ifNuidExists(neuId)) {
+
+			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
+		}
+
+		privacy.setNeuId(student.getNeuId());
+		privacy.setPublicId(student.getPublicId()); 
+
+		try{
+			privacies = privaciesDao.createPrivacy(privacy);
+		}catch(Exception ex) {
+
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+					entity(ex).build();
+		}
+
+		return Response.status(Response.Status.OK).entity("Privacies added successfully!").build();
+	}
+
+	/**
+	 * This function gets the privacy setting for a student 
+	 * 
+	 * @param neuId
+	 * @return 200 response if privacy setting is retrieved successfully 
+	 */
+	@GET
+	@Path("/students/{nuId}/privacies")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getStduentPrivacies(@PathParam("nuId") String neuId) {
+		Privacies privacy = null;
+		if (!studentDao.ifNuidExists(neuId)) {
+
+			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
+		} 
+
+		try{
+			privacy = privaciesDao.getPrivacyByNeuId(neuId);
+
+		}catch(Exception ex){
+
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+					entity(ex).build();
+		}
+
+		if(privacy == null){
+
+			return Response.status(Response.Status.NOT_FOUND).
+					entity("No privacy setting exists for a given NeuId: " + neuId).build();
+
+		}
+
+		return Response.status(Response.Status.OK).entity(privacy).build();
+	}
+
+	/**
+	 * This function updates an Extra Experience of student for a given ID
+	 * 
+	 * @param neuId
+	 * @param extraExperienceId
+	 * @return 200 response if the Extra Experience is updated successfully 
+	 */
+	@PUT
+	@Path("/students/{NUID}/privacies/")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response updatePrivacies(@PathParam("NUID") String neuId, Privacies privacies) { 
+		if (!studentDao.ifNuidExists(neuId)) {
+
+			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
+		} 
+
+		Students student = studentDao.getStudentRecord(neuId);
+		privacies.setNeuId(student.getNeuId());
+		privacies.setPublicId(student.getPublicId()); 
+
+		Privacies privacy =  privaciesDao.getPrivacyByNeuId(neuId);
+		if(privacy == null){
+
+			return Response.status(Response.Status.NOT_FOUND).
+					entity("No Privacies record exists for a given NUID").build(); 
+		}
+
+		try{
+			privaciesDao.updatePrivacy(privacies);
+		}catch(Exception ex){
+
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+					entity(ex).build();
+		}
+
+		return Response.status(Response.Status.OK).entity("Privacies updated successfully :").build(); 
+	}
+
+	//	/**
+	//	 * This function deletes a privacy for a student
+	//	 * 
+	//	 * @param neuId
+	//	 * @param privacyId
+	//	 * @return 200 response if the privacy is deleted successfully
+	//	 */
+	//	@DELETE
+	//	@Path("/students/{NUID}/privacies}")
+	//	@Produces(MediaType.APPLICATION_JSON)
+	//	public Response deletePrivacy(@PathParam("NUID") String neuId) {
+	//		Privacies privacies = null;
+	//		if (!studentDao.ifNuidExists(neuId)) {
+	//			
+	//			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
+	//		} 
+	//		
+	//		privacies = privaciesDao.getPrivacyByNeuId(neuId);
+	//
+	//		if(privacies == null){
+	//
+	//			return Response.status(Response.Status.NOT_FOUND).entity("No Privacy exists with a given Id").build();
+	//		}
+	//
+	//		try{
+	//			privaciesDao.deletePrivacy(neuId);
+	//		}catch(Exception ex){
+	//
+	//			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+	//					entity(ex).build();
+	//		}
+	//
+	//		return Response.status(Response.Status.OK).entity("Privacy deleted successfully").build();
+	//	}
+
+	/**
+	 * This function search for the other students
+	 * 
+	 * @param search
+	 * @return 200 Response if all the filtered students are returned successfully 
+	 */
+	@POST
+	@Path("/students")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response searchStudent(SearchOtherStudents search){
+
+		List<Students> studentRecords;
+		Map<String,List<String>> map = new HashMap<String,List<String>>();
+
+		System.out.println("wvhgsvghqshgv");
+
+
+		try{
+			if (search.getCompanyName()!= null && !search.getCompanyName().isEmpty()) {
+				map.put("companyName",search.getCompanyName());
+			}
+
+			if (search.getCourseName()!= null && !search.getCourseName().isEmpty()){
+				map.put("courseName",search.getCourseName());
+			}
+
+			if (search.getStartTerm()!= null && !search.getStartTerm().isEmpty()){
+				map.put("startTerm",search.getStartTerm());
+			}
+
+			if (search.getEndTerm()!= null && !search.getEndTerm().isEmpty()){
+				map.put("endTerm",search.getEndTerm());
+			}
+
+			if (search.getCampus()!= null && !search.getCampus().isEmpty()){
+				map.put("campus",search.getCampus());
+			}
+
+			if (search.getGender()!= null && !search.getGender().isEmpty()){
+				map.put("gender",search.getCampus());
+			}
+
+			for(String key: map.keySet()){
+				System.out.println("Key: " + key);
+
+				for(String value: map.get(key)){
+					System.out.print(value + ","); 
+				}
+			}
+
+		}catch (Exception e){
+			return Response.status(Response.Status.BAD_REQUEST).entity(e).build();
+		}
+
+		try {
+			studentRecords = (ArrayList<Students>) studentDao.getStudentFilteredStudents(map, 0, 20);
+		} catch (Exception e) {
+
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).build();
+		}
+
+		return Response.status(Response.Status.OK).entity(studentRecords).build();
+	}
+
 
 	private String createRegistrationKey() {
 
