@@ -48,9 +48,11 @@ import org.mehaexample.asdDemo.model.alignprivate.StudentLogins;
 import org.mehaexample.asdDemo.model.alignprivate.Students;
 import org.mehaexample.asdDemo.model.alignprivate.WorkExperiences;
 import org.mehaexample.asdDemo.restModels.EmailToRegister;
+import org.mehaexample.asdDemo.restModels.ExtraExperienceObject;
 import org.mehaexample.asdDemo.restModels.PasswordChangeObject;
 import org.mehaexample.asdDemo.restModels.PasswordCreateObject;
 import org.mehaexample.asdDemo.restModels.PasswordResetObject;
+import org.mehaexample.asdDemo.restModels.ProjectObject;
 import org.mehaexample.asdDemo.restModels.SearchOtherStudents;
 import org.mehaexample.asdDemo.restModels.StudentProfile;
 import org.mehaexample.asdDemo.utils.MailClient;
@@ -366,109 +368,47 @@ public class StudentFacingService {
 
 		return Response.status(Response.Status.OK).entity(student).build(); 
 	}
-
-	@SuppressWarnings("null")
-	@POST
-	@Path("/students/{nuId}/extraexperiences")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
+	
 	/**
 	 * This function creates an Extra Experience for a student
 	 * 
-	 * @param nuId
+	 * @param neuId
 	 * @param extraExperiences
 	 * @return 200 if the Extra Experience is created successfully 
 	 * @throws ParseException
 	 */
-	public Response addExtraExperience(@PathParam("nuId") String nuId, String param) {
-
-		if (!studentDao.ifNuidExists(nuId)) {
+	@POST
+	@Path("/students/{nuId}/extraexperiences")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response addExtraExperience(@PathParam("nuId") String neuId, ExtraExperienceObject extraExperienceObject) {
+		if (!studentDao.ifNuidExists(neuId)) {
 			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
 		}
-
-		JSONObject jsonObj = new JSONObject(param);
-		int extraExperienceId;
-		String neuId = null;
-		String companyName = null;
-		Object startDate = null;
-		Object endDate = null;
-		String title = null;
-		String description = null;
-
-		try{
-			if (!jsonObj.isNull("neuId")){
-				neuId = String.valueOf(jsonObj.get("neuId").toString()); 
-			} 
-		} catch(Exception e){
-			neuId = null;
-		}
-
-		try{
-			if (!jsonObj.isNull("companyName")){
-				companyName = String.valueOf(jsonObj.get("companyName").toString()); 
-			} 
-		} catch(Exception e){
-			companyName = null;
-		}
-
-		try{
-			if (!jsonObj.isNull("title")){
-				title = String.valueOf(jsonObj.get("title").toString()); 
-			}
-		} catch(Exception e){
-			title = null;
-		}
-
-		try{
-			if (!jsonObj.isNull("description")){
-				description = String.valueOf(jsonObj.get("description").toString()); 
-			}
-		} catch(Exception e){
-			description = null;
-		}
-
-		try{
-			if (!jsonObj.isNull("startDate")){
-				startDate = String.valueOf(jsonObj.get("startDate").toString());
-			}
-		} catch(Exception e){
-			startDate = null; 
-		}
-
-		try{
-			if (!jsonObj.isNull("endDate")){
-				endDate = String.valueOf(jsonObj.get("endDate").toString()); 
-			} 
-		} catch(Exception e){
-			endDate = null; 
-		}
-
+		
 		ExtraExperiences experiences = new ExtraExperiences();  
-		experiences.setCompanyName(companyName);
-		experiences.setTitle(title);
-		experiences.setDescription(description);
-		experiences.setNeuId(nuId);
-		experiences.setCompanyName(companyName);
-
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		experiences.setCompanyName(extraExperienceObject.getCompanyName());
+		experiences.setTitle(extraExperienceObject.getTitle());
+		experiences.setDescription(extraExperienceObject.getDescription());
+		experiences.setNeuId(neuId);
+	
+		SimpleDateFormat formatter = new SimpleDateFormat("YYYY-MM-dd");
 		try {
-			experiences.setStartDate(dateFormat.parse((String) startDate));
+            Date startDate = formatter.parse(extraExperienceObject.getStartDate());
+			experiences.setStartDate(startDate);
 		} catch (ParseException e) {
-			e.printStackTrace();
+			return Response.status(Response.Status.BAD_REQUEST).entity("Start Date didn't parse").build();
 		}
-		System.out.println("end");
 
 		try {
-			experiences.setEndDate(dateFormat.parse((String) endDate));
+			Date endDate = formatter.parse(extraExperienceObject.getEndDate());
+			experiences.setEndDate(endDate);
 		} catch (ParseException e) {
-			e.printStackTrace();
+			return Response.status(Response.Status.BAD_REQUEST).entity("End Date didn't parse").build();
 		}
 
 		try{
-			System.out.println("before add");
-
 			experiences = extraExperiencesDao.createExtraExperience(experiences);
-			System.out.println("after add");
 		}catch(Exception ex){
 
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
@@ -476,6 +416,54 @@ public class StudentFacingService {
 		}
 
 		return Response.status(Response.Status.OK).entity(experiences.getExtraExperienceId()).build();
+	}
+	 
+	/**
+	 * This function adds a project for a given student 
+	 * 
+	 * @param neuId
+	 * @param project
+	 * @return 200 response if the project is added successfully
+	 * @throws ParseException
+	 */
+	@POST
+	@Path("/students/{nuId}/projects")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response addProject(@PathParam("nuId") String neuId, ProjectObject projectObject) {
+		if (!studentDao.ifNuidExists(neuId)) {
+			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
+		}
+
+		Projects project = new Projects(); 
+		project.setNeuId(neuId);
+		project.setProjectName(projectObject.getProjectName()); 
+		project.setDescription(projectObject.getDescription()); 
+		
+		SimpleDateFormat formatter = new SimpleDateFormat("YYYY-MM-dd");
+		try {
+            Date startDate = formatter.parse(projectObject.getStartDate());
+            project.setStartDate(startDate);
+		} catch (ParseException e) {
+			return Response.status(Response.Status.BAD_REQUEST).entity("Start Date didn't parse").build();
+		}
+
+		try {
+			Date endDate = formatter.parse(projectObject.getEndDate());
+			project.setEndDate(endDate);
+		} catch (ParseException e) {
+			return Response.status(Response.Status.BAD_REQUEST).entity("End Date didn't parse").build();
+		}
+	
+		try{
+			project = projectsDao.createProject(project);
+		}catch(Exception ex) {
+
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+					entity(ex).build();
+		}
+
+		return Response.status(Response.Status.OK).entity(project.getProjectId()).build();
 	}
 
 	/**
@@ -686,38 +674,6 @@ public class StudentFacingService {
 
 			return Response.status(Response.Status.OK).entity("Project updated successfully :)").build();
 		}
-	}
-
-	/**
-	 * This function adds a project for a given student 
-	 * 
-	 * @param neuId
-	 * @param project
-	 * @return 200 response if the project is added successfully
-	 * @throws ParseException
-	 */
-	@POST
-	@Path("/students/{nuId}/projects")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response addProject(@PathParam("nuId") String neuId, Projects project) throws ParseException {
-		Projects projects = null;
-		if (!studentDao.ifNuidExists(neuId)) {
-
-			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
-		}
-
-		project.setNeuId(neuId);
-
-		try{
-			projects = projectsDao.createProject(project);
-		}catch(Exception ex) {
-
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
-					entity(ex).build();
-		}
-
-		return Response.status(Response.Status.OK).entity(projects.getProjectId()).build();
 	}
 
 	/**
@@ -1223,7 +1179,7 @@ public class StudentFacingService {
 					entity(ex).build();
 		}
 
-		return Response.status(Response.Status.OK).build(); 
+		return Response.status(Response.Status.OK).entity("Privacies Updated Successfully!").build(); 
 	}
 
 	/**
