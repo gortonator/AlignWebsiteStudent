@@ -2,8 +2,10 @@ package org.mehaexample.asdDemo.alignWebsite;
 
 import java.sql.Timestamp;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +28,7 @@ import org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers;
 import org.jose4j.jwe.JsonWebEncryption;
 import org.jose4j.jwe.KeyManagementAlgorithmIdentifiers;
 import org.jose4j.keys.AesKey;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.mehaexample.asdDemo.dao.alignprivate.CoursesDao;
 import org.mehaexample.asdDemo.dao.alignprivate.ElectivesDao;
@@ -137,7 +140,7 @@ public class StudentFacingService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getStudentProfile(@PathParam("nuid") String nuid) {
 		Students studentRecord = null;
-		Privacies privacies = null;
+		Privacies privacy = null;
 		if (!studentDao.ifNuidExists(nuid)) {
 
 			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND + ":" + nuid).build();
@@ -157,14 +160,14 @@ public class StudentFacingService {
 		}
 
 		try{
-			privacies = privaciesDao.getPrivacyByNeuId(nuid);
+			privacy = privaciesDao.getPrivacyByNeuId(nuid);
 		}catch(Exception ex) {
 
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
 					entity(ex).build();
 		}
 
-		if(privacies == null){
+		if(privacy == null){
 
 			return Response.status(Response.Status.NOT_FOUND).
 					entity("Privacy setting not found for the given student").build();
@@ -176,16 +179,120 @@ public class StudentFacingService {
 		List<Courses> courses = new ArrayList<>(); 
 		List<Electives> electives = electivesDao.getElectivesByNeuId(nuid);
 
+		JSONArray coursesObjArray = new JSONArray();
 		for (int i = 0; i < electives.size(); i++) {
+			JSONObject jsonObj = new JSONObject();
 			Electives elective = electivesDao.getElectiveById(electives.get(i).getElectiveId());
 			Courses course = coursesDao.getCourseById(elective.getCourseId());
-			courses.add(course);
+			jsonObj.put("courseName", course.getCourseName());
+			jsonObj.put("courseId", course.getCourseId());
+			jsonObj.put("description", course.getDescription());
+
+			coursesObjArray.put(jsonObj);
 		}
 
-		StudentProfile studentProfile = 
-				new StudentProfile(workExperiencesRecord, projects, extraExperiences, courses, studentRecord, privacies);
+		JSONObject Obj = new JSONObject();
 
-		return Response.status(Response.Status.OK).entity(studentProfile).build();
+		JSONArray workExperienceObj = new JSONArray();
+
+		for(WorkExperiences workExp : workExperiencesRecord){
+			JSONObject jsonObj = new JSONObject();
+			jsonObj.put("workExperienceId", workExp.getWorkExperienceId());
+			jsonObj.put("neuId", workExp.getNeuId());
+			jsonObj.put("companyName", workExp.getCompanyName());
+			jsonObj.put("startDate", workExp.getStartDate());
+			jsonObj.put("endDate", workExp.getEndDate());
+			jsonObj.put("currentJob", workExp.isCurrentJob());
+			jsonObj.put("coop", workExp.isCoop());
+			jsonObj.put("title", workExp.getTitle());
+			jsonObj.put("description", workExp.getDescription());
+			workExperienceObj.put(jsonObj); 
+		}
+
+		JSONArray extraExperienceObj = new JSONArray();
+
+		for(ExtraExperiences extraExperience : extraExperiences){
+			JSONObject jsonObj = new JSONObject();
+			jsonObj.put("companyName", extraExperience.getCompanyName());
+			jsonObj.put("description", extraExperience.getDescription());
+			jsonObj.put("endDate", extraExperience.getEndDate());
+			jsonObj.put("extraExperienceId", extraExperience.getExtraExperienceId());
+			jsonObj.put("startDate", extraExperience.getStartDate());
+			jsonObj.put("title", extraExperience.getTitle());
+			jsonObj.put("neuId", extraExperience.getNeuId());
+			extraExperienceObj.put(jsonObj); 
+		}
+
+		JSONArray projectObj = new JSONArray();
+
+		for(Projects project: projects){
+			JSONObject jsonObj = new JSONObject();
+			jsonObj.put("projectName", project.getProjectName());
+			jsonObj.put("description", project.getDescription());
+			jsonObj.put("endDate", project.getEndDate());
+			jsonObj.put("projectId", project.getProjectId());
+			jsonObj.put("startDate", project.getStartDate());
+			jsonObj.put("neuId", project.getNeuId());
+			projectObj.put(jsonObj); 
+		}
+
+		// add privacy
+		JSONObject privacyObject = new JSONObject();
+		privacyObject.put("neuId", privacy.getNeuId());
+		privacyObject.put("publicId", privacy.getPublicId());
+		privacyObject.put("visibleToPublic", privacy.isVisibleToPublic());
+		privacyObject.put("photo", privacy.isPhoto());
+		privacyObject.put("email", privacy.isEmail());
+		privacyObject.put("address", privacy.isAddress());
+		privacyObject.put("linkedin", privacy.isLinkedin());
+		privacyObject.put("github", privacy.isGithub());
+		privacyObject.put("facebook", privacy.isFacebook());
+		privacyObject.put("website", privacy.isWebsite());
+		privacyObject.put("course", privacy.isCourse());
+		privacyObject.put("extraExperience", privacy.isExtraExperience());
+		privacyObject.put("project", privacy.isProject());
+		privacyObject.put("skill", privacy.isSkill());
+
+		JSONObject studentObj = new JSONObject();
+		studentObj.put("neuId", studentRecord.getNeuId());
+		studentObj.put("publicId", studentRecord.getPublicId());
+		studentObj.put("email", studentRecord.getEmail());
+		studentObj.put("firstName", studentRecord.getFirstName());
+		studentObj.put("middleName", studentRecord.getMiddleName());
+		studentObj.put("lastName", studentRecord.getLastName());
+		studentObj.put("gender", studentRecord.getGender());
+		studentObj.put("race", studentRecord.getRace());
+		studentObj.put("scholarship", studentRecord.isScholarship());
+		studentObj.put("visa", studentRecord.getVisa());
+		studentObj.put("phoneNum", studentRecord.getPhoneNum());
+		studentObj.put("address", studentRecord.getAddress());
+		studentObj.put("state", studentRecord.getState());
+		studentObj.put("city", studentRecord.getCity());
+		studentObj.put("zip", studentRecord.getZip());
+		studentObj.put("entryTerm", studentRecord.getEntryTerm());
+		studentObj.put("entryYear", studentRecord.getEntryYear());
+		studentObj.put("expectedLastTerm", studentRecord.getExpectedLastTerm());
+		studentObj.put("expectedLastYear", studentRecord.getExpectedLastYear());
+		studentObj.put("enrollmentStatus", studentRecord.getEnrollmentStatus());
+		studentObj.put("campus", studentRecord.getCampus());
+		studentObj.put("degree", studentRecord.getDegree());
+		studentObj.put("photo", studentRecord.getPhoto());
+		studentObj.put("visible", studentRecord.isVisible());
+		studentObj.put("linkedin", studentRecord.getLinkedin());
+		studentObj.put("facebook", studentRecord.getFacebook());
+		studentObj.put("github", studentRecord.getGithub());
+		studentObj.put("website", studentRecord.getWebsite());
+		studentObj.put("skills", studentRecord.getSkills());
+		studentObj.put("summary", studentRecord.getSummary());
+
+		Obj.put("studentRecord", studentObj);
+		Obj.put("WorkExperiences", workExperienceObj);
+		Obj.put("extraExperienceObj", extraExperienceObj);
+		Obj.put("Projects", projectObj);
+		Obj.put("Courses", coursesObjArray);
+		Obj.put("Privacies", privacyObject);
+
+		return Response.status(Response.Status.OK).entity(Obj.toString()).build();
 	}
 
 	/**
@@ -260,29 +367,108 @@ public class StudentFacingService {
 		return Response.status(Response.Status.OK).entity(student).build(); 
 	}
 
-	/**
-	 * This function creates an Extra Experience for a student
-	 * 
-	 * @param neuId
-	 * @param extraExperiences
-	 * @return 200 if the Extra Experience is created successfully 
-	 * @throws ParseException
-	 */
+	@SuppressWarnings("null")
 	@POST
 	@Path("/students/{nuId}/extraexperiences")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	// check  throws ParseException
-	public Response addExtraExperience(@PathParam("nuId") String neuId, ExtraExperiences extraExperiences) {
-		ExtraExperiences experiences = null;
-		System.out.println("date : " + extraExperiences.getStartDate());
+	/**
+	 * This function creates an Extra Experience for a student
+	 * 
+	 * @param nuId
+	 * @param extraExperiences
+	 * @return 200 if the Extra Experience is created successfully 
+	 * @throws ParseException
+	 */
+	public Response addExtraExperience(@PathParam("nuId") String nuId, String param) {
 
-		if (!studentDao.ifNuidExists(neuId)) {
+		if (!studentDao.ifNuidExists(nuId)) {
 			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
 		}
 
+		JSONObject jsonObj = new JSONObject(param);
+		int extraExperienceId;
+		String neuId = null;
+		String companyName = null;
+		Object startDate = null;
+		Object endDate = null;
+		String title = null;
+		String description = null;
+
 		try{
-			experiences = extraExperiencesDao.createExtraExperience(extraExperiences);
+			if (!jsonObj.isNull("neuId")){
+				neuId = String.valueOf(jsonObj.get("neuId").toString()); 
+			} 
+		} catch(Exception e){
+			neuId = null;
+		}
+
+		try{
+			if (!jsonObj.isNull("companyName")){
+				companyName = String.valueOf(jsonObj.get("companyName").toString()); 
+			} 
+		} catch(Exception e){
+			companyName = null;
+		}
+
+		try{
+			if (!jsonObj.isNull("title")){
+				title = String.valueOf(jsonObj.get("title").toString()); 
+			}
+		} catch(Exception e){
+			title = null;
+		}
+
+		try{
+			if (!jsonObj.isNull("description")){
+				description = String.valueOf(jsonObj.get("description").toString()); 
+			}
+		} catch(Exception e){
+			description = null;
+		}
+
+		try{
+			if (!jsonObj.isNull("startDate")){
+				startDate = String.valueOf(jsonObj.get("startDate").toString());
+			}
+		} catch(Exception e){
+			startDate = null; 
+		}
+
+		try{
+			if (!jsonObj.isNull("endDate")){
+				endDate = String.valueOf(jsonObj.get("endDate").toString()); 
+			} 
+		} catch(Exception e){
+			endDate = null; 
+		}
+
+		ExtraExperiences experiences = new ExtraExperiences();  
+		experiences.setCompanyName(companyName);
+		experiences.setTitle(title);
+		experiences.setDescription(description);
+		experiences.setNeuId(nuId);
+		experiences.setCompanyName(companyName);
+
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		try {
+			experiences.setStartDate(dateFormat.parse((String) startDate));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		System.out.println("end");
+
+		try {
+			experiences.setEndDate(dateFormat.parse((String) endDate));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+
+		try{
+			System.out.println("before add");
+
+			experiences = extraExperiencesDao.createExtraExperience(experiences);
+			System.out.println("after add");
 		}catch(Exception ex){
 
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
@@ -932,8 +1118,6 @@ public class StudentFacingService {
 		}
 	}
 
-
-
 	/**
 	 * This function adds privacy for a given student
 	 * 
@@ -975,8 +1159,7 @@ public class StudentFacingService {
 	 * @return 200 response if privacy setting is retrieved successfully 
 	 */
 	@GET
-	@Path("/students/{nuId}/privacies")
-	@Consumes(MediaType.APPLICATION_JSON)
+	@Path("/students/{nuId}/privacies") 
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getStduentPrivacies(@PathParam("nuId") String neuId) {
 		Privacies privacy = null;
@@ -1043,41 +1226,6 @@ public class StudentFacingService {
 		return Response.status(Response.Status.OK).build(); 
 	}
 
-	//	/**
-	//	 * This function deletes a privacy for a student
-	//	 * 
-	//	 * @param neuId
-	//	 * @param privacyId
-	//	 * @return 200 response if the privacy is deleted successfully
-	//	 */
-	//	@DELETE
-	//	@Path("/students/{NUID}/privacies}")
-	//	@Produces(MediaType.APPLICATION_JSON)
-	//	public Response deletePrivacy(@PathParam("NUID") String neuId) {
-	//		Privacies privacies = null;
-	//		if (!studentDao.ifNuidExists(neuId)) {
-	//			
-	//			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
-	//		} 
-	//		
-	//		privacies = privaciesDao.getPrivacyByNeuId(neuId);
-	//
-	//		if(privacies == null){
-	//
-	//			return Response.status(Response.Status.NOT_FOUND).entity("No Privacy exists with a given Id").build();
-	//		}
-	//
-	//		try{
-	//			privaciesDao.deletePrivacy(neuId);
-	//		}catch(Exception ex){
-	//
-	//			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
-	//					entity(ex).build();
-	//		}
-	//
-	//		return Response.status(Response.Status.OK).entity("Privacy deleted successfully").build();
-	//	}
-
 	/**
 	 * This function search for the other students
 	 * 
@@ -1092,8 +1240,6 @@ public class StudentFacingService {
 
 		List<Students> studentRecords;
 		Map<String,List<String>> map = new HashMap<String,List<String>>();
-
-		System.out.println("wvhgsvghqshgv");
 
 		try{
 			if (search.getCompanyName()!= null && !search.getCompanyName().isEmpty()) { 
@@ -1117,15 +1263,7 @@ public class StudentFacingService {
 			}
 
 			if (search.getGender()!= null && !search.getGender().isEmpty()){
-				map.put("gender",search.getCampus());
-			}
-
-			for(String key: map.keySet()){
-				System.out.println("Key: " + key);
-
-				for(String value: map.get(key)){
-					System.out.print(value + ","); 
-				}
+				map.put("gender",search.getGender());
 			}
 
 		}catch (Exception e){

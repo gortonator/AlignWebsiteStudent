@@ -130,7 +130,7 @@ public class StudentFacingTests {
 		ExtraExperiences extraExperiences = new ExtraExperiences(NEUIDTEST, "companyName", startdate, 
 				enddate, "title", "description"	);
 
-		studentFacing.addExtraExperience(NEUIDTEST, extraExperiences);
+//		studentFacing.addExtraExperience(NEUIDTEST, extraExperiences);
 
 		// Add courses
 		//		Courses newCourse = new Courses("100", "course2", "course description 2");
