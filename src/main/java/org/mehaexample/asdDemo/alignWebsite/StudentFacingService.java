@@ -1095,9 +1095,8 @@ public class StudentFacingService {
 
 		System.out.println("wvhgsvghqshgv");
 
-
 		try{
-			if (search.getCompanyName()!= null && !search.getCompanyName().isEmpty()) {
+			if (search.getCompanyName()!= null && !search.getCompanyName().isEmpty()) { 
 				map.put("companyName",search.getCompanyName());
 			}
 
