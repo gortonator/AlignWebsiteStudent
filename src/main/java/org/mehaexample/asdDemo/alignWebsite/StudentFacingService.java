@@ -55,6 +55,7 @@ import org.mehaexample.asdDemo.restModels.PasswordResetObject;
 import org.mehaexample.asdDemo.restModels.ProjectObject;
 import org.mehaexample.asdDemo.restModels.SearchOtherStudents;
 import org.mehaexample.asdDemo.restModels.StudentProfile;
+import org.mehaexample.asdDemo.restModels.WorkExperienceObject;
 import org.mehaexample.asdDemo.utils.MailClient;
 
 import com.lambdaworks.crypto.SCryptUtil;
@@ -390,7 +391,6 @@ public class StudentFacingService {
 		} 
 
 		try{
-			System.out.println("coming till here");
 			extraExperiencesList = extraExperiencesDao.getExtraExperiencesByNeuId(neuId);
 		}catch(Exception ex){
 
@@ -426,8 +426,6 @@ public class StudentFacingService {
 			extraExperiencesObjectList.add(experienceObjectNew);
 		}
 
-		System.out.println("coming till here also");
-
 		return Response.status(Response.Status.OK).entity(extraExperiencesObjectList).build();
 	}
 
@@ -454,12 +452,36 @@ public class StudentFacingService {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
 					entity(ex).build();
 		}
+
 		if(workExperiencesList == null || workExperiencesList.isEmpty()){
 
 			return  Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
 		}
 
-		return Response.status(Response.Status.OK).entity(workExperiencesList).build();
+		List<WorkExperienceObject> workExperiencesObjectList = new ArrayList<>();
+
+		WorkExperienceObject workExperienceObjectNew = new WorkExperienceObject();
+		for(WorkExperiences experiences: workExperiencesList){
+			workExperienceObjectNew.setCompanyName(experiences.getCompanyName()); 
+			workExperienceObjectNew.setCompanyName(experiences.getCompanyName());
+			workExperienceObjectNew.setTitle(experiences.getTitle());
+			workExperienceObjectNew.setDescription(experiences.getDescription());
+			workExperienceObjectNew.setCoop(experiences.isCoop()); 
+			workExperienceObjectNew.setCurrentJob(experiences.isCurrentJob());
+			workExperienceObjectNew.setNeuId(neuId);
+
+			SimpleDateFormat formatter = new SimpleDateFormat("YYYY-MM-dd");
+
+			String startDateConverted = formatter.format(experiences.getStartDate());
+			workExperienceObjectNew.setStartDate(startDateConverted);
+
+			String endDateConverted = formatter.format(experiences.getEndDate());
+			workExperienceObjectNew.setEndDate(endDateConverted);
+
+			workExperiencesObjectList.add(workExperienceObjectNew);
+		}
+
+		return Response.status(Response.Status.OK).entity(workExperiencesObjectList).build();
 	}
 
 	/**
@@ -1162,9 +1184,8 @@ public class StudentFacingService {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).build();
 		}
 
-		return Response.status(Response.Status.OK).entity(studentRecords).build();
+		return Response.status(Response.Status.OK).entity(studentRecords).build(); 
 	}
-
 
 	private String createRegistrationKey() {
 
