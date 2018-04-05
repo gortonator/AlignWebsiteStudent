@@ -432,44 +432,6 @@ public class StudentFacingService {
 	}
 
 	/**
-	 * This function gets all the Extra Experiences of a student 
-	 * 
-	 * @param neuId
-	 * @param student
-	 * @return 200 response if all the Extra Experiences retrieved successfully 
-	 */
-	@GET
-	@Path("/students/{nuId}/extraexperiences2") 
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getStudentExtraExperience2(@PathParam("nuId") String neuId) {
-		List<ExtraExperiences> extraExperiencesList;
-		if (!studentDao.ifNuidExists(neuId)) {
-
-			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
-		} 
-
-		try{
-			System.out.println("coming till here");
-			extraExperiencesList = extraExperiencesDao.getExtraExperiencesByNeuId(neuId);
-		}catch(Exception ex){
-
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
-					entity(ex).build();
-		}
-
-		if(extraExperiencesList == null || extraExperiencesList.isEmpty()){
-
-			return Response.status(Response.Status.NOT_FOUND).
-					entity("No Extra Experience record exists for a given NeuId: " + neuId).build();
-
-		}
-
-		System.out.println("coming till here");
-
-		return Response.status(Response.Status.OK).entity(extraExperiencesList).build();
-	}
-
-	/**
 	 * This function gets all the Work Experiences for a student
 	 * 
 	 * @param neuId
