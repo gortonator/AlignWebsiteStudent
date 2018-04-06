@@ -414,6 +414,8 @@ public class StudentFacingService {
 			experienceObjectNew.setTitle(experiences.getTitle());
 			experienceObjectNew.setDescription(experiences.getDescription());
 			experienceObjectNew.setNeuId(neuId);
+			System.out.println("exitra id" + experiences.getExtraExperienceId());
+			experienceObjectNew.setExtraExperienceId(experiences.getExtraExperienceId());  
 
 			SimpleDateFormat formatter = new SimpleDateFormat("YYYY-MM-dd");
 
@@ -469,6 +471,7 @@ public class StudentFacingService {
 			workExperienceObjectNew.setCoop(experiences.isCoop()); 
 			workExperienceObjectNew.setCurrentJob(experiences.isCurrentJob());
 			workExperienceObjectNew.setNeuId(neuId);
+			workExperienceObjectNew.setWorkExperienceId(experiences.getWorkExperienceId()); 
 
 			SimpleDateFormat formatter = new SimpleDateFormat("YYYY-MM-dd");
 
@@ -492,24 +495,48 @@ public class StudentFacingService {
 	 * @return 200 response if the Extra Experience is updated successfully 
 	 */
 	@PUT
-	@Path("/students/{nuId}/extraexperiences/{Id}")
+	@Path("/students/{nuId}/extraexperiences/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response updateExtraExperience(@PathParam("nuId") String neuId, @PathParam("Id") Integer extraExperienceId) {
+	public Response updateExtraExperience(@PathParam("nuId") String neuId,
+			@PathParam("id") int extraExperienceId, ExtraExperienceObject extraExperienceObject) {
+
 		if (!studentDao.ifNuidExists(neuId)) {
 
 			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
 		} 
 
-		ExtraExperiences extraExperiences =  extraExperiencesDao.getExtraExperienceById(extraExperienceId);
+		ExtraExperiences extraExperiences = extraExperiencesDao.getExtraExperienceById(extraExperienceId);
 		if(extraExperiences == null){
 
 			return Response.status(Response.Status.NOT_FOUND).
 					entity("No Extra Experience record exists for a given Id: " + extraExperienceId).build(); 
 		}
 
+		ExtraExperiences experiences = new ExtraExperiences();  
+		experiences.setCompanyName(extraExperienceObject.getCompanyName());
+		experiences.setTitle(extraExperienceObject.getTitle());
+		experiences.setDescription(extraExperienceObject.getDescription());
+		experiences.setNeuId(neuId);
+		experiences.setExtraExperienceId(extraExperienceId); 
+
+		SimpleDateFormat formatter = new SimpleDateFormat("YYYY-MM-dd");
+		try {
+			Date startDate = formatter.parse(extraExperienceObject.getStartDate());
+			experiences.setStartDate(startDate);
+		} catch (ParseException e) {
+			return Response.status(Response.Status.BAD_REQUEST).entity("Start Date didn't parse").build();
+		}
+
+		try {
+			Date endDate = formatter.parse(extraExperienceObject.getEndDate());
+			experiences.setEndDate(endDate);
+		} catch (ParseException e) {
+			return Response.status(Response.Status.BAD_REQUEST).entity("End Date didn't parse").build();
+		}
+
 		try{
-			extraExperiencesDao.updateExtraExperience(extraExperiences);
+			extraExperiencesDao.updateExtraExperience(experiences);
 		}catch(Exception ex){
 
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
@@ -530,29 +557,51 @@ public class StudentFacingService {
 	@Path("/students/{nuId}/projects/{Id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response updateProject(@PathParam("nuId") String neuId, @PathParam("Id") Integer projectId, Projects project) {
+	public Response updateProject(@PathParam("nuId") String neuId, 
+			@PathParam("Id") Integer projectId, ProjectObject project) {
 		if (!studentDao.ifNuidExists(neuId)) {
 
 			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
-		} else {
-			Projects projects = projectsDao.getProjectById(projectId);
+		} 
 
-			if(projects == null){
+		Projects projects = projectsDao.getProjectById(projectId);
+		if(projects == null){
 
-				return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
-			}
-
-			try{
-				projectsDao.updateProject(project);
-
-			}catch(Exception ex) {
-
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
-						entity(ex).build();
-			}
-
-			return Response.status(Response.Status.OK).entity("Project updated successfully :)").build();
+			return Response.status(Response.Status.NOT_FOUND).entity("Project doesn't exists").build();
 		}
+
+		Projects projectUpdated = new Projects(); 
+		projectUpdated.setNeuId(neuId);
+		projectUpdated.setProjectName(project.getProjectName()); 
+		projectUpdated.setDescription(project.getDescription()); 
+		projectUpdated.setProjectId(projectId);
+
+		SimpleDateFormat formatter = new SimpleDateFormat("YYYY-MM-dd");
+		try {
+			Date startDate = formatter.parse(project.getStartDate());
+			projectUpdated.setStartDate(startDate);
+		} catch (ParseException e) {
+			return Response.status(Response.Status.BAD_REQUEST).entity("Start Date didn't parse").build();
+		}
+
+		try {
+			Date endDate = formatter.parse(project.getEndDate());
+			projectUpdated.setEndDate(endDate);
+		} catch (ParseException e) {
+			return Response.status(Response.Status.BAD_REQUEST).entity("End Date didn't parse").build();
+		}
+
+		try{
+			projectsDao.updateProject(projectUpdated);
+
+		}catch(Exception ex) {
+
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+					entity(ex).build();
+		}
+
+		return Response.status(Response.Status.OK).entity("Project updated successfully!").build();
+
 	}
 
 
@@ -565,7 +614,6 @@ public class StudentFacingService {
 	 */
 	@DELETE
 	@Path("/students/{nuId}/extraexperiences/{Id}")
-	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteExtraExperience(@PathParam("nuId") String neuId, @PathParam("Id") Integer extraExperienceId) {
 		ExtraExperiences extraExperiences = null;
@@ -599,7 +647,6 @@ public class StudentFacingService {
 	 */
 	@DELETE
 	@Path("/students/{nuId}/project/{Id}")
-	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON) 
 	public Response deleteProject(@PathParam("nuId") String neuId, @PathParam("Id") int projectId) {
 		Projects project = null;
