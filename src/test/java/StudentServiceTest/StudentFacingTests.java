@@ -238,23 +238,23 @@ public class StudentFacingTests {
 		Assert.assertEquals(workExperiencesList.size(), 1);
 	}
 
-	@SuppressWarnings("unchecked")
-	@Test
-	public void updateProjectTest(){
-		Response res = studentFacing.getStudentProfile(NEUIDTEST);
-		StudentProfile profile = (StudentProfile) res.getEntity();
-		Projects project = profile.getProjects().get(0);
-
-		project.setProjectName("NewProject"); 
-		Response response =  studentFacing.updateProject(NEUIDTEST, project.getProjectId(), project);
-
-		// get the project again
-		res = studentFacing.getStudentProfile(NEUIDTEST);
-		profile = (StudentProfile) res.getEntity();
-		project = profile.getProjects().get(0);
-
-		Assert.assertEquals(project.getProjectName(), "NewProject");
-	}
+//	@SuppressWarnings("unchecked")
+//	@Test
+//	public void updateProjectTest(){
+//		Response res = studentFacing.getStudentProfile(NEUIDTEST);
+//		StudentProfile profile = (StudentProfile) res.getEntity();
+//		Projects project = profile.getProjects().get(0);
+//
+//		project.setProjectName("NewProject"); 
+//		Response response =  studentFacing.updateProject(NEUIDTEST, project.getProjectId(), project);
+//
+//		// get the project again
+//		res = studentFacing.getStudentProfile(NEUIDTEST);
+//		profile = (StudentProfile) res.getEntity();
+//		project = profile.getProjects().get(0);
+//
+//		Assert.assertEquals(project.getProjectName(), "NewProject");
+//	}
 
 //	@Test
 //	public void deleteExtsadraExperienceTestadsf(){
