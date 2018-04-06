@@ -1233,13 +1233,10 @@ public class StudentFacingService {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).build();
 		}
 
-		//		JSONArray projectObj = new JSONArray();
-		//		JSONObject jsonObj = new JSONObject();
-		//		jsonObj.put(key, value);
-		//		projectObj.put(studentRecords);
+		JSONObject studentsRecordObj = new JSONObject();
+		studentsRecordObj.put("studentsRecord", studentRecords);
 
-
-		return Response.status(Response.Status.OK).entity(studentRecords).build(); 
+		return Response.status(Response.Status.OK).entity(studentsRecordObj.toString()).build(); 
 	}
 
 	private String createRegistrationKey() {
