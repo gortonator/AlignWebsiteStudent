@@ -235,7 +235,7 @@ public class StudentFacingService {
 
 		Obj.put("studentRecord", studentObj);
 		Obj.put("WorkExperiences", workExperienceObj);
-		Obj.put("extraExperienceObj", extraExperienceObj);
+		Obj.put("ExtraExperiences", extraExperienceObj);
 		Obj.put("Projects", projectObj);
 		Obj.put("Courses", coursesObjArray);
 		Obj.put("Privacies", privacyObject);
@@ -299,7 +299,7 @@ public class StudentFacingService {
 		experiences.setDescription(extraExperienceObject.getDescription());
 		experiences.setNeuId(neuId);
 
-		SimpleDateFormat formatter = new SimpleDateFormat("YYYY-MM-dd");
+		SimpleDateFormat formatter = new SimpleDateFormat("MM-dd-yyyy");
 		try {
 			Date startDate = formatter.parse(extraExperienceObject.getStartDate());
 			experiences.setStartDate(startDate);
@@ -347,7 +347,7 @@ public class StudentFacingService {
 		project.setProjectName(projectObject.getProjectName()); 
 		project.setDescription(projectObject.getDescription()); 
 
-		SimpleDateFormat formatter = new SimpleDateFormat("YYYY-MM-dd");
+		SimpleDateFormat formatter = new SimpleDateFormat("MM-dd-yyyy");
 		try {
 			Date startDate = formatter.parse(projectObject.getStartDate());
 			project.setStartDate(startDate);
@@ -418,7 +418,7 @@ public class StudentFacingService {
 			System.out.println("exitra id" + experiences.getExtraExperienceId());
 			experienceObjectNew.setExtraExperienceId(experiences.getExtraExperienceId());  
 
-			SimpleDateFormat formatter = new SimpleDateFormat("YYYY-MM-dd");
+			SimpleDateFormat formatter = new SimpleDateFormat("MM-dd-yyyy");
 
 			String startDateConverted = formatter.format(experiences.getStartDate());
 			experienceObjectNew.setStartDate(startDateConverted);
@@ -475,7 +475,7 @@ public class StudentFacingService {
 			workExperienceObjectNew.setNeuId(neuId);
 			workExperienceObjectNew.setWorkExperienceId(experiences.getWorkExperienceId()); 
 
-			SimpleDateFormat formatter = new SimpleDateFormat("YYYY-MM-dd");
+			SimpleDateFormat formatter = new SimpleDateFormat("MM-dd-yyyy");
 
 			String startDateConverted = formatter.format(experiences.getStartDate());
 			workExperienceObjectNew.setStartDate(startDateConverted);
@@ -522,7 +522,7 @@ public class StudentFacingService {
 		experiences.setNeuId(neuId);
 		experiences.setExtraExperienceId(extraExperienceId); 
 
-		SimpleDateFormat formatter = new SimpleDateFormat("YYYY-MM-dd");
+		SimpleDateFormat formatter = new SimpleDateFormat("MM-dd-yyyy");
 		try {
 			Date startDate = formatter.parse(extraExperienceObject.getStartDate());
 			experiences.setStartDate(startDate);
@@ -578,7 +578,7 @@ public class StudentFacingService {
 		projectUpdated.setDescription(project.getDescription()); 
 		projectUpdated.setProjectId(projectId);
 
-		SimpleDateFormat formatter = new SimpleDateFormat("YYYY-MM-dd");
+		SimpleDateFormat formatter = new SimpleDateFormat("MM-dd-yyyy");
 		try {
 			Date startDate = formatter.parse(project.getStartDate());
 			projectUpdated.setStartDate(startDate);
@@ -1232,6 +1232,12 @@ public class StudentFacingService {
 
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).build();
 		}
+
+		//		JSONArray projectObj = new JSONArray();
+		//		JSONObject jsonObj = new JSONObject();
+		//		jsonObj.put(key, value);
+		//		projectObj.put(studentRecords);
+
 
 		return Response.status(Response.Status.OK).entity(studentRecords).build(); 
 	}
