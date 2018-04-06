@@ -648,7 +648,7 @@ public class StudentFacingService {
 	 * @return 200 response if the project is deleted successfully 
 	 */
 	@DELETE
-	@Path("/students/{nuId}/project/{Id}")
+	@Path("/students/{nuId}/projects/{Id}")
 	@Produces(MediaType.APPLICATION_JSON) 
 	public Response deleteProject(@PathParam("nuId") String neuId, @PathParam("Id") int projectId) {
 		Projects project = null;
