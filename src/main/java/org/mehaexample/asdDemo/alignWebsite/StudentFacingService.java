@@ -407,8 +407,9 @@ public class StudentFacingService {
 
 		List<ExtraExperienceObject> extraExperiencesObjectList = new ArrayList<>();
 
-		ExtraExperienceObject experienceObjectNew = new ExtraExperienceObject();
 		for(ExtraExperiences experiences: extraExperiencesList){
+			ExtraExperienceObject experienceObjectNew = new ExtraExperienceObject();
+
 			experienceObjectNew.setCompanyName(experiences.getCompanyName()); 
 			experienceObjectNew.setCompanyName(experiences.getCompanyName());
 			experienceObjectNew.setTitle(experiences.getTitle());
@@ -462,8 +463,9 @@ public class StudentFacingService {
 
 		List<WorkExperienceObject> workExperiencesObjectList = new ArrayList<>();
 
-		WorkExperienceObject workExperienceObjectNew = new WorkExperienceObject();
 		for(WorkExperiences experiences: workExperiencesList){
+			WorkExperienceObject workExperienceObjectNew = new WorkExperienceObject();
+
 			workExperienceObjectNew.setCompanyName(experiences.getCompanyName()); 
 			workExperienceObjectNew.setCompanyName(experiences.getCompanyName());
 			workExperienceObjectNew.setTitle(experiences.getTitle());
