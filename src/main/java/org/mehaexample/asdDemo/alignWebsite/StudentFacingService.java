@@ -150,8 +150,6 @@ public class StudentFacingService {
 			jsonObj.put("companyName", workExp.getCompanyName());
 			jsonObj.put("startDate", workExp.getStartDate());
 			jsonObj.put("endDate", workExp.getEndDate());
-			jsonObj.put("currentJob", workExp.isCurrentJob());
-			jsonObj.put("coop", workExp.isCoop());
 			jsonObj.put("title", workExp.getTitle());
 			jsonObj.put("description", workExp.getDescription());
 			workExperienceObj.put(jsonObj); 
