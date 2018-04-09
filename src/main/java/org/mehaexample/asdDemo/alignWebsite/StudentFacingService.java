@@ -200,7 +200,7 @@ public class StudentFacingService {
 		privacyObject.put("skill", privacy.isSkill());
 		privacyObject.put("coop", privacy.isCoop());
 		privacyObject.put("phone", privacy.isPhone());
-		
+
 
 		JSONObject studentObj = new JSONObject();
 		studentObj.put("neuId", studentRecord.getNeuId());
@@ -729,8 +729,8 @@ public class StudentFacingService {
 				senderJwe.setKey(keyMain);
 				String compactSerialization = senderJwe.getCompactSerialization();
 				jsonObj.put("token", compactSerialization);
-				//				Students student = studentDao.findStudentistratorByEmail(loginInput.getUsername());
-				//				jsonObj.put("id", student.getStudentistratorNeuId());
+				Students student = studentDao.getStudentRecordByEmailId(loginInput.getUsername());
+				jsonObj.put("id", student.getNeuId());
 
 				return Response.status(Response.Status.OK).
 						entity(jsonObj.toString()).build();
