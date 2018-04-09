@@ -200,6 +200,9 @@ public class StudentFacingService {
 		privacyObject.put("extraExperience", privacy.isExtraExperience());
 		privacyObject.put("project", privacy.isProject());
 		privacyObject.put("skill", privacy.isSkill());
+		privacyObject.put("coop", privacy.isCoop());
+		privacyObject.put("phone", privacy.isPhone());
+		
 
 		JSONObject studentObj = new JSONObject();
 		studentObj.put("neuId", studentRecord.getNeuId());
