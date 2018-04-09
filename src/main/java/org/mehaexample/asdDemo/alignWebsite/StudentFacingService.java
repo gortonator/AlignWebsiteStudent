@@ -114,11 +114,11 @@ public class StudentFacingService {
 					entity(ex).build();
 		}
 
-		if(privacy == null){
-
-			return Response.status(Response.Status.NOT_FOUND).
-					entity("Privacy setting not found for the given student").build();
-		}
+//		if(privacy == null){
+//
+//			return Response.status(Response.Status.NOT_FOUND).
+//					entity("Privacy setting not found for the given student").build();
+//		}
 
 		List<WorkExperiences> workExperiencesRecord = workExperiencesDao.getWorkExperiencesByNeuId(nuid);
 		List<Projects> projects = projectsDao.getProjectsByNeuId(nuid);
@@ -729,7 +729,7 @@ public class StudentFacingService {
 				String compactSerialization = senderJwe.getCompactSerialization();
 				jsonObj.put("token", compactSerialization);
 				Students student = studentDao.getStudentRecordByEmailId(loginInput.getUsername());
-				System.out.println("Student object " + student);
+				System.out.println("Student object " + student); 
 				jsonObj.put("id", student.getNeuId());
 
 				return Response.status(Response.Status.OK).
