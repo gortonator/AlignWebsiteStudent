@@ -51,6 +51,7 @@ import org.mehaexample.asdDemo.utils.MailClient;
 
 import com.lambdaworks.crypto.SCryptUtil;
 
+@Path("extra")
 public class StudentFacingExtraMethods {
 	StudentsDao studentDao = new StudentsDao();
 	ElectivesDao electivesDao = new ElectivesDao();
@@ -62,7 +63,7 @@ public class StudentFacingExtraMethods {
 	PrivaciesDao privaciesDao = new PrivaciesDao();
 	private static String NUIDNOTFOUND = "No Student record exists with given ID"; 
 	private static String INCORRECTPASS = "Incorrect Password";
-	
+
 	/**
 	 * This function creates a new student record
 	 * 
@@ -117,7 +118,53 @@ public class StudentFacingExtraMethods {
 					entity(ex).build();
 		}		
 	} 
+
+	/**
+	 * This function gets all the student records
+	 * 
+	 * @param student
+	 * @return 200 Response if all students retrieved successfully
+	 */
+	@GET
+	@Path("students/get-all")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getStudent(){
+		List<Students> studentsList = null;
+		try{
+			studentsList = studentDao.getAllStudents();
+		}catch(Exception ex){
+
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+					entity(ex.toString()).build();
+		}
+
+		return Response.status(Response.Status.OK).entity(studentsList).build(); 
+
+	}
 	
+	/**
+	 * This function gets all the student Logins records
+	 * 
+	 * @param student
+	 * @return 200 Response if all students Logins retrieved successfully
+	 */
+	@GET
+	@Path("students/studentLogins/{email}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getStudentLogins(@PathParam("email") String email){
+		StudentLogins studentsLogin = null;
+		try{
+			studentsLogin = studentLoginsDao.findStudentLoginsByEmail(email);
+		}catch(Exception ex){
+
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+					entity(ex.toString()).build();
+		}
+
+		return Response.status(Response.Status.OK).entity(studentsLogin).build(); 
+
+	}
+
 	/**
 	 * This function get the courses taken by a student 
 	 * 
@@ -157,7 +204,7 @@ public class StudentFacingExtraMethods {
 
 		return Response.status(Response.Status.OK).entity(courses).build();
 	}
-	
+
 	/**
 	 * This function gets the student details by NUID
 	 * 

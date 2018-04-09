@@ -114,11 +114,12 @@ public class StudentFacingService {
 					entity(ex).build();
 		}
 
-		if(privacy == null){
-
-			return Response.status(Response.Status.NOT_FOUND).
-					entity("Privacy setting not found for the given student").build();
-		}
+		//
+		//		if(privacy == null){
+		//
+		//			return Response.status(Response.Status.NOT_FOUND).
+		//					entity("Privacy setting not found for the given student").build();
+		//		}
 
 		List<WorkExperiences> workExperiencesRecord = workExperiencesDao.getWorkExperiencesByNeuId(nuid);
 		List<Projects> projects = projectsDao.getProjectsByNeuId(nuid);
@@ -183,23 +184,24 @@ public class StudentFacingService {
 
 		// add privacy
 		JSONObject privacyObject = new JSONObject();
-		privacyObject.put("neuId", privacy.getNeuId());
-		privacyObject.put("publicId", privacy.getPublicId());
-		privacyObject.put("visibleToPublic", privacy.isVisibleToPublic());
-		privacyObject.put("photo", privacy.isPhoto());
-		privacyObject.put("email", privacy.isEmail());
-		privacyObject.put("address", privacy.isAddress());
-		privacyObject.put("linkedin", privacy.isLinkedin());
-		privacyObject.put("github", privacy.isGithub());
-		privacyObject.put("facebook", privacy.isFacebook());
-		privacyObject.put("website", privacy.isWebsite());
-		privacyObject.put("course", privacy.isCourse());
-		privacyObject.put("extraExperience", privacy.isExtraExperience());
-		privacyObject.put("project", privacy.isProject());
-		privacyObject.put("skill", privacy.isSkill());
-		privacyObject.put("coop", privacy.isCoop());
-		privacyObject.put("phone", privacy.isPhone());
-
+		if(privacy != null){
+			privacyObject.put("neuId", privacy.getNeuId());
+			privacyObject.put("publicId", privacy.getPublicId());
+			privacyObject.put("visibleToPublic", privacy.isVisibleToPublic());
+			privacyObject.put("photo", privacy.isPhoto());
+			privacyObject.put("email", privacy.isEmail());
+			privacyObject.put("address", privacy.isAddress());
+			privacyObject.put("linkedin", privacy.isLinkedin());
+			privacyObject.put("github", privacy.isGithub());
+			privacyObject.put("facebook", privacy.isFacebook());
+			privacyObject.put("website", privacy.isWebsite());
+			privacyObject.put("course", privacy.isCourse());
+			privacyObject.put("extraExperience", privacy.isExtraExperience());
+			privacyObject.put("project", privacy.isProject());
+			privacyObject.put("skill", privacy.isSkill());
+			privacyObject.put("coop", privacy.isCoop());
+			privacyObject.put("phone", privacy.isPhone());
+		}
 
 		JSONObject studentObj = new JSONObject();
 		studentObj.put("neuId", studentRecord.getNeuId());
