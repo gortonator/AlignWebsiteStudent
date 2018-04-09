@@ -233,7 +233,7 @@ public class StudentFacingService {
 		studentObj.put("skills", studentRecord.getSkills());
 		studentObj.put("summary", studentRecord.getSummary());
 
-		Obj.put("studentRecord", studentObj);
+		Obj.put("StudentRecord", studentObj);
 		Obj.put("WorkExperiences", workExperienceObj);
 		Obj.put("ExtraExperiences", extraExperienceObj);
 		Obj.put("Projects", projectObj);
@@ -1234,7 +1234,7 @@ public class StudentFacingService {
 		}
 
 		JSONObject studentsRecordObj = new JSONObject();
-		studentsRecordObj.put("studentsRecord", studentRecords);
+		studentsRecordObj.put("StudentsRecord", studentRecords);
 
 		return Response.status(Response.Status.OK).entity(studentsRecordObj.toString()).build(); 
 	}
