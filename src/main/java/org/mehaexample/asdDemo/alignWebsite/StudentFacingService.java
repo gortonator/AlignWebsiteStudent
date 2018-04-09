@@ -22,7 +22,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response; 
+import javax.ws.rs.core.Response;
 
 import org.jose4j.jwe.ContentEncryptionAlgorithmIdentifiers;
 import org.jose4j.jwe.JsonWebEncryption;
@@ -54,7 +54,6 @@ import org.mehaexample.asdDemo.restModels.PasswordCreateObject;
 import org.mehaexample.asdDemo.restModels.PasswordResetObject;
 import org.mehaexample.asdDemo.restModels.ProjectObject;
 import org.mehaexample.asdDemo.restModels.SearchOtherStudents;
-import org.mehaexample.asdDemo.restModels.StudentProfile;
 import org.mehaexample.asdDemo.restModels.WorkExperienceObject;
 import org.mehaexample.asdDemo.utils.MailClient;
 
@@ -730,6 +729,7 @@ public class StudentFacingService {
 				String compactSerialization = senderJwe.getCompactSerialization();
 				jsonObj.put("token", compactSerialization);
 				Students student = studentDao.getStudentRecordByEmailId(loginInput.getUsername());
+				System.out.println("Student object " + student);
 				jsonObj.put("id", student.getNeuId());
 
 				return Response.status(Response.Status.OK).
