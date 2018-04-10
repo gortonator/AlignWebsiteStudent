@@ -38,6 +38,7 @@ import org.mehaexample.asdDemo.dao.alignprivate.ProjectsDao;
 import org.mehaexample.asdDemo.dao.alignprivate.StudentLoginsDao;
 import org.mehaexample.asdDemo.dao.alignprivate.StudentsDao;
 import org.mehaexample.asdDemo.dao.alignprivate.WorkExperiencesDao;
+import org.mehaexample.asdDemo.dao.alignpublic.StudentsPublicDao;
 import org.mehaexample.asdDemo.model.alignadmin.LoginObject;
 import org.mehaexample.asdDemo.model.alignprivate.Courses;
 import org.mehaexample.asdDemo.model.alignprivate.Electives;
@@ -47,6 +48,7 @@ import org.mehaexample.asdDemo.model.alignprivate.Projects;
 import org.mehaexample.asdDemo.model.alignprivate.StudentLogins;
 import org.mehaexample.asdDemo.model.alignprivate.Students;
 import org.mehaexample.asdDemo.model.alignprivate.WorkExperiences;
+import org.mehaexample.asdDemo.model.alignpublic.StudentsPublic;
 import org.mehaexample.asdDemo.restModels.EmailToRegister;
 import org.mehaexample.asdDemo.restModels.ExtraExperienceObject;
 import org.mehaexample.asdDemo.restModels.PasswordChangeObject;
@@ -69,6 +71,7 @@ public class StudentFacingService {
 	ProjectsDao projectsDao = new ProjectsDao();
 	StudentLoginsDao studentLoginsDao = new StudentLoginsDao(); 
 	PrivaciesDao privaciesDao = new PrivaciesDao();
+	StudentsPublicDao studentsPublicDao = new StudentsPublicDao();
 	private static String NUIDNOTFOUND = "No Student record exists with given ID"; 
 	private static String INCORRECTPASS = "Incorrect Password";
 
@@ -1180,6 +1183,20 @@ public class StudentFacingService {
 
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
 					entity(ex).build();
+		}
+
+		StudentsPublic studentsPublic = 
+				studentsPublicDao.findStudentByPublicId(student.getPublicId());
+		studentsPublic.setVisibleToPublic(privacies.isVisibleToPublic());  
+
+		if(studentsPublic != null){
+			try{
+				studentsPublicDao.updateStudent(studentsPublic);
+			}catch(Exception ex){
+
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+						entity(ex).build();
+			}
 		}
 
 		return Response.status(Response.Status.OK).entity("Privacies Updated Successfully!").build(); 
