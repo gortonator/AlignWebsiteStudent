@@ -464,7 +464,7 @@ public class StudentsDao {
 		}
 	}
 
-	public List<Students> getStudentAutoFillSearch(String firstName, String middleName, String lastName, String neuId) {
+	public List<Students> getStudentAutoFillSearch(String firstName, String middleName, String lastName) {
 		try {
 			session = factory.openSession();
 			org.hibernate.query.Query query;
@@ -473,20 +473,17 @@ public class StudentsDao {
 								"SELECT s FROM Students s " +
 												"WHERE s.firstName like :firstName " +
 												"OR s.middleName like :middleName " +
-												"OR s.lastName like :lastName " +
-												"OR s.neuId like :neuId ");
+												"OR s.lastName like :lastName ");
 			} else {
 				query = session.createQuery(
 								"SELECT s FROM Students s " +
 												"WHERE ( s.firstName like :firstName " +
 												"AND s.lastName like :lastName ) " +
-												"OR s.middleName like :middleName " +
-												"OR s.neuId like :neuId ");
+												"OR s.middleName like :middleName ");
 			}
 			query.setParameter("firstName", "%" + firstName + "%");
 			query.setParameter("middleName", "%" + middleName + "%");
 			query.setParameter("lastName", "%" + lastName + "%");
-			query.setParameter("neuId", "%" + neuId + "%");
 			return (List<Students>) query.list();
 		} finally {
 			session.close();
