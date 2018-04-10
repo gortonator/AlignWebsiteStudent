@@ -265,12 +265,15 @@ public class StudentFacingService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateStudentRecord(@PathParam("nuId") String neuId, Students student) {
+
 		neuId = new String(Base64.getDecoder().decode(neuId));
 		student.setNeuId(neuId);
 
 		if (!studentDao.ifNuidExists(neuId)) {
 			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
 		}
+		
+		student.setNeuId(neuId);
 
 		try{
 			studentDao.updateStudentRecord(student);
