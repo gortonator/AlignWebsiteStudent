@@ -190,7 +190,7 @@ public class StudentFacingService {
 		// add privacy
 		JSONObject privacyObject = new JSONObject();
 		if(privacy != null){
-			privacyObject.put("neuId", new String(Base64.getEncoder().encode(privacy.getNeuId().getBytes())));
+			privacyObject.put("neuId", privacy.getNeuId());
 			privacyObject.put("publicId", privacy.getPublicId());
 			privacyObject.put("visibleToPublic", privacy.isVisibleToPublic());
 			privacyObject.put("photo", privacy.isPhoto());
