@@ -3,6 +3,7 @@ package org.mehaexample.asdDemo.alignWebsite;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -20,7 +21,9 @@ import org.jose4j.jwe.JsonWebEncryption;
 import org.jose4j.jwe.KeyManagementAlgorithmIdentifiers;
 import org.jose4j.keys.AesKey;
 import org.mehaexample.asdDemo.dao.alignprivate.StudentLoginsDao;
+import org.mehaexample.asdDemo.dao.alignprivate.StudentsDao;
 import org.mehaexample.asdDemo.model.alignprivate.StudentLogins;
+import org.mehaexample.asdDemo.model.alignprivate.Students;
 
 @Provider
 public class SecureAuth implements ContainerRequestFilter{
@@ -35,6 +38,7 @@ public class SecureAuth implements ContainerRequestFilter{
 	private HttpServletRequest sr;
 
 	StudentLoginsDao studentLoginsDao = new StudentLoginsDao();
+	StudentsDao studentDao = new StudentsDao();
 
 	@Override
 	public void filter(ContainerRequestContext requestContext)
@@ -47,7 +51,7 @@ public class SecureAuth implements ContainerRequestFilter{
 				String method = requestContext.getMethod();
 				if (method.equals("OPTIONS")){
 					return;
-				}	
+				}
 				List<String> authHeader =  requestContext.getHeaders().get(AUTHOIRIZATION_HEADER);
 				if(authHeader.size() > 0){
 					try {
@@ -76,10 +80,13 @@ public class SecureAuth implements ContainerRequestFilter{
 						if(studentLogins == null){
 							requestContext.abortWith(Response.status(Response.Status.NOT_ACCEPTABLE).
 									entity("Token not valid. Please login again.").build());
-							
-							return;
+						}else if (method.equals("PUT") || method.equals("DELETE")){
+							Students studentDetail = studentDao.getStudentRecordByEmailId(email);
+							if(!requestContext.getUriInfo().getPath().contains(new String(Base64.getEncoder().encode(studentDetail.getNeuId().getBytes())))){
+								requestContext.abortWith(Response.status(Response.Status.NOT_ACCEPTABLE).
+										entity("You cannot edit other student's info.").build());
+							}
 						}
-						
 						String loginTime = studentLogins.getLoginTime().toString();
 						String expireTime = studentLogins.getKeyExpiration().toString();
 						Timestamp now = new Timestamp(System.currentTimeMillis());
@@ -87,6 +94,19 @@ public class SecureAuth implements ContainerRequestFilter{
 						Timestamp expire = Timestamp.valueOf(expireTime);
 						String timeLogin = loginTime.substring(0,loginTime.length()-4);
 						if(ip.equals(ipAddress) && timeLogin.equals(tokenCheck) && valid.before(expire)) {
+							if (method.equals("POST")){
+								Students studentDetail = studentDao.getStudentRecordByEmailId(email);
+								String encodedNuid = new String(Base64.getEncoder().encode(studentDetail.getNeuId().getBytes()));
+								if(!requestContext.getUriInfo().getPath().contains(encodedNuid+"/extraexperiences") && 
+								   !requestContext.getUriInfo().getPath().contains(encodedNuid+"/projects")	&&
+								   !requestContext.getUriInfo().getPath().contains(encodedNuid+"/privacies") ){
+									if(!requestContext.getUriInfo().getPath().equals("students") &&
+									   !requestContext.getUriInfo().getPath().equals("students/")){
+									requestContext.abortWith(Response.status(Response.Status.NOT_ACCEPTABLE).
+											entity("You cannot edit other student's info.").build());
+									}
+								}
+							}
 							Timestamp keyExpiration = new Timestamp(System.currentTimeMillis()+15*60*1000);
 							studentLogins.setKeyExpiration(keyExpiration);
 							studentLoginsDao.updateStudentLogin(studentLogins);
