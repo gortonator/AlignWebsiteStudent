@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -89,11 +90,12 @@ public class StudentFacingService {
 	@Path("students/{nuid}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getStudentProfile(@PathParam("nuid") String nuid) {
+		nuid = new String(Base64.getDecoder().decode(nuid));
 		Students studentRecord = null;
 		Privacies privacy = null;
 		if (!studentDao.ifNuidExists(nuid)) {
 
-			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND + ":" + nuid).build();
+			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND + ":" + new String(Base64.getEncoder().encode(nuid.getBytes()))).build();
 		} 
 
 		try{
@@ -149,7 +151,7 @@ public class StudentFacingService {
 		for(WorkExperiences workExp : workExperiencesRecord){
 			JSONObject jsonObj = new JSONObject();
 			jsonObj.put("workExperienceId", workExp.getWorkExperienceId());
-			jsonObj.put("neuId", workExp.getNeuId());
+			jsonObj.put("neuId", new String(Base64.getEncoder().encode(workExp.getNeuId().getBytes())));
 			jsonObj.put("companyName", workExp.getCompanyName());
 			jsonObj.put("startDate", workExp.getStartDate());
 			jsonObj.put("endDate", workExp.getEndDate());
@@ -168,7 +170,7 @@ public class StudentFacingService {
 			jsonObj.put("extraExperienceId", extraExperience.getExtraExperienceId());
 			jsonObj.put("startDate", extraExperience.getStartDate());
 			jsonObj.put("title", extraExperience.getTitle());
-			jsonObj.put("neuId", extraExperience.getNeuId());
+			jsonObj.put("neuId", new String(Base64.getEncoder().encode(extraExperience.getNeuId().getBytes())));
 			extraExperienceObj.put(jsonObj); 
 		}
 
@@ -181,14 +183,14 @@ public class StudentFacingService {
 			jsonObj.put("endDate", project.getEndDate());
 			jsonObj.put("projectId", project.getProjectId());
 			jsonObj.put("startDate", project.getStartDate());
-			jsonObj.put("neuId", project.getNeuId());
+			jsonObj.put("neuId", new String(Base64.getEncoder().encode(project.getNeuId().getBytes())));
 			projectObj.put(jsonObj); 
 		}
 
 		// add privacy
 		JSONObject privacyObject = new JSONObject();
 		if(privacy != null){
-			privacyObject.put("neuId", privacy.getNeuId());
+			privacyObject.put("neuId", new String(Base64.getEncoder().encode(privacy.getNeuId().getBytes())));
 			privacyObject.put("publicId", privacy.getPublicId());
 			privacyObject.put("visibleToPublic", privacy.isVisibleToPublic());
 			privacyObject.put("photo", privacy.isPhoto());
@@ -207,7 +209,7 @@ public class StudentFacingService {
 		}
 
 		JSONObject studentObj = new JSONObject();
-		studentObj.put("neuId", studentRecord.getNeuId());
+		studentObj.put("neuId", new String(Base64.getEncoder().encode(studentRecord.getNeuId().getBytes())));
 		studentObj.put("publicId", studentRecord.getPublicId());
 		studentObj.put("email", studentRecord.getEmail());
 		studentObj.put("firstName", studentRecord.getFirstName());
@@ -263,15 +265,16 @@ public class StudentFacingService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateStudentRecord(@PathParam("nuId") String neuId, Students student) {
+		neuId = new String(Base64.getDecoder().decode(neuId));
 		student.setNeuId(neuId);
 
 		if (!studentDao.ifNuidExists(neuId)) {
-			System.out.println("not found "+ neuId);
 			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
 		}
 
 		try{
 			studentDao.updateStudentRecord(student);
+			student.setNeuId( new String(Base64.getEncoder().encode(student.getNeuId().getBytes())));
 		}catch(Exception ex){
 
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
@@ -294,6 +297,7 @@ public class StudentFacingService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addExtraExperience(@PathParam("nuId") String neuId, ExtraExperienceObject extraExperienceObject) {
+		neuId = new String(Base64.getDecoder().decode(neuId));
 		if (!studentDao.ifNuidExists(neuId)) {
 			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
 		}
@@ -343,6 +347,7 @@ public class StudentFacingService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addProject(@PathParam("nuId") String neuId, ProjectObject projectObject) {
+		neuId = new String(Base64.getDecoder().decode(neuId));
 		if (!studentDao.ifNuidExists(neuId)) {
 			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
 		}
@@ -389,6 +394,7 @@ public class StudentFacingService {
 	@Path("/students/{nuId}/extraexperiences") 
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getStudentExtraExperience(@PathParam("nuId") String neuId) {
+		neuId = new String(Base64.getDecoder().decode(neuId));
 		List<ExtraExperiences> extraExperiencesList;
 		if (!studentDao.ifNuidExists(neuId)) {
 
@@ -406,7 +412,7 @@ public class StudentFacingService {
 		if(extraExperiencesList == null || extraExperiencesList.isEmpty()){
 
 			return Response.status(Response.Status.NOT_FOUND).
-					entity("No Extra Experience record exists for a given NeuId: " + neuId).build();
+					entity("No Extra Experience record exists for a given NeuId: " + new String(Base64.getEncoder().encode(neuId.getBytes()))).build();
 
 		}
 
@@ -419,8 +425,7 @@ public class StudentFacingService {
 			experienceObjectNew.setCompanyName(experiences.getCompanyName());
 			experienceObjectNew.setTitle(experiences.getTitle());
 			experienceObjectNew.setDescription(experiences.getDescription());
-			experienceObjectNew.setNeuId(neuId);
-			System.out.println("exitra id" + experiences.getExtraExperienceId());
+			experienceObjectNew.setNeuId(new String(Base64.getEncoder().encode(neuId.getBytes())));
 			experienceObjectNew.setExtraExperienceId(experiences.getExtraExperienceId());  
 
 			SimpleDateFormat formatter = new SimpleDateFormat("MM-dd-yyyy");
@@ -448,6 +453,7 @@ public class StudentFacingService {
 	@Path("/students/{nuId}/workexperiences")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getStudentWorkExperiences(@PathParam("nuId") String neuId) {
+		neuId = new String(Base64.getDecoder().decode(neuId));
 		List<WorkExperiences> workExperiencesList = null;
 		if (!studentDao.ifNuidExists(neuId)) {
 			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
@@ -477,7 +483,7 @@ public class StudentFacingService {
 			workExperienceObjectNew.setDescription(experiences.getDescription());
 			workExperienceObjectNew.setCoop(experiences.isCoop()); 
 			workExperienceObjectNew.setCurrentJob(experiences.isCurrentJob());
-			workExperienceObjectNew.setNeuId(neuId);
+			workExperienceObjectNew.setNeuId(new String(Base64.getEncoder().encode(neuId.getBytes())));
 			workExperienceObjectNew.setWorkExperienceId(experiences.getWorkExperienceId()); 
 
 			SimpleDateFormat formatter = new SimpleDateFormat("MM-dd-yyyy");
@@ -507,7 +513,7 @@ public class StudentFacingService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateExtraExperience(@PathParam("nuId") String neuId,
 			@PathParam("id") int extraExperienceId, ExtraExperienceObject extraExperienceObject) {
-
+		neuId = new String(Base64.getDecoder().decode(neuId));
 		if (!studentDao.ifNuidExists(neuId)) {
 
 			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
@@ -566,6 +572,7 @@ public class StudentFacingService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateProject(@PathParam("nuId") String neuId, 
 			@PathParam("Id") Integer projectId, ProjectObject project) {
+		neuId = new String(Base64.getDecoder().decode(neuId));
 		if (!studentDao.ifNuidExists(neuId)) {
 
 			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
@@ -623,6 +630,7 @@ public class StudentFacingService {
 	@Path("/students/{nuId}/extraexperiences/{Id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteExtraExperience(@PathParam("nuId") String neuId, @PathParam("Id") Integer extraExperienceId) {
+		neuId = new String(Base64.getDecoder().decode(neuId));
 		ExtraExperiences extraExperiences = null;
 		if (!studentDao.ifNuidExists(neuId)) {
 			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
@@ -656,6 +664,7 @@ public class StudentFacingService {
 	@Path("/students/{nuId}/projects/{Id}")
 	@Produces(MediaType.APPLICATION_JSON) 
 	public Response deleteProject(@PathParam("nuId") String neuId, @PathParam("Id") int projectId) {
+		neuId = new String(Base64.getDecoder().decode(neuId));
 		Projects project = null;
 		if (!studentDao.ifNuidExists(neuId)) {
 
@@ -735,7 +744,7 @@ public class StudentFacingService {
 				jsonObj.put("token", compactSerialization);
 				Students student = studentDao.getStudentRecordByEmailId(loginInput.getUsername());
 				System.out.println("Student object " + student); 
-				jsonObj.put("id", student.getNeuId());
+				jsonObj.put("id", new String(Base64.getEncoder().encode(student.getNeuId().getBytes())));
 
 				return Response.status(Response.Status.OK).
 						entity(jsonObj.toString()).build();
@@ -1091,6 +1100,7 @@ public class StudentFacingService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addPrivacy(@PathParam("NUID") String neuId, Privacies privacy){
+		neuId = new String(Base64.getDecoder().decode(neuId));
 		Privacies privacies = null;
 
 		Students student = studentDao.getStudentRecord(neuId);
@@ -1124,26 +1134,20 @@ public class StudentFacingService {
 	@Path("/students/{nuId}/privacies") 
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getStduentPrivacies(@PathParam("nuId") String neuId) {
+		neuId = new String(Base64.getDecoder().decode(neuId));
 		Privacies privacy = null;
 		if (!studentDao.ifNuidExists(neuId)) {
-
 			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
 		} 
 
 		try{
 			privacy = privaciesDao.getPrivacyByNeuId(neuId);
+			privacy.setNeuId(new String(Base64.getEncoder().encode(neuId.getBytes())));
 
 		}catch(Exception ex){
 
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
 					entity(ex).build();
-		}
-
-		if(privacy == null){
-
-			return Response.status(Response.Status.NOT_FOUND).
-					entity("No privacy setting exists for a given NeuId: " + neuId).build();
-
 		}
 
 		return Response.status(Response.Status.OK).entity(privacy).build();
@@ -1161,8 +1165,8 @@ public class StudentFacingService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updatePrivacies(@PathParam("NUID") String neuId, Privacies privacies) { 
+		neuId = new String(Base64.getDecoder().decode(neuId));
 		if (!studentDao.ifNuidExists(neuId)) {
-
 			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
 		} 
 
@@ -1215,6 +1219,7 @@ public class StudentFacingService {
 	public Response searchStudent(SearchOtherStudents search){
 
 		List<Students> studentRecords;
+		List<Students> resultStudentRecords = new ArrayList<Students>();
 		Map<String,List<String>> map = new HashMap<String,List<String>>();
 
 		try{
@@ -1247,14 +1252,19 @@ public class StudentFacingService {
 		}
 
 		try {
-			studentRecords = (ArrayList<Students>) studentDao.getStudentFilteredStudents(map, 0, 20);
+			studentRecords = (ArrayList<Students>) studentDao.getStudentFilteredStudents(map, 0, 9999);
+			for (Students student : studentRecords) {
+				student.setNeuId(new String(Base64.getEncoder().encode(student.getNeuId().getBytes())));
+				resultStudentRecords.add(student);
+			}
+			
 		} catch (Exception e) {
 
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).build();
 		}
 
 		JSONObject studentsRecordObj = new JSONObject();
-		studentsRecordObj.put("StudentsRecord", studentRecords);
+		studentsRecordObj.put("StudentsRecord", resultStudentRecords);
 
 		return Response.status(Response.Status.OK).entity(studentsRecordObj.toString()).build(); 
 	}
