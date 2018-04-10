@@ -1309,7 +1309,7 @@ public class StudentFacingService {
 			for (Students student : students) {
 				JSONObject studentJson = new JSONObject();
 				studentJson.put("name",student.getFirstName()+" "+student.getLastName());
-				studentJson.put("nuid",student.getNeuId());
+				studentJson.put("nuid", new String(Base64.getEncoder().encode(student.getNeuId().getBytes())) );
 				studentJson.put("email",student.getEmail());
 				studentsArray.put(studentJson);
 			}
