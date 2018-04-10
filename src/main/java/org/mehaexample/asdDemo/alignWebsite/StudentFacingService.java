@@ -272,7 +272,7 @@ public class StudentFacingService {
 		if (!studentDao.ifNuidExists(neuId)) {
 			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
 		}
-		
+
 		student.setNeuId(neuId);
 
 		try{
@@ -1260,7 +1260,7 @@ public class StudentFacingService {
 				student.setNeuId(new String(Base64.getEncoder().encode(student.getNeuId().getBytes())));
 				resultStudentRecords.add(student);
 			}
-			
+
 		} catch (Exception e) {
 
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).build();
@@ -1270,6 +1270,58 @@ public class StudentFacingService {
 		studentsRecordObj.put("StudentsRecord", resultStudentRecords);
 
 		return Response.status(Response.Status.OK).entity(studentsRecordObj.toString()).build(); 
+	}
+
+	/**
+	 * Request 19
+	 * This is the function to get top undergraduate degrees.
+	 * The body should be in the JSON format like below:
+	 * <p>
+	 * http://localhost:8080/alignWebsite/webapi/public-facing/top-undergraddegrees
+	 *
+	 * @return List of n top undergraduate degrees
+	 */
+	@POST
+	@Path("autofill-search")
+	@Consumes(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getAutoFillSearch(String input) {
+		List<Students> students;
+		JSONObject result = new JSONObject();
+		JSONArray studentsArray = new JSONArray();
+		String firstName = input;
+		String middleName = input;
+		String lastName = input;
+		String neuId = input;
+		String email = input;
+
+		try {
+			String[] inputSplit = input.split(" ");
+			if(inputSplit.length>2){
+				firstName = inputSplit[0];
+				middleName = inputSplit[1];
+				lastName = inputSplit[2];
+			}else if(inputSplit.length>1){
+				firstName = inputSplit[0];
+				lastName = inputSplit[1];
+			}
+
+			students = studentDao.getStudentAutoFillSearch(firstName, middleName, lastName, input);
+
+			for (Students student : students) {
+				JSONObject studentJson = new JSONObject();
+				studentJson.put("name",student.getFirstName()+" "+student.getLastName());
+				studentJson.put("nuid",student.getNeuId());
+				studentJson.put("email",student.getEmail());
+				studentsArray.put(studentJson);
+			}
+			result.put("students",studentsArray);
+			result.put("resultscount",studentsArray.length());
+		} catch (Exception e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).build();
+		}
+
+		return Response.status(Response.Status.OK).entity(result.toString()).build();
 	}
 
 	private String createRegistrationKey() {
