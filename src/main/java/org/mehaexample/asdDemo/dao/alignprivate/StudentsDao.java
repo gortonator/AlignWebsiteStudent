@@ -336,44 +336,47 @@ public class StudentsDao {
 
 		for (Students student : result) {
 			Privacies privacy = privaciesDao.getPrivacyByNeuId(student.getNeuId());
-
-			if (!privacy.isAddress()) {
-				student.setAddress("");
-			}
-
-			if (!privacy.isEmail()) {
-				student.setEmail("");
-			}
-
-			if (!privacy.isPhone()) {
-				student.setPhoneNum("");
-			}
-
-			if (!privacy.isPhoto()) {
-				student.setPhoto(null);
-			}
-
-			if (!privacy.isFacebook()) {
-				student.setFacebook("");
-			}
-
-			if (!privacy.isGithub()) {
-				student.setGithub("");
-			}
-
-			if (!privacy.isWebsite()) {
-				student.setWebsite("");
-			}
-
-			if (!privacy.isSkill()) {
-				student.setSkills("");
-			}
-
-			if (!privacy.isLinkedin()) {
-				student.setLinkedin("");
-			}
+			setPrivacy(student, privacy);
 		}
 		return result;
+	}
+
+	private void setPrivacy(Students student, Privacies privacy) {
+		if (!privacy.isAddress()) {
+			student.setAddress("");
+		}
+
+		if (!privacy.isEmail()) {
+			student.setEmail("");
+		}
+
+		if (!privacy.isPhone()) {
+			student.setPhoneNum("");
+		}
+
+		if (!privacy.isPhoto()) {
+			student.setPhoto(null);
+		}
+
+		if (!privacy.isFacebook()) {
+			student.setFacebook("");
+		}
+
+		if (!privacy.isGithub()) {
+			student.setGithub("");
+		}
+
+		if (!privacy.isWebsite()) {
+			student.setWebsite("");
+		}
+
+		if (!privacy.isSkill()) {
+			student.setSkills("");
+		}
+
+		if (!privacy.isLinkedin()) {
+			student.setLinkedin("");
+		}
 	}
 
 	public int getStudentFilteredStudentsCount(Map<String, List<String>> filters) {
@@ -461,6 +464,35 @@ public class StudentsDao {
 		}
 	}
 
+	public List<Students> getStudentAutoFillSearch(String firstName, String middleName, String lastName, String neuId) {
+		try {
+			session = factory.openSession();
+			org.hibernate.query.Query query;
+			if (firstName.equalsIgnoreCase(lastName)) {
+				query = session.createQuery(
+								"SELECT s FROM Students s " +
+												"WHERE s.firstName like :firstName " +
+												"OR s.middleName like :middleName " +
+												"OR s.lastName like :lastName " +
+												"OR s.neuId like :neuId ");
+			} else {
+				query = session.createQuery(
+								"SELECT s FROM Students s " +
+												"WHERE ( s.firstName like :firstName " +
+												"AND s.lastName like :lastName ) " +
+												"OR s.middleName like :middleName " +
+												"OR s.neuId like :neuId ");
+			}
+			query.setParameter("firstName", "%" + firstName + "%");
+			query.setParameter("middleName", "%" + middleName + "%");
+			query.setParameter("lastName", "%" + lastName + "%");
+			query.setParameter("neuId", "%" + neuId + "%");
+			return (List<Students>) query.list();
+		} finally {
+			session.close();
+		}
+	}
+
 	/**
 	 * Search a single student record using neu id.
 	 *
@@ -477,6 +509,30 @@ public class StudentsDao {
 				return null;
 			}
 			return (Students) list.get(0);
+		} finally {
+			session.close();
+		}
+	}
+
+	/**
+	 * Search a single student record using neu id and hide some private information.
+	 *
+	 * @param neuId
+	 * @return a student object with related information hidden.
+	 */
+	public Students getStudentRecordWithPrivacy(String neuId) {
+		try {
+			session = factory.openSession();
+			org.hibernate.query.Query query = session.createQuery("FROM Students WHERE neuId = :studentNuid ");
+			query.setParameter("studentNuid", neuId);
+			List list = query.list();
+			if (list.isEmpty()) {
+				return null;
+			}
+			Privacies privacy = privaciesDao.getPrivacyByNeuId(neuId);
+			Students student = (Students) list.get(0);
+			setPrivacy(student, privacy);
+			return student;
 		} finally {
 			session.close();
 		}
