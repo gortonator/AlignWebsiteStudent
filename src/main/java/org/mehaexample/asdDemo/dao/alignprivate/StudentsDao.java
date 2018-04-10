@@ -336,6 +336,11 @@ public class StudentsDao {
 
 		for (Students student : result) {
 			Privacies privacy = privaciesDao.getPrivacyByNeuId(student.getNeuId());
+			if (privacy == null) {
+			  privacy = new Privacies(student.getNeuId(), student.getPublicId(), true, false, false, false, false, false,
+                false, false, false, false, false, false, false, false);
+			  privaciesDao.createPrivacy(privacy);
+      }
 			setPrivacy(student, privacy);
 		}
 		return result;
