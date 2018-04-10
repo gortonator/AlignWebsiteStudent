@@ -17,7 +17,7 @@ CREATE TABLE Electives (
     CourseTerm ENUM('SPRING', 'SUMMER', 'FALL'),
     CourseYear INT NOT NULL,
     Retake BOOLEAN DEFAULT FALSE,
-	Gpa FLOAT(6, 4) DEFAULT 0.0000,
+	Gpa VARCHAR(2) NOT NULL,
     Plagiarism BOOLEAN DEFAULT FALSE,
     CONSTRAINT pk_Electives_ElectiveId
 		PRIMARY KEY (ElectiveId),
