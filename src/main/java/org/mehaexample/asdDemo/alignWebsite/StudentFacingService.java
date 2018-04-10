@@ -1292,8 +1292,6 @@ public class StudentFacingService {
 		String firstName = input;
 		String middleName = input;
 		String lastName = input;
-		String neuId = input;
-		String email = input;
 
 		try {
 			String[] inputSplit = input.split(" ");
@@ -1306,7 +1304,7 @@ public class StudentFacingService {
 				lastName = inputSplit[1];
 			}
 
-			students = studentDao.getStudentAutoFillSearch(firstName, middleName, lastName, input);
+			students = studentDao.getStudentAutoFillSearch(firstName, middleName, lastName);
 
 			for (Students student : students) {
 				JSONObject studentJson = new JSONObject();
