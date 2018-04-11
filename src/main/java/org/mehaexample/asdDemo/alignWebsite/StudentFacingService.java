@@ -1273,16 +1273,13 @@ public class StudentFacingService {
 	}
 
 	/**
-	 * Request 19
-	 * This is the function to get top undergraduate degrees.
-	 * The body should be in the JSON format like below:
-	 * <p>
-	 * http://localhost:8080/alignWebsite/webapi/public-facing/top-undergraddegrees
+	 * Request 11
+	 * This function is to search students by name
 	 *
-	 * @return List of n top undergraduate degrees
+	 * @return List of students with matched name
 	 */
 	@POST
-	@Path("autofill-search")
+	@Path("/students/autofill-search")
 	@Consumes(MediaType.TEXT_PLAIN)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAutoFillSearch(String input) {
