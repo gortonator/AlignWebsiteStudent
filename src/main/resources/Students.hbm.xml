@@ -30,7 +30,7 @@
 				<param name="useNamed">true</param>
 			</type>
 		</property>
-		<property name="race" column="Race" type="string" />
+		<!--<property name="race" column="Race" type="string" />-->
 		<property name="scholarship" column="Scholarship" type="boolean" />
 		<property name="visa" column="visa" type="string" />
 		<property name="phoneNum" column="Phone" type="string" />

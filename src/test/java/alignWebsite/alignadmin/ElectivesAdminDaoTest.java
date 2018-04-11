@@ -73,7 +73,7 @@ public class ElectivesAdminDaoTest {
     elective.setNeuId(newStudent.getNeuId());
     elective.setCourseId(newCourse.getCourseId());
     elective.setRetake(false);
-    elective.setGpa((float) 3.2);
+    elective.setGpa("A-");
     elective.setPlagiarism(false);
 
     Assert.assertTrue(electivesAdminDao.getElectiveById(123321) == null);
@@ -109,7 +109,7 @@ public class ElectivesAdminDaoTest {
     elective.setNeuId(newStudent.getNeuId());
     elective.setCourseId(newCourse.getCourseId());
     elective.setRetake(false);
-    elective.setGpa((float) 3.2);
+    elective.setGpa("A-");
     elective.setPlagiarism(false);
 
     ElectivesAdmin electivesNew = electivesAdminDao.addElective(elective);
@@ -144,14 +144,14 @@ public class ElectivesAdminDaoTest {
     elective.setNeuId(newStudent.getNeuId());
     elective.setCourseId(newCourse.getCourseId());
     elective.setRetake(false);
-    elective.setGpa((float) 3.2);
+    elective.setGpa("A-");
     elective.setPlagiarism(false);
 
     ElectivesAdmin electivesNew = electivesAdminDao.addElective(elective);
 
-    electivesNew.setGpa((float) 4.2332);
+    electivesNew.setGpa("A-");
     electivesAdminDao.updateElectives(electivesNew);
-    Assert.assertEquals(electivesNew.getGpa(), ((float) 4.2332), 0.1);
+    Assert.assertTrue(electivesNew.getGpa().equals("A-"));
 
     electivesAdminDao.deleteElectiveRecord(electivesNew.getElectiveId());
     coursesDao.deleteCourseById(tempId + "");

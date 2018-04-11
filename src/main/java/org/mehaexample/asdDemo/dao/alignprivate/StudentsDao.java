@@ -278,27 +278,27 @@ public class StudentsDao {
 		}
 	}
 
-	// THIS IS FOR PUBLIC FACING SCRIPT
-	// Race Breakdown?
-	public List<MultipleValueAggregatedData> getRaceList() {
-		String hql = "SELECT NEW org.mehaexample.asdDemo.model.alignpublic.MultipleValueAggregatedData ( " +
-				"s.race, cast(Count(*) as integer) ) " +
-				"FROM Students s " +
-				"WHERE s.enrollmentStatus = 'FULL_TIME' OR s.enrollmentStatus = 'PART_TIME' " +
-				"GROUP BY s.race " +
-				"ORDER BY Count(*) DESC ";
-		try {
-			session = factory.openSession();
-			TypedQuery<MultipleValueAggregatedData> query = session.createQuery(hql, MultipleValueAggregatedData.class);
-			List<MultipleValueAggregatedData> list = query.getResultList();
-			for (MultipleValueAggregatedData data : list) {
-				data.setAnalyticTerm(MultipleValueAggregatedDataDao.LIST_OF_RACES);
-			}
-			return list;
-		} finally {
-			session.close();
-		}
-	}
+//	// THIS IS FOR PUBLIC FACING SCRIPT
+//	// Race Breakdown?
+//	public List<MultipleValueAggregatedData> getRaceList() {
+//		String hql = "SELECT NEW org.mehaexample.asdDemo.model.alignpublic.MultipleValueAggregatedData ( " +
+//				"s.race, cast(Count(*) as integer) ) " +
+//				"FROM Students s " +
+//				"WHERE s.enrollmentStatus = 'FULL_TIME' OR s.enrollmentStatus = 'PART_TIME' " +
+//				"GROUP BY s.race " +
+//				"ORDER BY Count(*) DESC ";
+//		try {
+//			session = factory.openSession();
+//			TypedQuery<MultipleValueAggregatedData> query = session.createQuery(hql, MultipleValueAggregatedData.class);
+//			List<MultipleValueAggregatedData> list = query.getResultList();
+//			for (MultipleValueAggregatedData data : list) {
+//				data.setAnalyticTerm(MultipleValueAggregatedDataDao.LIST_OF_RACES);
+//			}
+//			return list;
+//		} finally {
+//			session.close();
+//		}
+//	}
 
 	// THIS IS FOR PUBLIC FACING SCRIPT
 	// State Breakdown?

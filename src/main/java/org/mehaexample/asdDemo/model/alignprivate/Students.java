@@ -16,7 +16,7 @@ public class Students {
   private String middleName;
   private String lastName;
   private Gender gender;
-  private String race;
+//  private String race;
   private boolean scholarship;
   private String visa;
   private String phoneNum;
@@ -68,37 +68,37 @@ public class Students {
     this.visible = visible;
   }
 
-  public Students(String neuId, String email, String firstName, String middleName, String lastName, Gender gender, String race,
-                  String visa, String phoneNum, String address, String state, String city, String zip,
-                  Term entryTerm, int entryYear, Term expectedLastTerm, int expectedLastYear,
-                  EnrollmentStatus status, Campus campus, DegreeCandidacy degree, Blob photo, boolean visible) {
-    this.neuId = neuId;
-    this.email = email;
-    this.firstName = firstName;
-    this.middleName = middleName;
-    this.lastName = lastName;
-    this.gender = gender;
-    this.race = race;
-    this.scholarship = false;
-    this.visa = visa;
-    this.phoneNum = phoneNum;
-    this.address = address;
-    this.state = state;
-    this.city = city;
-    this.zip = zip;
-    this.entryTerm = entryTerm;
-    this.entryYear = entryYear;
-    this.expectedLastTerm = expectedLastTerm;
-    this.expectedLastYear = expectedLastYear;
-    this.enrollmentStatus = status;
-    this.campus = campus;
-    this.degree = degree;
-    this.photo = photo;
-    this.visible = visible;
-  }
+//  public Students(String neuId, String email, String firstName, String middleName, String lastName, Gender gender,
+//                  String visa, String phoneNum, String address, String state, String city, String zip,
+//                  Term entryTerm, int entryYear, Term expectedLastTerm, int expectedLastYear,
+//                  EnrollmentStatus status, Campus campus, DegreeCandidacy degree, Blob photo, boolean visible) {
+//    this.neuId = neuId;
+//    this.email = email;
+//    this.firstName = firstName;
+//    this.middleName = middleName;
+//    this.lastName = lastName;
+//    this.gender = gender;
+////    this.race = race;
+//    this.scholarship = false;
+//    this.visa = visa;
+//    this.phoneNum = phoneNum;
+//    this.address = address;
+//    this.state = state;
+//    this.city = city;
+//    this.zip = zip;
+//    this.entryTerm = entryTerm;
+//    this.entryYear = entryYear;
+//    this.expectedLastTerm = expectedLastTerm;
+//    this.expectedLastYear = expectedLastYear;
+//    this.enrollmentStatus = status;
+//    this.campus = campus;
+//    this.degree = degree;
+//    this.photo = photo;
+//    this.visible = visible;
+//  }
 
   public Students(String neuId, String email, String firstName, String middleName, String lastName, Gender gender,
-                  String race, boolean scholarship, String visa, String phoneNum, String address, String state,
+                  boolean scholarship, String visa, String phoneNum, String address, String state,
                   String city, String zip, Term entryTerm, int entryYear, Term expectedLastTerm, int expectedLastYear,
                   EnrollmentStatus enrollmentStatus, Campus campus, DegreeCandidacy degree, Blob photo, boolean visible,
                   String linkedin, String facebook, String github, String website, String skills, String summary) {
@@ -108,7 +108,7 @@ public class Students {
     this.middleName = middleName;
     this.lastName = lastName;
     this.gender = gender;
-    this.race = race;
+//    this.race = race;
     this.scholarship = scholarship;
     this.visa = visa;
     this.phoneNum = phoneNum;
@@ -193,13 +193,13 @@ public class Students {
     this.gender = gender;
   }
 
-  public String getRace() {
-    return race;
-  }
-
-  public void setRace(String race) {
-    this.race = race;
-  }
+//  public String getRace() {
+//    return race;
+//  }
+//
+//  public void setRace(String race) {
+//    this.race = race;
+//  }
 
   public boolean isScholarship() {
     return scholarship;
@@ -418,7 +418,6 @@ public class Students {
     if (middleName != null ? !middleName.equals(students.middleName) : students.middleName != null) return false;
     if (lastName != null ? !lastName.equals(students.lastName) : students.lastName != null) return false;
     if (gender != students.gender) return false;
-    if (race != null ? !race.equals(students.race) : students.race != null) return false;
     if (visa != null ? !visa.equals(students.visa) : students.visa != null) return false;
     if (phoneNum != null ? !phoneNum.equals(students.phoneNum) : students.phoneNum != null) return false;
     if (address != null ? !address.equals(students.address) : students.address != null) return false;
@@ -448,7 +447,6 @@ public class Students {
     result = 31 * result + (middleName != null ? middleName.hashCode() : 0);
     result = 31 * result + (lastName != null ? lastName.hashCode() : 0);
     result = 31 * result + (gender != null ? gender.hashCode() : 0);
-    result = 31 * result + (race != null ? race.hashCode() : 0);
     result = 31 * result + (scholarship ? 1 : 0);
     result = 31 * result + (visa != null ? visa.hashCode() : 0);
     result = 31 * result + (phoneNum != null ? phoneNum.hashCode() : 0);

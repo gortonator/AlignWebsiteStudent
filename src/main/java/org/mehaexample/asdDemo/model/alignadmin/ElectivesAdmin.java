@@ -11,11 +11,11 @@ public class ElectivesAdmin {
   private Term courseTerm;
   private int courseYear;
   private boolean retake;
-  private float gpa;
+  private String gpa;
   private boolean plagiarism;
 
   public ElectivesAdmin(String neuId, String courseId, String courseName, Term courseTerm,
-                        int courseYear, boolean retake, float gpa, boolean plagiarism) {
+                        int courseYear, boolean retake, String gpa, boolean plagiarism) {
     this.neuId = neuId;
     this.courseId = courseId;
     this.courseName = courseName;
@@ -85,11 +85,11 @@ public class ElectivesAdmin {
     this.retake = retake;
   }
 
-  public float getGpa() {
+  public String getGpa() {
     return gpa;
   }
 
-  public void setGpa(float gpa) {
+  public void setGpa(String gpa) {
     this.gpa = gpa;
   }
 

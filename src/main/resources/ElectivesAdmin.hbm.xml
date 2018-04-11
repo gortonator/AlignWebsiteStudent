@@ -33,7 +33,7 @@
 
 		<property name="plagiarism" column="Plagiarism" type="boolean" />
 
-		<property name="gpa" column="Gpa" type="float" />
+		<property name="gpa" column="Gpa" type="string" />
 
 	</class>
 </hibernate-mapping>

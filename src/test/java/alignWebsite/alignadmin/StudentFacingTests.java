@@ -115,9 +115,9 @@ public class StudentFacingTests {
 
 	
 		newStudent.setScholarship(true);
-		newStudent.setRace("White");
-		newStudent2.setRace("Black");
-		newStudent3.setRace("White");
+//		newStudent.setRace("White");
+//		newStudent2.setRace("Black");
+//		newStudent3.setRace("White");
 
 		studentsDao.addStudent(newStudent);
 		studentsDao.addStudent(newStudent2);

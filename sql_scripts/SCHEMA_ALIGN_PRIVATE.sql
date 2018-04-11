@@ -22,7 +22,6 @@ CREATE TABLE Students (
     MiddleName VARCHAR(25),
     LastName VARCHAR(25) NOT NULL,
     Gender ENUM ('M', 'F') NOT NULL,
-    Race VARCHAR(25) DEFAULT NULL,
     Scholarship BOOLEAN DEFAULT FALSE,
     Visa VARCHAR(5),
     Phone VARCHAR(25),

@@ -339,7 +339,7 @@ public class StudentFacingExtraMethods {
 		studentObj.put("middleName", studentRecord.getMiddleName());
 		studentObj.put("lastName", studentRecord.getLastName());
 		studentObj.put("gender", studentRecord.getGender());
-		studentObj.put("race", studentRecord.getRace());
+//		studentObj.put("race", studentRecord.getRace());
 		studentObj.put("scholarship", studentRecord.isScholarship());
 		studentObj.put("visa", studentRecord.getVisa());
 		studentObj.put("phoneNum", studentRecord.getPhoneNum());
