@@ -11,7 +11,6 @@ import java.util.List;
 
 public class MultipleValueAggregatedDataDao {
   public static final String LIST_OF_EMPLOYERS = "ListOfEmployers";
-  public static final String LIST_OF_RACES = "ListOfRaces";
   public static final String LIST_OF_BACHELOR_DEGREES = "ListOfBachelorDegrees";
   public static final String LIST_OF_STUDENTS_STATES = "ListOfStudentsStates";
   public static final String LIST_OF_DEGREES = "ListOfDegrees";
@@ -71,10 +70,6 @@ public class MultipleValueAggregatedDataDao {
     }
   }
 
-  public List<DataCount> getListOfRacesCount() {
-    return findDataCountByTerm(LIST_OF_RACES);
-  }
-
   public List<DataCount> getListOfStudentsStatesCount() {
     return findDataCountByTerm(LIST_OF_STUDENTS_STATES);
   }
@@ -105,10 +100,6 @@ public class MultipleValueAggregatedDataDao {
 
   public boolean deleteListOfBachelorDegrees() {
     return deleteDataByTerm(LIST_OF_BACHELOR_DEGREES);
-  }
-
-  public boolean deleteListOfRacesCounts() {
-    return deleteDataByTerm(LIST_OF_RACES);
   }
 
   public boolean deleteListOfStudentsStatesCounts() {

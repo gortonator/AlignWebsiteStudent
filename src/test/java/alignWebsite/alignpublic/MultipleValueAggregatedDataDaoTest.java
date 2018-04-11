@@ -81,38 +81,6 @@ public class MultipleValueAggregatedDataDaoTest {
   }
 
   @Test
-  public void updateGetDeleteRacesTest() {
-    // add data
-    MultipleValueAggregatedData white = new MultipleValueAggregatedData();
-    white.setAnalyticTerm(MultipleValueAggregatedDataDao.LIST_OF_RACES);
-    white.setAnalyticKey("White");
-    white.setAnalyticValue(20);
-
-    MultipleValueAggregatedData black = new MultipleValueAggregatedData();
-    black.setAnalyticTerm(MultipleValueAggregatedDataDao.LIST_OF_RACES);
-    black.setAnalyticKey("Black");
-    black.setAnalyticValue(21);
-
-    // update in database
-    List<MultipleValueAggregatedData> listOfRaces = new ArrayList<>();
-    listOfRaces.add(white);
-    listOfRaces.add(black);
-    dataDao.saveOrUpdateList(listOfRaces);
-
-    // query the database
-    List<DataCount> result = dataDao.getListOfRacesCount();
-    Assert.assertTrue(result.size() == 2);
-    Assert.assertTrue(result.get(0).getDataKey().equals("Black"));
-    Assert.assertTrue(result.get(0).getDataValue() == 21);
-    Assert.assertTrue(result.get(1).getDataKey().equals("White"));
-    Assert.assertTrue(result.get(1).getDataValue() == 20);
-
-    // clear the database
-    dataDao.deleteListOfRacesCounts();
-    Assert.assertTrue(dataDao.getListOfRacesCount().isEmpty());
-  }
-
-  @Test
   public void updateGetDeleteStudentsStatesTest() {
     // add data
     MultipleValueAggregatedData wa = new MultipleValueAggregatedData();
