@@ -1279,7 +1279,7 @@ public class StudentFacingService {
 	 * @return List of students with matched name
 	 */
 	@POST
-	@Path("/students/autofill-search")
+	@Path("autofill-search")
 	@Consumes(MediaType.TEXT_PLAIN)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAutoFillSearch(String input) {
