@@ -1194,7 +1194,10 @@ public class StudentFacingService {
 
 		StudentsPublic studentsPublic = 
 				studentsPublicDao.findStudentByPublicId(student.getPublicId());
-		studentsPublic.setVisibleToPublic(privacies.isVisibleToPublic());  
+
+		if(studentsPublic != null){
+			studentsPublic.setVisibleToPublic(privacies.isVisibleToPublic());  
+		}
 
 		if(studentsPublic != null){
 			try{
