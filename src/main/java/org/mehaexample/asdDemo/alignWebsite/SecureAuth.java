@@ -77,6 +77,7 @@ public class SecureAuth implements ContainerRequestFilter{
 						String timeValid = tokenData.nextToken();
 						String tokenCheck = timeValid.substring(0,timeValid.length()-6);
 						StudentLogins studentLogins = studentLoginsDao.findStudentLoginsByEmail(email);
+
 						if(studentLogins == null){
 							requestContext.abortWith(Response.status(Response.Status.NOT_ACCEPTABLE).
 									entity("Token not valid. Please login again.").build());
@@ -98,16 +99,27 @@ public class SecureAuth implements ContainerRequestFilter{
 								Students studentDetail = studentDao.getStudentRecordByEmailId(email);
 								String encodedNuid = new String(Base64.getEncoder().encode(studentDetail.getNeuId().getBytes()));
 								if(!requestContext.getUriInfo().getPath().contains(encodedNuid+"/extraexperiences") && 
-								   !requestContext.getUriInfo().getPath().contains(encodedNuid+"/projects")	&&
-								   !requestContext.getUriInfo().getPath().contains(encodedNuid+"/privacies") ){
+										!requestContext.getUriInfo().getPath().contains(encodedNuid+"/projects")	&&
+										!requestContext.getUriInfo().getPath().contains(encodedNuid+"/privacies") ){
 									if(!requestContext.getUriInfo().getPath().equals("students") &&
-									   !requestContext.getUriInfo().getPath().equals("students/") &&
-									   !requestContext.getUriInfo().getPath().equals("autofill-search") &&
-									   !requestContext.getUriInfo().getPath().equals("autofill-search/") ){
-									requestContext.abortWith(Response.status(Response.Status.NOT_ACCEPTABLE).
-											entity("You cannot edit other student's info.").build());
+											!requestContext.getUriInfo().getPath().equals("students/") &&
+											!requestContext.getUriInfo().getPath().equals("autofill-search") &&
+											!requestContext.getUriInfo().getPath().equals("autofill-search/") ){
+										requestContext.abortWith(Response.status(Response.Status.NOT_ACCEPTABLE).
+												entity("You cannot edit other student's info.").build());
 									}
 								}
+							}
+							if (method.equals("GET")){
+								Students studentDetail = studentDao.getStudentRecordByEmailId(email);
+								String encodedNuid = new String(Base64.getEncoder().encode(studentDetail.getNeuId().getBytes()));
+								if(requestContext.getUriInfo().getPath().contains("myProfile/")) {
+									if(!requestContext.getUriInfo().getPath().contains("myProfile/"+encodedNuid)){
+										requestContext.abortWith(Response.status(Response.Status.NOT_ACCEPTABLE).
+												entity("fetch retricted. You can't access other students confidential info.").build());
+									}
+								}
+
 							}
 							Timestamp keyExpiration = new Timestamp(System.currentTimeMillis()+15*60*1000);
 							studentLogins.setKeyExpiration(keyExpiration);
