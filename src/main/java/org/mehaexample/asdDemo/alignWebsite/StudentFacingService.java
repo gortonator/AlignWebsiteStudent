@@ -78,7 +78,140 @@ public class StudentFacingService {
 	private static String NUIDNOTFOUND = "No Student record exists with given ID"; 
 	private static String INCORRECTPASS = "Incorrect Password";
 
-	public StudentFacingService(){}
+	public StudentFacingService(){} 
+
+	/**
+	 * This function gets the other student details by NUID
+	 * 	 
+	 * @param nuid
+	 * @return a student object
+	 */
+	@GET
+	@Path("students/{nuid}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getOtherStudentProfile(@PathParam("nuid") String nuid) {
+		nuid = new String(Base64.getDecoder().decode(nuid));
+		Students studentRecord = null;
+
+		if (!studentDao.ifNuidExists(nuid)) {
+
+			return Response.status(Response.Status.NOT_FOUND).
+					entity(NUIDNOTFOUND + ":" + new String(Base64.getEncoder().encode(nuid.getBytes()))).build();
+		} 
+
+		try{
+			studentRecord = studentDao.getStudentRecordWithPrivacy(nuid);
+		}catch(Exception ex){
+
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+					entity(ex).build();
+		}
+
+		if(studentRecord == null){
+
+			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
+		}
+
+		List<WorkExperiences> workExperiencesRecord = workExperiencesDao.getWorkExperiencesWithPrivacy(nuid);
+		List<Projects> projects = projectsDao.getProjectsWithPrivacy(nuid);
+		List<ExtraExperiences> extraExperiences = extraExperiencesDao.getExtraExperiencesWithPrivacy(nuid);
+		List<Courses> courses = new ArrayList<>(); 
+		List<Electives> electives = electivesDao.getElectivesWithPrivacy(nuid); 
+
+		JSONArray coursesObjArray = new JSONArray();
+		for (int i = 0; i < electives.size(); i++) {
+			JSONObject jsonObj = new JSONObject();
+			Electives elective = electivesDao.getElectiveById(electives.get(i).getElectiveId());
+			Courses course = coursesDao.getCourseById(elective.getCourseId());
+			jsonObj.put("courseName", course.getCourseName());
+			jsonObj.put("courseId", course.getCourseId());
+			jsonObj.put("description", course.getDescription());
+
+			coursesObjArray.put(jsonObj);
+		}
+
+		JSONObject Obj = new JSONObject();
+
+		JSONArray workExperienceObj = new JSONArray();
+
+		for(WorkExperiences workExp : workExperiencesRecord){
+			JSONObject jsonObj = new JSONObject();
+			jsonObj.put("workExperienceId", workExp.getWorkExperienceId());
+			//			jsonObj.put("neuId", new String(Base64.getEncoder().encode(workExp.getNeuId().getBytes())));
+			jsonObj.put("companyName", workExp.getCompanyName());
+			jsonObj.put("startDate", workExp.getStartDate());
+			jsonObj.put("endDate", workExp.getEndDate());
+			jsonObj.put("title", workExp.getTitle());
+			jsonObj.put("description", workExp.getDescription());
+			workExperienceObj.put(jsonObj); 
+		}
+
+		JSONArray extraExperienceObj = new JSONArray();
+
+		for(ExtraExperiences extraExperience : extraExperiences){
+			JSONObject jsonObj = new JSONObject();
+			jsonObj.put("companyName", extraExperience.getCompanyName());
+			jsonObj.put("description", extraExperience.getDescription());
+			jsonObj.put("endDate", extraExperience.getEndDate());
+			jsonObj.put("extraExperienceId", extraExperience.getExtraExperienceId());
+			jsonObj.put("startDate", extraExperience.getStartDate());
+			jsonObj.put("title", extraExperience.getTitle());
+			//			jsonObj.put("neuId", new String(Base64.getEncoder().encode(extraExperience.getNeuId().getBytes())));
+			extraExperienceObj.put(jsonObj); 
+		}
+
+		JSONArray projectObj = new JSONArray();
+
+		for(Projects project: projects){
+			JSONObject jsonObj = new JSONObject();
+			jsonObj.put("projectName", project.getProjectName());
+			jsonObj.put("description", project.getDescription());
+			jsonObj.put("endDate", project.getEndDate());
+			jsonObj.put("projectId", project.getProjectId());
+			jsonObj.put("startDate", project.getStartDate());
+			//			jsonObj.put("neuId", new String(Base64.getEncoder().encode(project.getNeuId().getBytes())));
+			projectObj.put(jsonObj); 
+		}
+
+		JSONObject studentObj = new JSONObject();
+		//		studentObj.put("neuId", new String(Base64.getEncoder().encode(studentRecord.getNeuId().getBytes())));
+		studentObj.put("publicId", studentRecord.getPublicId());
+		studentObj.put("email", studentRecord.getEmail());
+		studentObj.put("firstName", studentRecord.getFirstName());
+		studentObj.put("middleName", studentRecord.getMiddleName());
+		studentObj.put("lastName", studentRecord.getLastName());
+		studentObj.put("gender", studentRecord.getGender());
+		studentObj.put("scholarship", studentRecord.isScholarship());
+		studentObj.put("visa", studentRecord.getVisa());
+		studentObj.put("phoneNum", studentRecord.getPhoneNum());
+		studentObj.put("address", studentRecord.getAddress());
+		studentObj.put("state", studentRecord.getState());
+		studentObj.put("city", studentRecord.getCity());
+		studentObj.put("zip", studentRecord.getZip());
+		studentObj.put("entryTerm", studentRecord.getEntryTerm());
+		studentObj.put("entryYear", studentRecord.getEntryYear());
+		studentObj.put("expectedLastTerm", studentRecord.getExpectedLastTerm());
+		studentObj.put("expectedLastYear", studentRecord.getExpectedLastYear());
+		studentObj.put("enrollmentStatus", studentRecord.getEnrollmentStatus());
+		studentObj.put("campus", studentRecord.getCampus());
+		studentObj.put("degree", studentRecord.getDegree());
+		studentObj.put("photo", studentRecord.getPhoto());
+		studentObj.put("visible", studentRecord.isVisible());
+		studentObj.put("linkedin", studentRecord.getLinkedin());
+		studentObj.put("facebook", studentRecord.getFacebook());
+		studentObj.put("github", studentRecord.getGithub());
+		studentObj.put("website", studentRecord.getWebsite());
+		studentObj.put("skills", studentRecord.getSkills());
+		studentObj.put("summary", studentRecord.getSummary());
+
+		Obj.put("StudentRecord", studentObj);
+		Obj.put("WorkExperiences", workExperienceObj);
+		Obj.put("ExtraExperiences", extraExperienceObj);
+		Obj.put("Projects", projectObj);
+		Obj.put("Courses", coursesObjArray);
+
+		return Response.status(Response.Status.OK).entity(Obj.toString()).build();
+	} 
 
 	/**
 	 * This function gets the student details by NUID
@@ -89,14 +222,9 @@ public class StudentFacingService {
 	 * @return a student object
 	 */
 	@GET
-	@Path("students/{nuid}")
+	@Path("myProfile/{nuid}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getStudentProfile(@PathParam("nuid") String nuid) {
-		
-		Students student = studentDao.getStudentRecord(nuid);
-		String email = student.getEmail();
-		StudentLogins studentLogins = studentLoginsDao.findStudentLoginsByEmail(email);
-//		String tokenForNuid = studentLogins.ge\
 		nuid = new String(Base64.getDecoder().decode(nuid));
 		Students studentRecord = null;
 		Privacies privacy = null;
@@ -708,11 +836,11 @@ public class StudentFacingService {
 		JSONArray result = new JSONArray();
 		try {
 			years = studentsPublicDao.getListOfAllGraduationYears();
-			
+
 			if (years == null) {
 				return Response.status(Response.Status.NOT_FOUND).entity("No graduation years are found").build();
 			} 
-			
+
 			for(Integer year : years){
 				result.put(Integer.toString(year));
 			}
@@ -736,7 +864,7 @@ public class StudentFacingService {
 		List<String> listOfAllCoopCompanies;
 		try {
 			listOfAllCoopCompanies = workExperiencesPublicDao.getListOfAllCoopCompanies();
-			
+
 			if (listOfAllCoopCompanies == null) {
 				return Response.status(Response.Status.NOT_FOUND).entity("No COOPS are found").build();
 			} 
@@ -758,40 +886,74 @@ public class StudentFacingService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAllCourses() {
 		List<Courses> listOfAllCourses;
+		List<String> listofCouseIds = new ArrayList<>();
 		try {
 			listOfAllCourses = coursesDao.getAllCourses();
-			
+
 			if (listOfAllCourses == null) {
 				return Response.status(Response.Status.NOT_FOUND).entity("No courses found").build();
 			} 
-			
+
+			for(Courses courses : listOfAllCourses){
+				String courseId = courses.getCourseId();
+				listofCouseIds.add(courseId);
+			}
 		} catch (Exception e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).build();
 		}
 
-		return Response.status(Response.Status.OK).entity(listOfAllCourses).build();
+		return Response.status(Response.Status.OK).entity(listofCouseIds).build();
 	}
 
-	//	/**
-	//	 * Request 6
-	//	 * This is a function to get list of ALL the campuses
-	//	 *
-	//	 * @return List of campuses
-	//	 */
-	//	@GET
-	//	@Path("/campuses")
-	//	@Produces(MediaType.APPLICATION_JSON)
-	//	public Response getAllCampuses() {
-	//		List<String> listOfAllCampuses;
-	//		try {
-	//			listOfAllCampuses = studentsPublicDao
-	//
-	//		} catch (Exception e) {
-	//			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).build();
-	//		}
-	//
-	//		return Response.status(Response.Status.OK).entity(listOfAllCampuses).build();
-	//	} 
+	/**
+	 * This is a function to get list of ALL Enrollment years
+	 * 	 
+	 * @return List of all Enrollment years
+	 */
+	@GET
+	@Path("/enrollmentyears")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getAllEnrollmentYears() {
+		List<Integer> listOfAllEnrollmentYears;
+		try {
+
+			listOfAllEnrollmentYears = studentDao.getAllEntryYears();
+
+			if (listOfAllEnrollmentYears == null) {
+				return Response.status(Response.Status.NOT_FOUND).
+						entity("No Enrollment years are found").build();
+			} 
+
+		} catch (Exception e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).build();
+		}
+
+		return Response.status(Response.Status.OK).entity(listOfAllEnrollmentYears).build();
+	}
+
+	/**
+	 * This is a function to get list of ALL the campuses
+	 *
+	 * @return List of campuses
+	 */
+	@GET
+	@Path("/campuses")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getAllCampuses() {
+		List<String> listOfAllCampuses;
+		try {
+			listOfAllCampuses = studentDao.getAllCampuses();
+
+			if (listOfAllCampuses == null) {
+				return Response.status(Response.Status.NOT_FOUND).entity("No Campuses are found").build();
+			} 
+		} catch (Exception e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).build();
+		}
+
+		return Response.status(Response.Status.OK).entity(listOfAllCampuses).build();
+	} 
+
 	/**
 	 * This is a function to login using student email and password
 	 * 
