@@ -40,6 +40,7 @@ import org.mehaexample.asdDemo.dao.alignprivate.StudentLoginsDao;
 import org.mehaexample.asdDemo.dao.alignprivate.StudentsDao;
 import org.mehaexample.asdDemo.dao.alignprivate.WorkExperiencesDao;
 import org.mehaexample.asdDemo.dao.alignpublic.StudentsPublicDao;
+import org.mehaexample.asdDemo.dao.alignpublic.WorkExperiencesPublicDao;
 import org.mehaexample.asdDemo.model.alignadmin.LoginObject;
 import org.mehaexample.asdDemo.model.alignprivate.Courses;
 import org.mehaexample.asdDemo.model.alignprivate.Electives;
@@ -68,6 +69,7 @@ public class StudentFacingService {
 	ElectivesDao electivesDao = new ElectivesDao();
 	CoursesDao coursesDao = new CoursesDao();
 	WorkExperiencesDao workExperiencesDao = new WorkExperiencesDao();
+	WorkExperiencesPublicDao workExperiencesPublicDao = new WorkExperiencesPublicDao();
 	ExtraExperiencesDao extraExperiencesDao = new ExtraExperiencesDao();
 	ProjectsDao projectsDao = new ProjectsDao();
 	StudentLoginsDao studentLoginsDao = new StudentLoginsDao(); 
@@ -93,7 +95,7 @@ public class StudentFacingService {
 		nuid = new String(Base64.getDecoder().decode(nuid));
 		Students studentRecord = null;
 		Privacies privacy = null;
-		
+
 		if (!studentDao.ifNuidExists(nuid)) {
 
 			return Response.status(Response.Status.NOT_FOUND).
@@ -714,7 +716,30 @@ public class StudentFacingService {
 
 		return Response.status(Response.Status.OK).entity(result.toString()).build();
 	}
-	
+
+	/**
+	 * Request 6
+	 * This is a function to get list of ALL Coop companies
+	 * <p>
+	 * http://localhost:8080/alignWebsite/webapi/public-facing/all-coops
+	 *
+	 * @return List of UnderGradSchools
+	 */
+	@GET
+	@Path("/coops")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getAllCoopCompanies() {
+		List<String> listOfAllCoopCompanies;
+		try {
+			listOfAllCoopCompanies = workExperiencesPublicDao.getListOfAllCoopCompanies();
+
+		} catch (Exception e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).build();
+		}
+
+		return Response.status(Response.Status.OK).entity(listOfAllCoopCompanies).build();
+	}
+
 	/**
 	 * This is a function to login using student email and password
 	 * 
