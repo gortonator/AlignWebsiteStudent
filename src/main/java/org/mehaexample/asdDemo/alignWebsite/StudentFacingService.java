@@ -93,9 +93,11 @@ public class StudentFacingService {
 		nuid = new String(Base64.getDecoder().decode(nuid));
 		Students studentRecord = null;
 		Privacies privacy = null;
+		
 		if (!studentDao.ifNuidExists(nuid)) {
 
-			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND + ":" + new String(Base64.getEncoder().encode(nuid.getBytes()))).build();
+			return Response.status(Response.Status.NOT_FOUND).
+					entity(NUIDNOTFOUND + ":" + new String(Base64.getEncoder().encode(nuid.getBytes()))).build();
 		} 
 
 		try{
@@ -686,6 +688,33 @@ public class StudentFacingService {
 		return Response.status(Response.Status.OK).entity("Project deleted successfully").build(); 
 	}
 
+	/**
+	 * Request 8
+	 * This is the function to get all graduate years.
+	 * The body should be in the JSON format like below:
+	 * <p>
+	 * http://localhost:8080/alignWebsite/webapi/public-facing/all-grad-years
+	 *
+	 * @return List of all graduate years
+	 */
+	@GET
+	@Path("graduationyears")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getAllGradYears(){
+		List<Integer> years;
+		JSONArray result = new JSONArray();
+		try {
+			years = studentsPublicDao.getListOfAllGraduationYears();
+			for(Integer year : years){
+				result.put(Integer.toString(year));
+			}
+		} catch (Exception e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).build();
+		}
+
+		return Response.status(Response.Status.OK).entity(result.toString()).build();
+	}
+	
 	/**
 	 * This is a function to login using student email and password
 	 * 
