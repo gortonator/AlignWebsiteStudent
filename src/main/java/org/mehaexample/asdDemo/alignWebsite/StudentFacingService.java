@@ -92,11 +92,6 @@ public class StudentFacingService {
 	@Path("students/{nuid}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getStudentProfile(@PathParam("nuid") String nuid) {
-
-		Students student = studentDao.getStudentRecord(nuid);
-		String email = student.getEmail();
-		StudentLogins studentLogins = studentLoginsDao.findStudentLoginsByEmail(email);
-		//		String tokenForNuid = studentLogins.ge\
 		nuid = new String(Base64.getDecoder().decode(nuid));
 		Students studentRecord = null;
 		Privacies privacy = null;
