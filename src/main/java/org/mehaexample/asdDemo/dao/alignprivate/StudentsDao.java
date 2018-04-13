@@ -1,9 +1,6 @@
 package org.mehaexample.asdDemo.dao.alignprivate;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
@@ -727,4 +724,43 @@ public class StudentsDao {
 		}
 	}
 
+	/**
+	 *
+	 * @return list of all campuses in database
+	 */
+	public List<String> getAllCampuses() {
+		try {
+			session = factory.openSession();
+			org.hibernate.query.Query query = session.createQuery("FROM Students");
+
+			Set<String> campusSet = new HashSet<>();
+			for (Object o : query.list()) {
+				campusSet.add(((Students) o).getCampus().name());
+			}
+
+			return new ArrayList<>(campusSet);
+		} finally {
+			session.close();
+		}
+	}
+
+	/**
+	 *
+	 * @return List of all Enrollment years in database
+	 */
+	public List<Integer> getAllEntryYears() {
+		try {
+			session = factory.openSession();
+			org.hibernate.query.Query query = session.createQuery("FROM Students");
+
+			Set<Integer> entrySet = new HashSet<>();
+			for (Object o : query.list()) {
+				entrySet.add(((Students) o).getEntryYear());
+			}
+
+			return new ArrayList<>(entrySet);
+		} finally {
+			session.close();
+		}
+	}
 }
