@@ -758,6 +758,7 @@ public class StudentFacingService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAllCourses() {
 		List<Courses> listOfAllCourses;
+		List<String> listofCouseIds = new ArrayList<>();
 		try {
 			listOfAllCourses = coursesDao.getAllCourses();
 
@@ -765,11 +766,15 @@ public class StudentFacingService {
 				return Response.status(Response.Status.NOT_FOUND).entity("No courses found").build();
 			} 
 
+			for(Courses courses : listOfAllCourses){
+				String courseId = courses.getCourseId();
+				listofCouseIds.add(courseId);
+			}
 		} catch (Exception e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).build();
 		}
 
-		return Response.status(Response.Status.OK).entity(listOfAllCourses).build();
+		return Response.status(Response.Status.OK).entity(listofCouseIds).build();
 	}
 
 	/**
