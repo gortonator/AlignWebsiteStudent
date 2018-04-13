@@ -92,6 +92,11 @@ public class StudentFacingService {
 	@Path("students/{nuid}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getStudentProfile(@PathParam("nuid") String nuid) {
+		
+		Students student = studentDao.getStudentRecord(nuid);
+		String email = student.getEmail();
+		StudentLogins studentLogins = studentLoginsDao.findStudentLoginsByEmail(email);
+//		String tokenForNuid = studentLogins.ge\
 		nuid = new String(Base64.getDecoder().decode(nuid));
 		Students studentRecord = null;
 		Privacies privacy = null;
@@ -691,12 +696,8 @@ public class StudentFacingService {
 	}
 
 	/**
-	 * Request 8
 	 * This is the function to get all graduate years.
-	 * The body should be in the JSON format like below:
-	 * <p>
-	 * http://localhost:8080/alignWebsite/webapi/public-facing/all-grad-years
-	 *
+	 * 
 	 * @return List of all graduate years
 	 */
 	@GET
@@ -707,6 +708,11 @@ public class StudentFacingService {
 		JSONArray result = new JSONArray();
 		try {
 			years = studentsPublicDao.getListOfAllGraduationYears();
+			
+			if (years == null) {
+				return Response.status(Response.Status.NOT_FOUND).entity("No graduation years are found").build();
+			} 
+			
 			for(Integer year : years){
 				result.put(Integer.toString(year));
 			}
@@ -720,10 +726,8 @@ public class StudentFacingService {
 	/**
 	 * Request 6
 	 * This is a function to get list of ALL Coop companies
-	 * <p>
-	 * http://localhost:8080/alignWebsite/webapi/public-facing/all-coops
-	 *
-	 * @return List of UnderGradSchools
+	 * 	 
+	 * @return List of all Coops
 	 */
 	@GET
 	@Path("/coops")
@@ -732,14 +736,62 @@ public class StudentFacingService {
 		List<String> listOfAllCoopCompanies;
 		try {
 			listOfAllCoopCompanies = workExperiencesPublicDao.getListOfAllCoopCompanies();
+			
+			if (listOfAllCoopCompanies == null) {
+				return Response.status(Response.Status.NOT_FOUND).entity("No COOPS are found").build();
+			} 
 
 		} catch (Exception e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).build();
 		}
 
 		return Response.status(Response.Status.OK).entity(listOfAllCoopCompanies).build();
+	} 
+
+	/**
+	 * This is a function to get list of ALL Courses
+	 * 	 
+	 * @return List of all Coops
+	 */
+	@GET
+	@Path("/courses")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getAllCourses() {
+		List<Courses> listOfAllCourses;
+		try {
+			listOfAllCourses = coursesDao.getAllCourses();
+			
+			if (listOfAllCourses == null) {
+				return Response.status(Response.Status.NOT_FOUND).entity("No courses found").build();
+			} 
+			
+		} catch (Exception e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).build();
+		}
+
+		return Response.status(Response.Status.OK).entity(listOfAllCourses).build();
 	}
 
+	//	/**
+	//	 * Request 6
+	//	 * This is a function to get list of ALL the campuses
+	//	 *
+	//	 * @return List of campuses
+	//	 */
+	//	@GET
+	//	@Path("/campuses")
+	//	@Produces(MediaType.APPLICATION_JSON)
+	//	public Response getAllCampuses() {
+	//		List<String> listOfAllCampuses;
+	//		try {
+	//			listOfAllCampuses = studentsPublicDao
+	//
+	//		} catch (Exception e) {
+	//			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).build();
+	//		}
+	//
+	//		return Response.status(Response.Status.OK).entity(listOfAllCampuses).build();
+	//	} 
 	/**
 	 * This is a function to login using student email and password
 	 * 
