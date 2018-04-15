@@ -13,7 +13,6 @@
             <generator class="assigned"/>
         </id>
 
-        <property name="type" column="Type" type="string" />
         <property name = "photo" column="Photo" type="binary" />
 
     </class>
