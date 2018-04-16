@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.json.JsonObject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -426,13 +427,11 @@ public class StudentFacingService {
 	 */
 	@PUT
 	@Path("/students/{nuId}/photo")
-	@Consumes(MediaType.TEXT_PLAIN)
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateStudentWithPhoto(@PathParam("nuId") String neuId, String imageString) {
 
-		neuId = new String(Base64.getDecoder().decode(neuId));
-
-		System.out.println("neuid: " + neuId); 
+		neuId = new String(Base64.getDecoder().decode(neuId)); 
 
 		if (!studentDao.ifNuidExists(neuId)) {
 			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
