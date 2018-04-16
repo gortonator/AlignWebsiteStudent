@@ -34,6 +34,7 @@ import org.json.JSONObject;
 import org.mehaexample.asdDemo.dao.alignprivate.CoursesDao;
 import org.mehaexample.asdDemo.dao.alignprivate.ElectivesDao;
 import org.mehaexample.asdDemo.dao.alignprivate.ExtraExperiencesDao;
+import org.mehaexample.asdDemo.dao.alignprivate.PhotosDao;
 import org.mehaexample.asdDemo.dao.alignprivate.PrivaciesDao;
 import org.mehaexample.asdDemo.dao.alignprivate.ProjectsDao;
 import org.mehaexample.asdDemo.dao.alignprivate.StudentLoginsDao;
@@ -45,6 +46,7 @@ import org.mehaexample.asdDemo.model.alignadmin.LoginObject;
 import org.mehaexample.asdDemo.model.alignprivate.Courses;
 import org.mehaexample.asdDemo.model.alignprivate.Electives;
 import org.mehaexample.asdDemo.model.alignprivate.ExtraExperiences;
+import org.mehaexample.asdDemo.model.alignprivate.Photos;
 import org.mehaexample.asdDemo.model.alignprivate.Privacies;
 import org.mehaexample.asdDemo.model.alignprivate.Projects;
 import org.mehaexample.asdDemo.model.alignprivate.StudentLogins;
@@ -75,10 +77,13 @@ public class StudentFacingService {
 	StudentLoginsDao studentLoginsDao = new StudentLoginsDao(); 
 	PrivaciesDao privaciesDao = new PrivaciesDao();
 	StudentsPublicDao studentsPublicDao = new StudentsPublicDao();
+	PhotosDao photosDao = new PhotosDao();
+	Photos photo = new Photos();
 	private static String NUIDNOTFOUND = "No Student record exists with given ID"; 
 	private static String INCORRECTPASS = "Incorrect Password";
 
 	public StudentFacingService(){} 
+
 
 	/**
 	 * This function gets the other student details by NUID
@@ -117,6 +122,13 @@ public class StudentFacingService {
 		List<ExtraExperiences> extraExperiences = extraExperiencesDao.getExtraExperiencesWithPrivacy(nuid);
 		List<Courses> courses = new ArrayList<>(); 
 		List<Electives> electives = electivesDao.getElectivesWithPrivacy(nuid); 
+
+		//		JSONObject photoObject = new JSONObject();
+		//		photoObject.put("neuId", photo.getNeuId());
+		//		
+		//		byte[] photoByte = photo.getPhoto();
+		//		String image = new String(getEncoder().encode(photoByte));
+		//		photoObject.put("photo", image);
 
 		JSONArray coursesObjArray = new JSONArray();
 		for (int i = 0; i < electives.size(); i++) {
@@ -204,11 +216,23 @@ public class StudentFacingService {
 		studentObj.put("skills", studentRecord.getSkills());
 		studentObj.put("summary", studentRecord.getSummary());
 
+		// adding the photo object
+		JSONObject photoObject = new JSONObject();
+		photo = photosDao.getPhotoByNeuId(nuid);
+
+		if(photo != null){
+			photoObject.put("neuId", new String(Base64.getEncoder().encode(photo.getNeuId().getBytes())));
+			byte[] photoByte = photo.getPhoto();
+			String image = new String(Base64.getEncoder().encode(photoByte));
+			photoObject.put("photo", image);
+		}
+
 		Obj.put("StudentRecord", studentObj);
 		Obj.put("WorkExperiences", workExperienceObj);
 		Obj.put("ExtraExperiences", extraExperienceObj);
 		Obj.put("Projects", projectObj);
 		Obj.put("Courses", coursesObjArray);
+		Obj.put("Photo", photoObject);
 
 		return Response.status(Response.Status.OK).entity(Obj.toString()).build();
 	} 
@@ -370,16 +394,74 @@ public class StudentFacingService {
 		studentObj.put("skills", studentRecord.getSkills());
 		studentObj.put("summary", studentRecord.getSummary());
 
+		// adding the photo object
+		JSONObject photoObject = new JSONObject();
+		photo = photosDao.getPhotoByNeuId(nuid);
+
+		if(photo != null){
+			photoObject.put("neuId", new String(Base64.getEncoder().encode(photo.getNeuId().getBytes())));
+			byte[] photoByte = photo.getPhoto();
+			String image = new String(Base64.getEncoder().encode(photoByte));
+			photoObject.put("photo", image);
+		}
+
 		Obj.put("StudentRecord", studentObj);
 		Obj.put("WorkExperiences", workExperienceObj);
 		Obj.put("ExtraExperiences", extraExperienceObj);
 		Obj.put("Projects", projectObj);
 		Obj.put("Courses", coursesObjArray);
 		Obj.put("Privacies", privacyObject);
+		Obj.put("Photo", photoObject);
 
 		return Response.status(Response.Status.OK).entity(Obj.toString()).build();
 	}
 
+
+	/**
+	 * This function updates a student photo
+	 * 
+	 * @param neuId
+	 * @param imageString
+	 * 
+	 * @return 200 if photo is updated successfully
+	 */
+	@PUT
+	@Path("/students/{nuId}/photo")
+	@Consumes(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response updateStudentWithPhoto(@PathParam("nuId") String neuId, String imageString) {
+
+		neuId = new String(Base64.getDecoder().decode(neuId));
+
+		System.out.println("neuid: " + neuId); 
+
+		if (!studentDao.ifNuidExists(neuId)) {
+			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
+		}
+
+		if (!photosDao.ifNuidExists(neuId)) {
+			return Response.status(Response.Status.NOT_FOUND).
+					entity("No photo found for the given student").build();
+		}
+
+		Photos photo = photosDao.getPhotoByNeuId(neuId);
+
+		if (imageString != null) {
+			byte[] imageByte = Base64.getDecoder().decode(imageString);
+			photo.setPhoto(imageByte);
+		}
+
+		try{
+			photosDao.updatePhoto(photo);
+			photo.setNeuId( new String(Base64.getEncoder().encode(photo.getNeuId().getBytes())));
+		}catch(Exception ex){
+
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
+					entity(ex).build();
+		}
+
+		return Response.status(Response.Status.OK).entity(photo).build();
+	}
 
 	/**
 	 * This function updates a student detail by NUID 
