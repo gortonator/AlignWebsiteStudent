@@ -123,13 +123,6 @@ public class StudentFacingService {
 		List<Courses> courses = new ArrayList<>(); 
 		List<Electives> electives = electivesDao.getElectivesWithPrivacy(nuid); 
 
-		//		JSONObject photoObject = new JSONObject();
-		//		photoObject.put("neuId", photo.getNeuId());
-		//		
-		//		byte[] photoByte = photo.getPhoto();
-		//		String image = new String(getEncoder().encode(photoByte));
-		//		photoObject.put("photo", image);
-
 		JSONArray coursesObjArray = new JSONArray();
 		for (int i = 0; i < electives.size(); i++) {
 			JSONObject jsonObj = new JSONObject();
@@ -223,7 +216,10 @@ public class StudentFacingService {
 		if(photo != null){
 			photoObject.put("neuId", new String(Base64.getEncoder().encode(photo.getNeuId().getBytes())));
 			byte[] photoByte = photo.getPhoto();
-			String image = new String(Base64.getEncoder().encode(photoByte));
+			String image = "";
+			if (photoByte != null) {
+				image = new String(Base64.getEncoder().encode(photoByte));
+			}
 			photoObject.put("photo", image);
 		}
 
@@ -401,7 +397,10 @@ public class StudentFacingService {
 		if(photo != null){
 			photoObject.put("neuId", new String(Base64.getEncoder().encode(photo.getNeuId().getBytes())));
 			byte[] photoByte = photo.getPhoto();
-			String image = new String(Base64.getEncoder().encode(photoByte));
+			String image = "";
+			if (photoByte != null) {
+				image = new String(Base64.getEncoder().encode(photoByte));
+			}
 			photoObject.put("photo", image);
 		}
 
@@ -418,7 +417,7 @@ public class StudentFacingService {
 
 
 	/**
-	 * This function updates a student photo
+	 * This function updates a student's photo
 	 * 
 	 * @param neuId
 	 * @param imageString
@@ -460,7 +459,8 @@ public class StudentFacingService {
 					entity(ex).build();
 		}
 
-		return Response.status(Response.Status.OK).entity(photo).build();
+		return Response.status(Response.Status.OK).
+				entity("Congratulations! Your Photo is uploaded successfully!").build();
 	}
 
 	/**
