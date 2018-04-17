@@ -14,6 +14,7 @@ import org.mehaexample.asdDemo.model.alignprivate.Students;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.mehaexample.asdDemo.model.alignpublic.MultipleValueAggregatedData;
+import org.mehaexample.asdDemo.restModels.StudentCoopInfo;
 
 import javax.persistence.TypedQuery;
 
@@ -366,20 +367,16 @@ public class StudentsDao {
 	 * @param end
 	 * @return a list of students filtered by specified map.
 	 */
-	public List<Students> getStudentFilteredStudents2(Map<String, List<String>> filters, int begin, int end) {
-		StringBuilder hql = new StringBuilder("SELECT Distinct(s) FROM Students s ");
-
-		List<Students> result = (List<Students>) populateStudentFilterHql2(hql, filters, begin, end);
-
-		for (Students student : result) {
-			Privacies privacy = privaciesDao.getPrivacyByNeuId(student.getNeuId());
-			if (privacy == null) {
-				privacy = new Privacies(student.getNeuId(), student.getPublicId(), true, false, false, false, false, false,
-								false, false, false, false, false, false, false, false);
-				privaciesDao.createPrivacy(privacy);
-			}
-			setPrivacy(student, privacy);
+	public List<StudentCoopInfo> getStudentFilteredStudents2(Map<String, List<String>> filters, int begin, int end) {
+		if (!filters.containsKey("companyName")) {
+			return new ArrayList<>();
 		}
+
+		StringBuilder hql = new StringBuilder("SELECT NEW org.mehaexample.asdDemo.restModels.StudentCoopInfo(s.neuId, " +
+						"s.campus, s.entryYear, s.expectedLastYear, we.companyName) FROM Students s ");
+
+		List<StudentCoopInfo> result = (List<StudentCoopInfo>) populateStudentFilterHql2(hql, filters, begin, end);
+
 		return result;
 	}
 
