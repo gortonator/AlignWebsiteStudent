@@ -3,57 +3,57 @@ package org.mehaexample.asdDemo.restModels;
 import org.mehaexample.asdDemo.enums.Campus;
 
 public class StudentCoopInfo {
-  private String neuId;
-  private Campus campus;
-  private int entryYear;
-  private int expectedLastYear;
-  private String companyName;
+  private String NuId;
+  private Campus Campuses;
+  private int EnrollmentYear;
+  private int GraduationYear;
+  private String Coops;
 
-  public StudentCoopInfo(String neuId, Campus campus, int entryYear, int expectedLastYear, String companyName) {
-    this.neuId = neuId;
-    this.campus = campus;
-    this.entryYear = entryYear;
-    this.expectedLastYear = expectedLastYear;
-    this.companyName = companyName;
+  public StudentCoopInfo(String nuId, Campus campus, int enrollmentYear, int graduationYear, String coops) {
+    NuId = nuId;
+    Campuses = campus;
+    EnrollmentYear = enrollmentYear;
+    GraduationYear = graduationYear;
+    Coops = coops;
   }
 
-  public String getNeuId() {
-    return neuId;
+  public String getNuId() {
+    return NuId;
   }
 
-  public void setNeuId(String neuId) {
-    this.neuId = neuId;
+  public void setNuId(String nuId) {
+    NuId = nuId;
   }
 
   public Campus getCampus() {
-    return campus;
+    return Campuses;
   }
 
   public void setCampus(Campus campus) {
-    this.campus = campus;
+    Campuses = campus;
   }
 
-  public int getEntryYear() {
-    return entryYear;
+  public int getEnrollmentYear() {
+    return EnrollmentYear;
   }
 
-  public void setEntryYear(int entryYear) {
-    this.entryYear = entryYear;
+  public void setEnrollmentYear(int enrollmentYear) {
+    EnrollmentYear = enrollmentYear;
   }
 
-  public int getExpectedLastYear() {
-    return expectedLastYear;
+  public int getGraduationYear() {
+    return GraduationYear;
   }
 
-  public void setExpectedLastYear(int expectedLastYear) {
-    this.expectedLastYear = expectedLastYear;
+  public void setGraduationYear(int graduationYear) {
+    GraduationYear = graduationYear;
   }
 
-  public String getCompanyName() {
-    return companyName;
+  public String getCoops() {
+    return Coops;
   }
 
-  public void setCompanyName(String companyName) {
-    this.companyName = companyName;
+  public void setCoops(String coops) {
+    Coops = coops;
   }
 }
