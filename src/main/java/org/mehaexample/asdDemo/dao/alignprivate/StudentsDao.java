@@ -14,6 +14,7 @@ import org.mehaexample.asdDemo.model.alignprivate.Students;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.mehaexample.asdDemo.model.alignpublic.MultipleValueAggregatedData;
+import org.mehaexample.asdDemo.restModels.StudentCoopInfo;
 
 import javax.persistence.TypedQuery;
 
@@ -324,6 +325,15 @@ public class StudentsDao {
 	 *
 	 * @param filters The key of filter map is the property, like firstName.
 	 *                The value of map is a list of detail values.
+	 *                The format of filters is
+	 *                {
+	 *											"companyName"   :["Amazong", "Google", "Facebook"],
+	 *											"courseName"    :["Intensive Foundations of CS"],
+	 *											"gender"	      :["F","M"],
+	 *											"campus"	      :["SEATTLE", "BOSTON"],
+	 *											"startTerm"     :["FALL2014", "SPRING2015"],
+	 *											"endTerm"       :["SPRING2018", "SUMMER2018"]
+	 *								}
 	 * @return a list of students filtered by specified map.
 	 */
 	public List<Students> getStudentFilteredStudents(Map<String, List<String>> filters, int begin, int end) {
@@ -343,42 +353,31 @@ public class StudentsDao {
 		return result;
 	}
 
-	private void setPrivacy(Students student, Privacies privacy) {
-		if (!privacy.isAddress()) {
-			student.setAddress("");
+	/**
+	 * Search for students by multiple properties. Each property have one or multiple values.
+	 * @param filters The format of filters is
+	 *                 {
+	 *                 	"companyName"				: ["Amazon", "Google"],
+	 *                 	"campus"						:	["SEATTLE", "BOSTON"],
+	 *                 	"entryYear"					:	[2015, 2016],
+	 *               	 	"expectedLastYear"	: [2018, 2019],
+	 *               	 	"courseId"					: ["CS 5610"]
+	 *               	 }
+	 * @param begin
+	 * @param end
+	 * @return a list of students filtered by specified map.
+	 */
+	public List<StudentCoopInfo> getStudentFilteredStudents2(Map<String, List<String>> filters, int begin, int end) {
+		if (!filters.containsKey("companyName")) {
+			return new ArrayList<>();
 		}
 
-		if (!privacy.isEmail()) {
-			student.setEmail("");
-		}
+		StringBuilder hql = new StringBuilder("SELECT NEW org.mehaexample.asdDemo.restModels.StudentCoopInfo(s.neuId, " +
+						"s.campus, s.entryYear, s.expectedLastYear, we.companyName) FROM Students s ");
 
-		if (!privacy.isPhone()) {
-			student.setPhoneNum("");
-		}
+		List<StudentCoopInfo> result = (List<StudentCoopInfo>) populateStudentFilterHql2(hql, filters, begin, end);
 
-		if (!privacy.isPhoto()) {
-			student.setPhoto(null);
-		}
-
-		if (!privacy.isFacebook()) {
-			student.setFacebook("");
-		}
-
-		if (!privacy.isGithub()) {
-			student.setGithub("");
-		}
-
-		if (!privacy.isWebsite()) {
-			student.setWebsite("");
-		}
-
-		if (!privacy.isSkill()) {
-			student.setSkills("");
-		}
-
-		if (!privacy.isLinkedin()) {
-			student.setLinkedin("");
-		}
+		return result;
 	}
 
 	public int getStudentFilteredStudentsCount(Map<String, List<String>> filters) {
@@ -446,7 +445,7 @@ public class StudentsDao {
 				if (filter.equals("campus")) {
 					List<Campus> campuses = new ArrayList<>();
 					for (String campus : filterElements) {
-						campuses.add(Campus.valueOf(campus));
+						campuses.add(Campus.valueOf(campus.toUpperCase()));
 					}
 					query.setParameterList(filter, campuses);
 				} else if (filter.equals("gender")) {
@@ -463,6 +462,114 @@ public class StudentsDao {
 			return query.list();
 		} finally {
 			session.close();
+		}
+	}
+
+	private List populateStudentFilterHql2(StringBuilder hql, Map<String, List<String>> filters, Integer begin, Integer end) {
+		if (filters.containsKey("companyName")) {
+			hql.append("INNER JOIN WorkExperiences we ON s.neuId = we.neuId ");
+		}
+
+		if (filters.containsKey("courseId")) {
+			hql.append("INNER JOIN Electives el ON s.neuId = el.neuId ");
+		}
+
+		Set<String> filterKeys = filters.keySet();
+		if (!filters.isEmpty()) {
+			hql.append("WHERE ");
+		}
+
+		boolean firstWhereArgument = true;
+		for (String filter : filterKeys) {
+			if (!firstWhereArgument) {
+				hql.append("AND ");
+			}
+
+			if (filter.equals("companyName")) {
+				hql.append("we.").append(filter).append(" IN ").append("(").append(":")
+								.append(filter).append(") ");
+			} else if (filter.equals("courseId")) {
+				hql.append("el.").append(filter).append(" IN ").append("(").append(":")
+								.append(filter).append(") ");
+			} else {
+				hql.append("s.").append(filter).append(" IN ").append("(").append(":")
+								.append(filter).append(") ");
+			}
+
+			if (firstWhereArgument) {
+				firstWhereArgument = false;
+			}
+		}
+
+		hql.append(" ORDER BY s.expectedLastYear DESC ");
+
+		try {
+			session = factory.openSession();
+			org.hibernate.query.Query query = session.createQuery(hql.toString());
+			if (begin != null || end != null) {
+				query.setFirstResult(begin - 1);
+				query.setMaxResults(end - begin + 1);
+			}
+			for (String filter : filterKeys) {
+				List<String> filterElements = filters.get(filter);
+				if (filter.equals("campus")) {
+					List<Campus> campuses = new ArrayList<>();
+					for (String campus : filterElements) {
+						campuses.add(Campus.valueOf(campus.toUpperCase()));
+					}
+					query.setParameterList(filter, campuses);
+				} else if (filter.equals("entryYear") || filter.equals("expectedLastYear")) {
+					List<Integer> years = new ArrayList<>();
+					for (String year : filterElements) {
+						years.add(Integer.parseInt(year));
+					}
+					query.setParameterList(filter, years);
+				}	else {
+					query.setParameterList(filter, filterElements);
+				}
+			}
+
+			return query.list();
+		} finally {
+			session.close();
+		}
+	}
+
+	private void setPrivacy(Students student, Privacies privacy) {
+		if (!privacy.isAddress()) {
+			student.setAddress("");
+		}
+
+		if (!privacy.isEmail()) {
+			student.setEmail("");
+		}
+
+		if (!privacy.isPhone()) {
+			student.setPhoneNum("");
+		}
+
+		if (!privacy.isPhoto()) {
+			student.setPhoto(null);
+		}
+
+		if (!privacy.isFacebook()) {
+			student.setFacebook("");
+		}
+
+		if (!privacy.isGithub()) {
+			student.setGithub("");
+		}
+
+		if (!privacy.isWebsite()) {
+			student.setWebsite("");
+		}
+
+		if (!privacy.isSkill()) {
+			student.setSkills("");
+		}
+
+		if (!privacy.isLinkedin()) {
+			student.setLinkedin("");
 		}
 	}
 
