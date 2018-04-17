@@ -13,7 +13,6 @@ import java.util.*;
 
 public class StudentsPublicDao {
   private SessionFactory factory;
-  private Session session;
 
   public StudentsPublicDao() {
     // it will check the hibernate.cfg.xml file and load it
@@ -27,13 +26,13 @@ public class StudentsPublicDao {
     }
   }
 
-  public StudentsPublic createStudent(StudentsPublic student) {
+  public synchronized StudentsPublic createStudent(StudentsPublic student) {
     Transaction tx = null;
     if (findStudentByPublicId(student.getPublicId()) != null) {
       throw new HibernateException("Student already exist in public database.");
     } else {
+      Session session = factory.openSession();
       try {
-        session = factory.openSession();
         tx = session.beginTransaction();
         session.save(student);
         tx.commit();
@@ -47,10 +46,10 @@ public class StudentsPublicDao {
     return student;
   }
 
-  public StudentsPublic findStudentByPublicId(int publicId) {
+  public synchronized StudentsPublic findStudentByPublicId(int publicId) {
     List<StudentsPublic> list;
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       org.hibernate.query.Query query = session.createQuery("FROM StudentsPublic WHERE publicId = :publicId ");
       query.setParameter("publicId", publicId);
       list = query.list();
@@ -69,8 +68,8 @@ public class StudentsPublicDao {
             "GROUP BY s.graduationYear " +
             "ORDER BY Count(*) DESC ";
     List<TopGradYears> listOfTopGradYears;
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       TypedQuery<TopGradYears> query = session.createQuery(hql, TopGradYears.class);
       query.setMaxResults(numberOfResultsDesired);
       listOfTopGradYears = query.getResultList();
@@ -82,12 +81,12 @@ public class StudentsPublicDao {
 
   public List<Integer> getListOfAllGraduationYears() {
     List<Integer> listOfAllGraduationYears;
+    Session session = factory.openSession();
     try {
       String hql = "SELECT s.graduationYear " +
               "FROM StudentsPublic s " +
               "GROUP BY s.graduationYear " +
               "ORDER BY s.graduationYear ASC";
-      session = factory.openSession();
       org.hibernate.query.Query query = session.createQuery(hql);
       listOfAllGraduationYears = query.getResultList();
     } finally {
@@ -98,12 +97,12 @@ public class StudentsPublicDao {
 
   public List<StudentsPublic> getListOfAllStudents() {
     List<StudentsPublic> listOfAllStudents;
+    Session session = factory.openSession();
     try {
       String hql = "SELECT s " +
               "FROM StudentsPublic s " +
               "WHERE s.visibleToPublic = true " +
               "ORDER BY s.graduationYear DESC";
-      session = factory.openSession();
       org.hibernate.query.Query query = session.createQuery(hql);
       listOfAllStudents = query.getResultList();
     } finally {
@@ -157,8 +156,8 @@ public class StudentsPublicDao {
     }
 
     hql.append(" ORDER BY s.graduationYear DESC ");
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       org.hibernate.query.Query query = session.createQuery(hql.toString());
       if (begin != null || end != null) {
         query.setFirstResult(begin - 1);
@@ -180,15 +179,15 @@ public class StudentsPublicDao {
     }
   }
 
-  public boolean updateStudent(StudentsPublic student) {
+  public synchronized boolean updateStudent(StudentsPublic student) {
     if (findStudentByPublicId(student.getPublicId()) == null) {
       throw new HibernateException("Cannot find student with that public Id");
     }
 
     Transaction tx = null;
 
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       tx = session.beginTransaction();
       session.saveOrUpdate(student);
       tx.commit();
@@ -202,10 +201,10 @@ public class StudentsPublicDao {
     return true;
   }
 
-  public boolean deleteStudentByPublicId(int publicId) {
+  public synchronized boolean deleteStudentByPublicId(int publicId) {
     StudentsPublic student = findStudentByPublicId(publicId);
     if (student != null) {
-      session = factory.openSession();
+      Session session = factory.openSession();
       Transaction tx = null;
       try {
         tx = session.beginTransaction();

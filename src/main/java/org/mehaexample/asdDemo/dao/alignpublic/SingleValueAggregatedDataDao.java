@@ -25,7 +25,6 @@ public class SingleValueAggregatedDataDao {
   private static final String TOTAL_STUDENTS_WITH_SCHOLARSHIP = "TotalStudentsWithScholarship";
 
   private SessionFactory factory;
-  private Session session;
 
   public SingleValueAggregatedDataDao() {
     this.factory = PublicSessionFactory.getFactory();
@@ -94,8 +93,8 @@ public class SingleValueAggregatedDataDao {
   }
 
   private int findValueByKey(String analyticKey) {
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       org.hibernate.query.Query query = session.createQuery(
               "SELECT analyticValue FROM SingleValueAggregatedData WHERE analyticKey = :analyticKey ");
       query.setParameter("analyticKey", analyticKey);
@@ -162,8 +161,8 @@ public class SingleValueAggregatedDataDao {
   }
 
   private SingleValueAggregatedData findDataByKey(String analyticKey) {
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       org.hibernate.query.Query query = session.createQuery(
               "FROM SingleValueAggregatedData WHERE analyticKey = :analyticKey ");
       query.setParameter("analyticKey", analyticKey);
@@ -177,14 +176,14 @@ public class SingleValueAggregatedDataDao {
     }
   }
 
-  public boolean saveOrUpdateData(SingleValueAggregatedData updatedData) {
+  public synchronized boolean saveOrUpdateData(SingleValueAggregatedData updatedData) {
     Transaction tx = null;
     SingleValueAggregatedData data = findDataByKey(updatedData.getAnalyticKey());
     if (data == null) {
       throw new HibernateException("Data cannot be found.");
     }
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       tx = session.beginTransaction();
       session.saveOrUpdate(updatedData);
       tx.commit();

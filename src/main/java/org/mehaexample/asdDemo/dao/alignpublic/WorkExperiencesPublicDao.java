@@ -13,7 +13,6 @@ import java.util.List;
 
 public class WorkExperiencesPublicDao {
   private SessionFactory factory;
-  private Session session;
 
   public WorkExperiencesPublicDao() {
     // it will check the hibernate.cfg.xml file and load it
@@ -27,10 +26,10 @@ public class WorkExperiencesPublicDao {
     }
   }
 
-  public WorkExperiencesPublic createWorkExperience(WorkExperiencesPublic workExperience) {
+  public synchronized WorkExperiencesPublic createWorkExperience(WorkExperiencesPublic workExperience) {
+    Session session = factory.openSession();
     Transaction tx = null;
     try {
-      session = factory.openSession();
       tx = session.beginTransaction();
       session.save(workExperience);
       tx.commit();
@@ -45,8 +44,8 @@ public class WorkExperiencesPublicDao {
 
   public WorkExperiencesPublic findWorkExperienceById(int workExperienceId) {
     List<WorkExperiencesPublic> list;
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       org.hibernate.query.Query query = session.createQuery(
               "FROM WorkExperiencesPublic WHERE workExperienceId = :workExperienceId ");
       query.setParameter("workExperienceId", workExperienceId);
@@ -66,8 +65,8 @@ public class WorkExperiencesPublicDao {
             "GROUP BY w.coop " +
             "ORDER BY Count(*) DESC ";
     List<TopCoops> listOfTopCoops;
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       TypedQuery<TopCoops> query = session.createQuery(hql, TopCoops.class);
       query.setMaxResults(numberOfResultsDesired);
       listOfTopCoops = query.getResultList();
@@ -83,8 +82,8 @@ public class WorkExperiencesPublicDao {
             "GROUP BY w.coop " +
             "ORDER BY Count(*) DESC";
     List<String> listOfAllCoopCompanies;
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       org.hibernate.query.Query query = session.createQuery(hql);
       listOfAllCoopCompanies = query.getResultList();
     } finally {
@@ -93,10 +92,10 @@ public class WorkExperiencesPublicDao {
     return listOfAllCoopCompanies;
   }
 
-  public boolean deleteWorkExperienceById(int workExperienceId) {
+  public synchronized boolean deleteWorkExperienceById(int workExperienceId) {
     WorkExperiencesPublic workExperience = findWorkExperienceById(workExperienceId);
     if (workExperience != null) {
-      session = factory.openSession();
+      Session session = factory.openSession();
       Transaction tx = null;
       try {
         tx = session.beginTransaction();

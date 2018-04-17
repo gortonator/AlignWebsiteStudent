@@ -16,7 +16,6 @@ public class MultipleValueAggregatedDataDao {
   public static final String LIST_OF_DEGREES = "ListOfDegrees";
 
   private SessionFactory factory;
-  private Session session;
 
   public MultipleValueAggregatedDataDao() {
     this.factory = PublicSessionFactory.getFactory();
@@ -28,11 +27,11 @@ public class MultipleValueAggregatedDataDao {
     }
   }
 
-  public boolean saveOrUpdateList(List<MultipleValueAggregatedData> list) {
+  public synchronized boolean saveOrUpdateList(List<MultipleValueAggregatedData> list) {
     Transaction tx = null;
     for (MultipleValueAggregatedData employer : list) {
+      Session session = factory.openSession();
       try {
-        session = factory.openSession();
         tx = session.beginTransaction();
         session.saveOrUpdate(employer);
         tx.commit();
@@ -55,8 +54,8 @@ public class MultipleValueAggregatedDataDao {
   }
 
   private List<String> findTopFiveKeyByTerm(String analyticTerm) {
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       org.hibernate.query.Query query = session.createQuery(
               "SELECT analyticKey " +
                       "FROM MultipleValueAggregatedData " +
@@ -79,8 +78,8 @@ public class MultipleValueAggregatedDataDao {
   }
 
   private List<DataCount> findDataCountByTerm(String analyticTerm) {
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       org.hibernate.query.Query query = session.createQuery(
               "SELECT NEW org.mehaexample.asdDemo.model.alignpublic.DataCount( " +
                       "analyticKey, analyticValue ) " +
@@ -111,8 +110,8 @@ public class MultipleValueAggregatedDataDao {
   }
 
   private List<MultipleValueAggregatedData> findDataByTerm(String analyticTerm) {
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       org.hibernate.query.Query query = session.createQuery(
               "FROM MultipleValueAggregatedData " +
                       "WHERE analyticTerm = :analyticTerm " +
@@ -124,10 +123,10 @@ public class MultipleValueAggregatedDataDao {
     }
   }
 
-  private boolean deleteDataByTerm(String analyticTerm) {
+  private synchronized boolean deleteDataByTerm(String analyticTerm) {
     List<MultipleValueAggregatedData> listOfData = findDataByTerm(analyticTerm);
     for (MultipleValueAggregatedData data : listOfData) {
-      session = factory.openSession();
+      Session session = factory.openSession();
       Transaction tx = null;
       try {
         tx = session.beginTransaction();

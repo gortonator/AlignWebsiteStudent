@@ -14,7 +14,7 @@ public class PublicSessionFactory {
 				.configure("/hibernate_Public.cfg.xml").buildSessionFactory();
 	}
 
-	public static SessionFactory getFactory() {
+	public synchronized static SessionFactory getFactory() {
 		return factory;
 	}
 }

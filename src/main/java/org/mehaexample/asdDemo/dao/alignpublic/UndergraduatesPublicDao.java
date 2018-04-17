@@ -14,7 +14,6 @@ import java.util.List;
 
 public class UndergraduatesPublicDao {
   private SessionFactory factory;
-  private Session session;
 
   public UndergraduatesPublicDao() {
       // it will check the hibernate.cfg.xml file and load it
@@ -28,10 +27,10 @@ public class UndergraduatesPublicDao {
     }
   }
 
-  public UndergraduatesPublic createUndergraduate(UndergraduatesPublic undergraduate) {
+  public synchronized UndergraduatesPublic createUndergraduate(UndergraduatesPublic undergraduate) {
     Transaction tx = null;
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       tx = session.beginTransaction();
       session.save(undergraduate);
       tx.commit();
@@ -46,8 +45,8 @@ public class UndergraduatesPublicDao {
 
   public UndergraduatesPublic findUndergraduateById(int undergraduateId) {
     List<UndergraduatesPublic> list;
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       org.hibernate.query.Query query = session.createQuery(
               "FROM UndergraduatesPublic WHERE undergraduateId = :undergraduateId ");
       query.setParameter("undergraduateId", undergraduateId);
@@ -67,8 +66,8 @@ public class UndergraduatesPublicDao {
             "GROUP BY u.undergradSchool " +
             "ORDER BY Count(*) DESC ";
     List<TopUndergradSchools> listOfTopUndergradSchools;
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       TypedQuery<TopUndergradSchools> query = session.createQuery(hql, TopUndergradSchools.class);
       query.setMaxResults(numberOfResultsDesired);
       listOfTopUndergradSchools = query.getResultList();
@@ -84,8 +83,8 @@ public class UndergraduatesPublicDao {
             "GROUP BY u.undergradDegree " +
             "ORDER BY Count(*) DESC ";
     List<TopUndergradDegrees> listOfTopUndergradDegrees;
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       TypedQuery<TopUndergradDegrees> query = session.createQuery(hql, TopUndergradDegrees.class);
       query.setMaxResults(numberOfResultsDesired);
       listOfTopUndergradDegrees = query.getResultList();
@@ -101,8 +100,8 @@ public class UndergraduatesPublicDao {
             "GROUP BY u.undergradSchool " +
             "ORDER BY Count(*) DESC";
     List<String> listOfAllSchools;
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       org.hibernate.query.Query query = session.createQuery(hql);
       listOfAllSchools = query.getResultList();
     } finally{
@@ -117,8 +116,8 @@ public class UndergraduatesPublicDao {
             "GROUP BY u.undergradDegree " +
             "ORDER BY Count(*) DESC";
     List<String> listOfAllSchools;
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       org.hibernate.query.Query query = session.createQuery(hql);
       listOfAllSchools = query.getResultList();
     } finally{
@@ -149,10 +148,10 @@ public class UndergraduatesPublicDao {
 //    return true;
 //  }
 
-  public boolean deleteUndergraduateById(int publicId) {
+  public synchronized boolean deleteUndergraduateById(int publicId) {
     UndergraduatesPublic undergraduate = findUndergraduateById(publicId);
     if (undergraduate != null) {
-      session = factory.openSession();
+      Session session = factory.openSession();
       Transaction tx = null;
       try {
         tx = session.beginTransaction();
