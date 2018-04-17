@@ -3,14 +3,14 @@ package org.mehaexample.asdDemo.restModels;
 import org.mehaexample.asdDemo.enums.Campus;
 
 public class StudentCoopInfo {
-  private String NuId;
+  private String Nuid;
   private Campus Campuses;
   private int EnrollmentYear;
   private int GraduationYear;
   private String Coops;
 
   public StudentCoopInfo(String nuId, Campus campus, int enrollmentYear, int graduationYear, String coops) {
-    NuId = nuId;
+    Nuid = nuId;
     Campuses = campus;
     EnrollmentYear = enrollmentYear;
     GraduationYear = graduationYear;
@@ -18,11 +18,11 @@ public class StudentCoopInfo {
   }
 
   public String getNuId() {
-    return NuId;
+    return Nuid;
   }
 
   public void setNuId(String nuId) {
-    NuId = nuId;
+    Nuid = nuId;
   }
 
   public Campus getCampus() {
