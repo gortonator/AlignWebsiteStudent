@@ -131,7 +131,7 @@ public class SecureAuth implements ContainerRequestFilter{
 						}
 					} catch (Exception e) {
 						requestContext.abortWith(Response.status(Response.Status.NOT_ACCEPTABLE).
-								entity("Token Tampered. Please login again.").build());
+								entity(e).build());
 					}
 				} else {
 					requestContext.abortWith(Response.status(Response.Status.NOT_ACCEPTABLE).
