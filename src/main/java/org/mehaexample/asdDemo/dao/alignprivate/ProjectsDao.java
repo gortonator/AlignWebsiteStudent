@@ -12,7 +12,6 @@ import java.util.List;
 
 public class ProjectsDao {
   private SessionFactory factory;
-  private Session session;
   private PrivaciesDao privaciesDao;
 
   /**
@@ -40,8 +39,8 @@ public class ProjectsDao {
    * @return Project if found.
    */
   public Projects getProjectById(int projectId) {
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       org.hibernate.query.Query query = session.createQuery(
               "FROM Projects WHERE projectId = :projectId");
       query.setParameter("projectId", projectId);
@@ -61,8 +60,8 @@ public class ProjectsDao {
    * @return List of Projects.
    */
   public List<Projects> getProjectsByNeuId(String neuId) {
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       org.hibernate.query.Query query = session.createQuery(
               "FROM Projects WHERE neuId = :neuId");
       query.setParameter("neuId", neuId);
@@ -87,8 +86,8 @@ public class ProjectsDao {
    * @param project the project object to be created; not null.
    * @return newly created project if success. Otherwise, return null;
    */
-  public Projects createProject(Projects project) {
-    session = factory.openSession();
+  public synchronized Projects createProject(Projects project) {
+    Session session = factory.openSession();
     Transaction tx = null;
     try {
       tx = session.beginTransaction();
@@ -110,12 +109,12 @@ public class ProjectsDao {
    * @param projectId the project Id to be deleted.
    * @return true if project is deleted, false otherwise.
    */
-  public boolean deleteProjectById(int projectId) {
+  public synchronized boolean deleteProjectById(int projectId) {
     Projects project = getProjectById(projectId);
     if (project == null) {
       throw new HibernateException("Project Id cannot be found.");
     }
-    session = factory.openSession();
+    Session session = factory.openSession();
     Transaction tx = null;
     try {
       tx = session.beginTransaction();
@@ -131,11 +130,11 @@ public class ProjectsDao {
     return true;
   }
 
-  public boolean deleteProjectsByNeuId(String neuId) {
+  public synchronized boolean deleteProjectsByNeuId(String neuId) {
     Transaction tx = null;
 
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       tx = session.beginTransaction();
       org.hibernate.query.Query query = session.createQuery("DELETE FROM Projects " +
               "WHERE neuId = :neuId ");
@@ -158,12 +157,12 @@ public class ProjectsDao {
    * @param project project object; not null.
    * @return true if the project is updated, false otherwise.
    */
-  public boolean updateProject(Projects project) {
+  public synchronized boolean updateProject(Projects project) {
 
     if (getProjectById(project.getProjectId()) == null) {
       throw new HibernateException("Project does not exist.");
     }
-    session = factory.openSession();
+    Session session = factory.openSession();
     Transaction tx = null;
     try {
       tx = session.beginTransaction();

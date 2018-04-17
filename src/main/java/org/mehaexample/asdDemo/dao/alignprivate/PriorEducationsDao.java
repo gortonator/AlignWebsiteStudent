@@ -16,7 +16,6 @@ import java.util.List;
 
 public class PriorEducationsDao {
   private SessionFactory factory;
-  private Session session;
 
   /**
    * Default constructor.
@@ -41,8 +40,8 @@ public class PriorEducationsDao {
    * @return Prior Education if found, null if not found.
    */
   public PriorEducations getPriorEducationById(int priorEducationId) {
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       org.hibernate.query.Query query = session.createQuery(
               "FROM PriorEducations WHERE priorEducationId = :priorEducationId");
       query.setParameter("priorEducationId", priorEducationId);
@@ -63,8 +62,8 @@ public class PriorEducationsDao {
    * @return List of Prior Educations if neu Id found, null if Neu Id not found.
    */
   public List<PriorEducations> getPriorEducationsByNeuId(String neuId) {
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       org.hibernate.query.Query query = session.createQuery(
               "FROM PriorEducations WHERE neuId = :neuId");
       query.setParameter("neuId", neuId);
@@ -82,8 +81,8 @@ public class PriorEducationsDao {
    * @param priorEducation the prior education object to be created; not null.
    * @return newly created priorEducation.
    */
-  public PriorEducations createPriorEducation(PriorEducations priorEducation) {
-    session = factory.openSession();
+  public synchronized PriorEducations createPriorEducation(PriorEducations priorEducation) {
+    Session session = factory.openSession();
     Transaction tx = null;
     try {
       tx = session.beginTransaction();
@@ -109,8 +108,8 @@ public class PriorEducationsDao {
             "AND (s.enrollmentStatus = 'FULL_TIME' OR s.enrollmentStatus = 'PART_TIME') " +
             "GROUP BY pe.majorName " +
             "ORDER BY Count(*) DESC ";
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       TypedQuery<MultipleValueAggregatedData> query = session.createQuery(hql, MultipleValueAggregatedData.class);
       List<MultipleValueAggregatedData> list = query.getResultList();
       for (MultipleValueAggregatedData data : list) {
@@ -131,8 +130,8 @@ public class PriorEducationsDao {
             "WHERE s.enrollmentStatus = 'FULL_TIME' OR s.enrollmentStatus = 'PART_TIME'" +
             "GROUP BY pe.degreeCandidacy " +
             "ORDER BY Count(*) DESC ";
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       TypedQuery<MultipleValueAggregatedData> query = session.createQuery(hql, MultipleValueAggregatedData.class);
       List<MultipleValueAggregatedData> list = query.getResultList();
       for (MultipleValueAggregatedData data : list) {
@@ -150,13 +149,13 @@ public class PriorEducationsDao {
    * @param priorEducationId the prior education Id to be deleted.
    * @return true if prior education is deleted, false otherwise.
    */
-  public boolean deletePriorEducationById(int priorEducationId) {
+  public synchronized boolean deletePriorEducationById(int priorEducationId) {
     PriorEducations priorEducation = getPriorEducationById(priorEducationId);
     if (priorEducation == null) {
       throw new HibernateException("Prior Education does not exist.");
     }
 
-    session = factory.openSession();
+    Session session = factory.openSession();
     Transaction tx = null;
     try {
       tx = session.beginTransaction();
@@ -178,11 +177,11 @@ public class PriorEducationsDao {
    * @param priorEducation prior education object; not null.
    * @return true if the prior education is updated, false otherwise.
    */
-  public boolean updatePriorEducation(PriorEducations priorEducation) {
+  public synchronized boolean updatePriorEducation(PriorEducations priorEducation) {
     if (getPriorEducationById(priorEducation.getPriorEducationId()) == null) {
       throw new HibernateException("Prior Education does not exist.");
     }
-    session = factory.openSession();
+    Session session = factory.openSession();
     Transaction tx = null;
     try {
       tx = session.beginTransaction();
@@ -211,8 +210,8 @@ public class PriorEducationsDao {
     }
     hql.append("GROUP BY pe.majorName ");
     hql.append("ORDER BY Count(*) DESC ");
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       TypedQuery<TopBachelor> query = session.createQuery(hql.toString(), TopBachelor.class);
       query.setMaxResults(10);
       if (campuses != null) {
@@ -241,8 +240,8 @@ public class PriorEducationsDao {
     }
     hql.append("GROUP BY pe.institutionName ");
     hql.append("ORDER BY Count(*) DESC ");
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       TypedQuery<StudentBachelorInstitution> query = session.createQuery(hql.toString(), StudentBachelorInstitution.class);
       if (campus != null) {
         query.setParameter("campus", campus);

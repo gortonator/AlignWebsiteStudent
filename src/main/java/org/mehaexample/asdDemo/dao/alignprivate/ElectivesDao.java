@@ -16,7 +16,6 @@ import java.util.List;
 
 public class ElectivesDao {
   private SessionFactory factory;
-  private Session session;
 
   private StudentsDao studentDao;
   private PrivaciesDao privaciesDao;
@@ -41,8 +40,8 @@ public class ElectivesDao {
   }
 
   public List<Electives> getElectivesByNeuId(String neuId) {
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       org.hibernate.query.Query query = session.createQuery("from Electives where neuId = :neuId");
       query.setParameter("neuId", neuId);
       return (List<Electives>) query.list();
@@ -61,8 +60,8 @@ public class ElectivesDao {
   }
 
   public Electives getElectiveById(int electiveId) {
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       org.hibernate.query.Query query = session.createQuery("from Electives where electiveId = :electiveId");
       query.setParameter("electiveId", electiveId);
       List<Electives> list = query.list();
@@ -81,13 +80,13 @@ public class ElectivesDao {
    * @param elective elective to be added; not null.
    * @return true if insert successfully. Otherwise throws exception.
    */
-  public Electives addElective(Electives elective) {
+  public synchronized Electives addElective(Electives elective) {
     if (elective == null) {
       return null;
     }
 
     Transaction tx = null;
-    session = factory.openSession();
+    Session session = factory.openSession();
 
     if (studentDao.ifNuidExists(elective.getNeuId())) {
       try {
@@ -106,12 +105,12 @@ public class ElectivesDao {
     return elective;
   }
 
-  public boolean updateElectives(Electives elective) {
+  public synchronized boolean updateElectives(Electives elective) {
     if (getElectiveById(elective.getElectiveId()) == null) {
       throw new HibernateException("Elective does not exist.");
     }
 
-    session = factory.openSession();
+    Session session = factory.openSession();
     Transaction tx = null;
     try {
       tx = session.beginTransaction();
@@ -126,15 +125,15 @@ public class ElectivesDao {
     return true;
   }
 
-  public boolean deleteElectiveRecord(int id) {
+  public synchronized boolean deleteElectiveRecord(int id) {
     if (getElectiveById(id) == null) {
       throw new HibernateException("Elective does not exist.");
     }
 
     Transaction tx = null;
 
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       tx = session.beginTransaction();
       Electives electives = session.get(Electives.class, id);
       session.delete(electives);
@@ -149,11 +148,11 @@ public class ElectivesDao {
     return true;
   }
 
-  public boolean deleteElectivesByNeuId(String neuId) {
+  public synchronized boolean deleteElectivesByNeuId(String neuId) {
     Transaction tx = null;
 
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       tx = session.beginTransaction();
       org.hibernate.query.Query query = session.createQuery("DELETE FROM Electives " +
               "WHERE neuId = :neuId ");
@@ -190,8 +189,8 @@ public class ElectivesDao {
     }
     hql.append("GROUP BY e.courseName ");
     hql.append("ORDER BY Count(*) DESC ");
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       TypedQuery<TopElective> query = session.createQuery(hql.toString(), TopElective.class);
       query.setMaxResults(10);
       if (campus != null) {

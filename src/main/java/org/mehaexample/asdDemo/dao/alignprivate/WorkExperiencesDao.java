@@ -20,7 +20,6 @@ import java.util.List;
 
 public class WorkExperiencesDao {
   private SessionFactory factory;
-  private Session session;
   private PrivaciesDao privaciesDao;
 
   /**
@@ -48,8 +47,8 @@ public class WorkExperiencesDao {
    * @return Work Experience if found.
    */
   public WorkExperiences getWorkExperienceById(int workExperienceId) {
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       org.hibernate.query.Query query = session.createQuery(
               "FROM WorkExperiences WHERE workExperienceId = :workExperienceId");
       query.setParameter("workExperienceId", workExperienceId);
@@ -69,8 +68,8 @@ public class WorkExperiencesDao {
    * @return List of Work Experiences.
    */
   public List<WorkExperiences> getWorkExperiencesByNeuId(String neuId) {
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       org.hibernate.query.Query query = session.createQuery(
               "FROM WorkExperiences WHERE neuId = :neuId");
       query.setParameter("neuId", neuId);
@@ -97,10 +96,10 @@ public class WorkExperiencesDao {
    * @param workExperience the work experience object to be created; not null.
    * @return newly created WorkExperience if success. Otherwise, return null;
    */
-  public WorkExperiences createWorkExperience(WorkExperiences workExperience) {
+  public synchronized WorkExperiences createWorkExperience(WorkExperiences workExperience) {
     Transaction tx = null;
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       tx = session.beginTransaction();
       session.save(workExperience);
       tx.commit();
@@ -117,8 +116,8 @@ public class WorkExperiencesDao {
   // THIS IS THE SCRIPT FOR MACHINE LEARNING
   // How many Align students get jobs?
   public int getTotalStudentsGotJob() {
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       org.hibernate.query.Query query = session.createQuery(
               "SELECT COUNT(DISTINCT we.neuId) FROM WorkExperiences we WHERE we.coop = false ");
       return ((Long) query.list().get(0)).intValue();
@@ -133,10 +132,10 @@ public class WorkExperiencesDao {
    * @param workExperienceId the work experience Id to be deleted.
    * @return true if work experience is deleted, false otherwise.
    */
-  public boolean deleteWorkExperienceById(int workExperienceId) {
+  public synchronized boolean deleteWorkExperienceById(int workExperienceId) {
     WorkExperiences workExperiences = getWorkExperienceById(workExperienceId);
     if (workExperiences != null) {
-      session = factory.openSession();
+      Session session = factory.openSession();
       Transaction tx = null;
       try {
         tx = session.beginTransaction();
@@ -155,11 +154,11 @@ public class WorkExperiencesDao {
     return true;
   }
 
-  public boolean deleteWorkExperienceByNeuId(String neuId) {
+  public synchronized boolean deleteWorkExperienceByNeuId(String neuId) {
     Transaction tx = null;
 
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       tx = session.beginTransaction();
       org.hibernate.query.Query query = session.createQuery("DELETE FROM WorkExperiences " +
               "WHERE neuId = :neuId ");
@@ -182,9 +181,9 @@ public class WorkExperiencesDao {
    * @param workExperience work experience object; not null.
    * @return true if the work experience is updated, false otherwise.
    */
-  public boolean updateWorkExperience(WorkExperiences workExperience) {
+  public synchronized boolean updateWorkExperience(WorkExperiences workExperience) {
     if (getWorkExperienceById(workExperience.getWorkExperienceId()) != null) {
-      session = factory.openSession();
+      Session session = factory.openSession();
       Transaction tx = null;
       try {
         tx = session.beginTransaction();
@@ -216,8 +215,8 @@ public class WorkExperiencesDao {
     }
     hql.append("GROUP BY s.neuId ");
     hql.append("ORDER BY Count(*) DESC ");
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       TypedQuery<TopEmployer> query = session.createQuery(hql.toString(), TopEmployer.class);
       query.setMaxResults(10);
       if (campus != null) {
@@ -241,8 +240,8 @@ public class WorkExperiencesDao {
             "WHERE we.coop = false " +
             "GROUP BY we.companyName " +
             "ORDER BY Count(*) DESC ";
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       TypedQuery<MultipleValueAggregatedData> query = session.createQuery(hql, MultipleValueAggregatedData.class);
       List<MultipleValueAggregatedData> list = query.getResultList();
       for (MultipleValueAggregatedData data : list) {
@@ -266,8 +265,8 @@ public class WorkExperiencesDao {
     if (year != null) {
       hql.append("AND s.expectedLastYear = :year ");
     }
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       TypedQuery<StudentCoopList> query = session.createQuery(hql.toString(), StudentCoopList.class);
       if (campus != null) {
         query.setParameter("campus", campus);
@@ -287,8 +286,8 @@ public class WorkExperiencesDao {
   }
 
   private List<String> getCompaniesByNeuId(String neuId) {
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       org.hibernate.query.Query query = session.createQuery(
               "SELECT we.companyName FROM WorkExperiences we WHERE we.neuId = :neuId");
       query.setParameter("neuId", neuId);
@@ -311,8 +310,8 @@ public class WorkExperiencesDao {
     if (year != null) {
       hql.append("AND s.expectedLastYear = :year ");
     }
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       TypedQuery<StudentBasicInfo> query = session.createQuery(hql.toString(), StudentBasicInfo.class);
       query.setParameter("companyName", companyName);
       if (campus != null) {
@@ -340,8 +339,8 @@ public class WorkExperiencesDao {
       hql.append("AND ");
       hql.append("s.expectedLastYear = :year ");
     }
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       TypedQuery<StudentCoopList> query = session.createQuery(hql.toString(), StudentCoopList.class);
       if (campus != null) {
         query.setParameter("campus", campus);
@@ -361,8 +360,8 @@ public class WorkExperiencesDao {
   }
 
   private List<String> getCurrentCompaniesByNeuId(String neuId) {
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       org.hibernate.query.Query query = session.createQuery(
               "SELECT we.companyName FROM WorkExperiences we WHERE we.currentJob = true AND we.neuId = :neuId");
       query.setParameter("neuId", neuId);

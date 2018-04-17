@@ -12,7 +12,6 @@ import java.util.List;
 
 public class ExtraExperiencesDao {
 	private SessionFactory factory;
-	private Session session;
 	private PrivaciesDao privaciesDao;
 
 	/**
@@ -40,8 +39,8 @@ public class ExtraExperiencesDao {
 	 * @return Extra Experience if found.
 	 */
 	public ExtraExperiences getExtraExperienceById(int extraExperienceId) {
+		Session session = factory.openSession();
 		try {
-			session = factory.openSession();
 			org.hibernate.query.Query query = session.createQuery(
 					"FROM ExtraExperiences WHERE extraExperienceId = :extraExperienceId");
 			query.setParameter("extraExperienceId", extraExperienceId);
@@ -61,8 +60,8 @@ public class ExtraExperiencesDao {
 	 * @return List of Extra Experiences.
 	 */
 	public List<ExtraExperiences> getExtraExperiencesByNeuId(String neuId) {
+		Session session = factory.openSession();
 		try {
-			session = factory.openSession();
 			org.hibernate.query.Query query = session.createQuery(
 					"FROM ExtraExperiences WHERE neuId = :neuId");
 			query.setParameter("neuId", neuId);
@@ -89,8 +88,8 @@ public class ExtraExperiencesDao {
 	 * @param extraExperience the extra experience object to be created; not null.
 	 * @return newly created ExtraExperience if success. Otherwise, return null;
 	 */
-	public ExtraExperiences createExtraExperience(ExtraExperiences extraExperience) {
-		session = factory.openSession();
+	public synchronized ExtraExperiences createExtraExperience(ExtraExperiences extraExperience) {
+		Session session = factory.openSession();
 		Transaction tx = null;
 		try {
 			tx = session.beginTransaction();
@@ -112,12 +111,12 @@ public class ExtraExperiencesDao {
 	 * @param extraExperienceId the extra experience Id to be deleted.
 	 * @return true if extra experience is deleted, false otherwise.
 	 */
-	public boolean deleteExtraExperienceById(int extraExperienceId) {
+	public synchronized boolean deleteExtraExperienceById(int extraExperienceId) {
 		ExtraExperiences extraExperiences = getExtraExperienceById(extraExperienceId);
 		if (extraExperiences == null) {
 			throw new HibernateException("Extra Experience does not exist.");
 		}
-		session = factory.openSession();
+		Session session = factory.openSession();
 		Transaction tx = null;
 		try {
 			tx = session.beginTransaction();
@@ -133,11 +132,11 @@ public class ExtraExperiencesDao {
 		return true;
 	}
 
-	public boolean deleteExtraExperienceByNeuId(String neuId) {
+	public synchronized boolean deleteExtraExperienceByNeuId(String neuId) {
 		Transaction tx = null;
 
+		Session session = factory.openSession();
 		try {
-			session = factory.openSession();
 			tx = session.beginTransaction();
 			org.hibernate.query.Query query = session.createQuery("DELETE FROM ExtraExperiences " +
 					"WHERE neuId = :neuId ");
@@ -160,11 +159,11 @@ public class ExtraExperiencesDao {
 	 * @param extraExperience extra experience object; not null.
 	 * @return true if the extra experience is updated, false otherwise.
 	 */
-	public boolean updateExtraExperience(ExtraExperiences extraExperience) {
+	public synchronized boolean updateExtraExperience(ExtraExperiences extraExperience) {
 		if (getExtraExperienceById(extraExperience.getExtraExperienceId()) == null) {
 			throw new HibernateException("Extra Experience does not exist.");
 		}
-		session = factory.openSession();
+		Session session = factory.openSession();
 		Transaction tx = null;
 		try {
 			tx = session.beginTransaction();

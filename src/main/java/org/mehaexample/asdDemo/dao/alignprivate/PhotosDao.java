@@ -12,7 +12,6 @@ import java.util.List;
 
 public class PhotosDao {
   private SessionFactory factory;
-  private Session session;
   private PrivaciesDao privaciesDao;
 
   public PhotosDao() {
@@ -34,8 +33,8 @@ public class PhotosDao {
    * @return a photo for a specific student
    */
   public Photos getPhotoByNeuId(String neuId) {
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       org.hibernate.query.Query query = session.createQuery("FROM Photos WHERE neuId = :neuId ");
       query.setParameter("neuId", neuId);
       List list = query.list();
@@ -63,15 +62,15 @@ public class PhotosDao {
    * @param photo
    * @return newly created photo
    */
-  public Photos createPhoto(Photos photo) {
+  public synchronized Photos createPhoto(Photos photo) {
     Transaction tx = null;
 
     if (ifNuidExists(photo.getNeuId())) {
       throw new HibernateException("Photo already exists.");
     }
 
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       tx = session.beginTransaction();
       session.save(photo);
       tx.commit();
@@ -91,15 +90,15 @@ public class PhotosDao {
    * @param photo
    * @return true if updated successfully.
    */
-  public boolean updatePhoto(Photos photo) {
+  public synchronized boolean updatePhoto(Photos photo) {
     Transaction tx = null;
 
     if (!ifNuidExists(photo.getNeuId())) {
       throw new HibernateException("Photo doesn't exist.");
     }
 
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       tx = session.beginTransaction();
       session.saveOrUpdate(photo);
       tx.commit();
@@ -123,8 +122,8 @@ public class PhotosDao {
   public boolean ifNuidExists(String neuId) {
     boolean find = false;
 
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       org.hibernate.query.Query query = session.createQuery("FROM Photos WHERE neuId = :neuId");
       query.setParameter("neuId", neuId);
       List list = query.list();

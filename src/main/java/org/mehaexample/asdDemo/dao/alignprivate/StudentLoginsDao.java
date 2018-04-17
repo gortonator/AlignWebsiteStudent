@@ -10,7 +10,6 @@ import java.util.List;
 
 public class StudentLoginsDao {
   private SessionFactory factory;
-  private Session session;
 
   /**
    * Default Constructor.
@@ -28,8 +27,8 @@ public class StudentLoginsDao {
   }
 
   public StudentLogins findStudentLoginsByEmail(String email) {
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       org.hibernate.query.Query query = session.createQuery("FROM StudentLogins WHERE email = :email ");
       query.setParameter("email", email);
       List list = query.list();
@@ -42,13 +41,13 @@ public class StudentLoginsDao {
     }
   }
 
-  public StudentLogins createStudentLogin(StudentLogins studentLogin) {
+  public synchronized StudentLogins createStudentLogin(StudentLogins studentLogin) {
+    Session session = factory.openSession();
     Transaction tx = null;
     if (findStudentLoginsByEmail(studentLogin.getEmail()) != null) {
       throw new HibernateException("Student Login already exists.");
     }
     try {
-      session = factory.openSession();
       tx = session.beginTransaction();
       session.save(studentLogin);
       tx.commit();
@@ -62,11 +61,11 @@ public class StudentLoginsDao {
     return studentLogin;
   }
 
-  public boolean updateStudentLogin(StudentLogins studentLogin) {
+  public synchronized boolean updateStudentLogin(StudentLogins studentLogin) {
+    Session session = factory.openSession();
     Transaction tx = null;
     if (findStudentLoginsByEmail(studentLogin.getEmail()) != null) {
       try {
-        session = factory.openSession();
         tx = session.beginTransaction();
         session.saveOrUpdate(studentLogin);
         tx.commit();
@@ -83,14 +82,14 @@ public class StudentLoginsDao {
     return true;
   }
 
-  public boolean deleteStudentLogin(String email) {
+  public synchronized boolean deleteStudentLogin(String email) {
+    Session session = factory.openSession();
     if (email == null || email.trim().isEmpty()) {
       throw new IllegalArgumentException("Email argument cannot be null or empty.");
     }
 
     StudentLogins studentLogin = findStudentLoginsByEmail(email);
     if (studentLogin != null) {
-      session = factory.openSession();
       Transaction tx = null;
       try {
         tx = session.beginTransaction();

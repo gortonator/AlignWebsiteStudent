@@ -11,7 +11,6 @@ import org.mehaexample.asdDemo.model.alignprivate.Courses;
 public class CoursesDao {
 
   private SessionFactory factory;
-  private Session session;
 
   /**
    * Default constructor.
@@ -34,8 +33,8 @@ public class CoursesDao {
    * @return list of All companies from private database.
    */
   public List<Courses> getAllCourses() {
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       org.hibernate.query.Query query = session.createQuery("FROM Courses");
       return (List<Courses>) query.list();
     } finally {
@@ -51,8 +50,8 @@ public class CoursesDao {
    * @return Course corresponding to the course Id, null otherwise.
    */
   public Courses getCourseById(String courseId) {
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       org.hibernate.query.Query query = session.createQuery("FROM Courses WHERE courseId = :courseId");
       query.setParameter("courseId", courseId);
       List listOfCourses = query.list();
@@ -71,7 +70,7 @@ public class CoursesDao {
    * @param course course object
    * @return Course if found, null if an error happen.
    */
-  public Courses createCourse(Courses course) {
+  public synchronized Courses createCourse(Courses course) {
     if (course == null) {
       return null;
     }
@@ -80,7 +79,7 @@ public class CoursesDao {
       throw new HibernateException("Course already exist.");
     }
 
-    session = factory.openSession();
+    Session session = factory.openSession();
     Transaction tx = null;
     try {
       tx = session.beginTransaction();
@@ -103,7 +102,7 @@ public class CoursesDao {
    * @param courseId course Id.
    * @return true if course is deleted, false otherwise.
    */
-  public boolean deleteCourseById(String courseId) {
+  public synchronized boolean deleteCourseById(String courseId) {
     if (courseId == null || courseId.trim().isEmpty()) {
       throw new IllegalArgumentException("Course Id argument cannot be empty / null.");
     }
@@ -113,7 +112,7 @@ public class CoursesDao {
     if (course == null) {
       throw new HibernateException("Course Id cannot be found.");
     }
-    session = factory.openSession();
+    Session session = factory.openSession();
     Transaction tx = null;
     try {
       tx = session.beginTransaction();
@@ -135,9 +134,9 @@ public class CoursesDao {
    * @param course course object.
    * @return true if course is updated, false otherwise.
    */
-  public boolean updateCourse(Courses course) {
+  public synchronized boolean updateCourse(Courses course) {
     if (getCourseById(course.getCourseId()) != null) {
-      session = factory.openSession();
+      Session session = factory.openSession();
       Transaction tx = null;
       try {
         tx = session.beginTransaction();
