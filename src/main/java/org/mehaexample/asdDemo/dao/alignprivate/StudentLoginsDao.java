@@ -38,7 +38,7 @@ public class StudentLoginsDao {
       }
       return (StudentLogins) list.get(0);
     } finally {
-      session.close();
+      if (session != null) { session.close(); }
     }
   }
 
