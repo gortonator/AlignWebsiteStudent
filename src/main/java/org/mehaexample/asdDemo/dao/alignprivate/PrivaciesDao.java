@@ -10,7 +10,6 @@ import java.util.List;
 
 public class PrivaciesDao {
   private SessionFactory factory;
-  private Session session;
 
   public PrivaciesDao() {
     this.factory = StudentSessionFactory.getFactory();
@@ -29,8 +28,8 @@ public class PrivaciesDao {
    * @return a privacy for a specific student
    */
   public Privacies getPrivacyByNeuId(String neuId) {
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       org.hibernate.query.Query query = session.createQuery("FROM Privacies WHERE neuId = :neuId ");
       query.setParameter("neuId", neuId);
       List list = query.list();
@@ -49,15 +48,15 @@ public class PrivaciesDao {
    * @param privacy
    * @return newly created privacy
    */
-  public Privacies createPrivacy(Privacies privacy) {
+  public synchronized Privacies createPrivacy(Privacies privacy) {
     Transaction tx = null;
 
     if (ifNuidExists(privacy.getNeuId())) {
       throw new HibernateException("Privacy already exists.");
     }
 
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       tx = session.beginTransaction();
       session.save(privacy);
       tx.commit();
@@ -77,15 +76,15 @@ public class PrivaciesDao {
    * @param privacy
    * @return true if updated successfully.
    */
-  public boolean updatePrivacy(Privacies privacy) {
+  public synchronized boolean updatePrivacy(Privacies privacy) {
     Transaction tx = null;
 
     if (!ifNuidExists(privacy.getNeuId())) {
       throw new HibernateException("Privacy doesn't exist.");
     }
 
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       tx = session.beginTransaction();
       session.saveOrUpdate(privacy);
       tx.commit();
@@ -105,7 +104,7 @@ public class PrivaciesDao {
    * @param neuId
    * @return true if deleted successfully.
    */
-  public boolean deletePrivacy(String neuId) {
+  public synchronized boolean deletePrivacy(String neuId) {
     Transaction tx = null;
 
     if (neuId == null || neuId.isEmpty()) {
@@ -117,8 +116,8 @@ public class PrivaciesDao {
     }
 
     Privacies privacy = getPrivacyByNeuId(neuId);
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       tx = session.beginTransaction();
       session.delete(privacy);
       tx.commit();
@@ -141,8 +140,8 @@ public class PrivaciesDao {
   public boolean ifNuidExists(String neuId) {
     boolean find = false;
 
+    Session session = factory.openSession();
     try {
-      session = factory.openSession();
       org.hibernate.query.Query query = session.createQuery("FROM Privacies WHERE neuId = :neuId");
       query.setParameter("neuId", neuId);
       List list = query.list();
