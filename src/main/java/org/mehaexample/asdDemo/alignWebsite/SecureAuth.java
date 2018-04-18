@@ -103,6 +103,8 @@ public class SecureAuth implements ContainerRequestFilter{
 										!requestContext.getUriInfo().getPath().contains(encodedNuid+"/privacies") ){
 									if(!requestContext.getUriInfo().getPath().equals("students") &&
 											!requestContext.getUriInfo().getPath().equals("students/") &&
+											!requestContext.getUriInfo().getPath().equals("filterstudents") &&
+											!requestContext.getUriInfo().getPath().equals("filterstudents/") &&
 											!requestContext.getUriInfo().getPath().equals("autofill-search") &&
 											!requestContext.getUriInfo().getPath().equals("autofill-search/") ){
 										requestContext.abortWith(Response.status(Response.Status.NOT_ACCEPTABLE).
