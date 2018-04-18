@@ -61,6 +61,8 @@ import org.mehaexample.asdDemo.restModels.PasswordCreateObject;
 import org.mehaexample.asdDemo.restModels.PasswordResetObject;
 import org.mehaexample.asdDemo.restModels.ProjectObject;
 import org.mehaexample.asdDemo.restModels.SearchOtherStudents;
+import org.mehaexample.asdDemo.restModels.StudentCoopInfo;
+import org.mehaexample.asdDemo.restModels.StudentFilterInfo;
 import org.mehaexample.asdDemo.restModels.WorkExperienceObject;
 import org.mehaexample.asdDemo.utils.MailClient;
 
@@ -212,8 +214,8 @@ public class StudentFacingService {
 
 		// adding the photo object
 		JSONObject photoObject = new JSONObject();
-		photo = photosDao.getPhotoByNeuId(nuid);
-
+		photo = photosDao.getPhotoWithPrivacy(nuid);
+				
 		if(photo != null){
 			photoObject.put("neuId", new String(Base64.getEncoder().encode(photo.getNeuId().getBytes())));
 			byte[] photoByte = photo.getPhoto();
@@ -1552,6 +1554,66 @@ public class StudentFacingService {
 		}
 
 		return Response.status(Response.Status.OK).entity("Privacies Updated Successfully!").build(); 
+	}
+	
+	
+	/**
+	 * This function filter students based on the criteria
+	 * 
+	 * @param search
+	 * @return 200 Response if all the filtered students are returned successfully 
+	 */
+	@POST
+	@Path("/filterstudents")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response filterStudent(StudentFilterInfo studentFilterInfo){
+
+		List<StudentCoopInfo> resultStudentInfo = new ArrayList<StudentCoopInfo>();
+		Map<String,List<String>> map = new HashMap<String,List<String>>();
+
+		try{
+			if (studentFilterInfo.getCoops()!= null && !studentFilterInfo.getCoops().isEmpty()) { 
+				map.put("companyName",studentFilterInfo.getCoops());
+			}
+
+			if (studentFilterInfo.getCampuses()!= null && !studentFilterInfo.getCampuses().isEmpty()){
+				map.put("campus",studentFilterInfo.getCampuses());
+			}
+
+			if (studentFilterInfo.getEnrollmentYear()!= null && !studentFilterInfo.getEnrollmentYear().isEmpty()){
+				map.put("entryYear",studentFilterInfo.getEnrollmentYear());
+			}
+
+			if (studentFilterInfo.getGraduationYear()!= null && !studentFilterInfo.getGraduationYear().isEmpty()){
+				map.put("expectedLastYear",studentFilterInfo.getGraduationYear());
+			}
+
+		}catch (Exception e){
+			
+			return Response.status(Response.Status.BAD_REQUEST).entity(e).build();
+		}
+
+		try {
+			List<StudentCoopInfo> studentCoopInfoList = 
+					(ArrayList<StudentCoopInfo>) studentDao.getStudentFilteredStudents2(map, 0, 9999);
+
+			for (StudentCoopInfo studentCoopInfoEach : studentCoopInfoList) {
+				studentCoopInfoEach.setNuId(new String(Base64.getEncoder().
+						encode(studentCoopInfoEach.getNuId().getBytes())));
+				resultStudentInfo.add(studentCoopInfoEach);
+			}
+
+		} catch (Exception e) {
+
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).build();
+		}
+
+		JSONObject studentsRecordObj = new JSONObject();
+		studentsRecordObj.put("Quantity", resultStudentInfo.size());
+		studentsRecordObj.put("Students", resultStudentInfo);
+
+		return Response.status(Response.Status.OK).entity(studentsRecordObj.toString()).build(); 
 	}
 
 	/**
