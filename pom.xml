@@ -248,10 +248,10 @@
                 <test.password>
                 </test.password>
                 <database.username>
-                    root
+                    backend_student
                 </database.username>
                 <database.password>
-                    123456
+                    password
                 </database.password>
             </properties>
         </profile>
