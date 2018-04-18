@@ -367,12 +367,14 @@ public class StudentsDao {
 	 * @return a list of students filtered by specified map.
 	 */
 	public List<StudentCoopInfo> getStudentFilteredStudents2(Map<String, List<String>> filters, int begin, int end) {
+		StringBuilder hql =  new StringBuilder();
 		if (!filters.containsKey("companyName")) {
-			return new ArrayList<>();
+			hql = hql.append("SELECT NEW org.mehaexample.asdDemo.restModels.StudentCoopInfo(s.neuId, " +
+							"s.campus, s.entryYear, s.expectedLastYear, '') FROM Students s ");
+		} else {
+			hql = hql.append("SELECT NEW org.mehaexample.asdDemo.restModels.StudentCoopInfo(s.neuId, " +
+							"s.campus, s.entryYear, s.expectedLastYear, we.companyName) FROM Students s ");
 		}
-
-		StringBuilder hql = new StringBuilder("SELECT NEW org.mehaexample.asdDemo.restModels.StudentCoopInfo(s.neuId, " +
-						"s.campus, s.entryYear, s.expectedLastYear, we.companyName) FROM Students s ");
 
 		List<StudentCoopInfo> result = (List<StudentCoopInfo>) populateStudentFilterHql2(hql, filters, begin, end);
 
