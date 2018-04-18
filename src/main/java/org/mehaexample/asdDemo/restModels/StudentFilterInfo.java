@@ -3,65 +3,63 @@ package org.mehaexample.asdDemo.restModels;
 import java.util.List;
 
 public class StudentFilterInfo {
-	private List<String> Coops;
-	private List<String> Campuses;
-	private List<String> EnrollmentYear;
-	private List<String> GraduationYear;
-	private List<String> Courses;
+	private List<String> coops;
+	private List<String> campuses;
+	private List<String> enrollmentYear;
+	private List<String> graduationYear;
+	private List<String> courses;
 	
 	public StudentFilterInfo(List<String> coops, List<String> campuses, List<String> enrollmentYear,
 			List<String> graduationYear, List<String> courses) {
 		super();
-		Coops = coops;
-		Campuses = campuses;
-		EnrollmentYear = enrollmentYear;
-		GraduationYear = graduationYear;
-		Courses = courses;
+		this.coops = coops;
+		this.campuses = campuses;
+		this.enrollmentYear = enrollmentYear;
+		this.graduationYear = graduationYear;
+		this.courses = courses;
 	}
 
 	public StudentFilterInfo() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	public List<String> getCoops() {
-		return Coops;
+		return coops;
 	}
 
 	public void setCoops(List<String> coops) {
-		Coops = coops;
+		this.coops = coops;
 	}
 
 	public List<String> getCampuses() {
-		return Campuses;
+		return campuses;
 	}
 
 	public void setCampuses(List<String> campuses) {
-		Campuses = campuses;
+		this.campuses = campuses;
 	}
 
 	public List<String> getEnrollmentYear() {
-		return EnrollmentYear;
+		return enrollmentYear;
 	}
 
 	public void setEnrollmentYear(List<String> enrollmentYear) {
-		EnrollmentYear = enrollmentYear;
+		this.enrollmentYear = enrollmentYear;
 	}
 
 	public List<String> getGraduationYear() {
-		return GraduationYear;
+		return graduationYear;
 	}
 
 	public void setGraduationYear(List<String> graduationYear) {
-		GraduationYear = graduationYear;
+		this.graduationYear = graduationYear;
 	}
 
 	public List<String> getCourses() {
-		return Courses;
+		return courses;
 	}
 
 	public void setCourses(List<String> courses) {
-		Courses = courses;
+		this.courses = courses;
 	}
-
 }

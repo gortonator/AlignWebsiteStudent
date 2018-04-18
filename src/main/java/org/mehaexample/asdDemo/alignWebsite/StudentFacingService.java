@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.json.JsonObject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -1568,10 +1567,9 @@ public class StudentFacingService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response filterStudent(StudentFilterInfo studentFilterInfo){
-
 		List<StudentCoopInfo> resultStudentInfo = new ArrayList<StudentCoopInfo>();
 		Map<String,List<String>> map = new HashMap<String,List<String>>();
-
+		
 		try{
 			if (studentFilterInfo.getCoops()!= null && !studentFilterInfo.getCoops().isEmpty()) { 
 				map.put("companyName",studentFilterInfo.getCoops());
@@ -1597,6 +1595,10 @@ public class StudentFacingService {
 		try {
 			List<StudentCoopInfo> studentCoopInfoList = 
 					(ArrayList<StudentCoopInfo>) studentDao.getStudentFilteredStudents2(map, 0, 9999);
+			
+			if(studentCoopInfoList.size() == 0){
+				return Response.status(Response.Status.NOT_FOUND).entity("No students found for the filter entered").build();
+			}
 
 			for (StudentCoopInfo studentCoopInfoEach : studentCoopInfoList) {
 				studentCoopInfoEach.setNuId(new String(Base64.getEncoder().
