@@ -13,8 +13,10 @@
         </property>
 
         <property name="hibernate.connection.url">
-            jdbc:mariadb://${test.ip}:${test.port}/AlignAdmin?autoReconnect=true
+            jdbc:mariadb://${test.ip}:${test.port}/AlignAdmin
         </property>
+
+        <property name="hibernate.connection.autoReconnect">true</property>
 
         <property name="hibernate.connection.username">
             ${test.username}
