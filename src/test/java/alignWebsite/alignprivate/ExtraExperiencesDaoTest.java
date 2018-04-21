@@ -26,10 +26,6 @@ public class ExtraExperiencesDaoTest {
     extraExperiencesDao = new ExtraExperiencesDao(true);
     studentsDao = new StudentsDao(true);
     privaciesDao = new PrivaciesDao(true);
-
-//    extraExperiencesDao = new ExtraExperiencesDao();
-//    studentsDao = new StudentsDao();
-//    privaciesDao = new PrivaciesDao();
   }
 
   @Before
@@ -66,11 +62,17 @@ public class ExtraExperiencesDaoTest {
     studentsDao.deleteStudent("111234567");
   }
 
+  /**
+   * This is test for deleting non existent extra experience record
+   */
   @Test(expected = HibernateException.class)
   public void deleteNonExistentExtraExp() {
     extraExperiencesDao.deleteExtraExperienceById(-200);
   }
 
+  /**
+   * This is test for updating non existent extra experience record
+   */
   @Test(expected = HibernateException.class)
   public void updateNonExistentExtraExp() {
     ExtraExperiences newExtraExperience = new ExtraExperiences();
@@ -78,6 +80,9 @@ public class ExtraExperiencesDaoTest {
     extraExperiencesDao.updateExtraExperience(newExtraExperience);
   }
 
+  /**
+   * This is test for getting extra experience by its id
+   */
   @Test
   public void getExtraExperienceById() {
     int tempId = extraExperiencesDao.getExtraExperiencesByNeuId("001234567").get(0).getExtraExperienceId();
@@ -88,6 +93,9 @@ public class ExtraExperiencesDaoTest {
     assertTrue(notFoundExtraExperience == null);
   }
 
+  /**
+   * This is test for geting extra experiences by neu id
+   */
   @Test
   public void getExtraExperiencesByNeuId() {
     List<ExtraExperiences> listOfExtraExperiences = extraExperiencesDao.getExtraExperiencesByNeuId("001234567");
@@ -96,6 +104,10 @@ public class ExtraExperiencesDaoTest {
     assertTrue(extraExperiencesDao.getExtraExperiencesByNeuId("00000000").size() == 0);
   }
 
+  /**
+   * This is test for creating, updating and deleting exra experiences record
+   * @throws ParseException
+   */
   @Test
   public void createDeleteUpdateExtraExperience() throws ParseException {
     ExtraExperiences newExtraExperience = new ExtraExperiences();
@@ -125,6 +137,9 @@ public class ExtraExperiencesDaoTest {
     assertTrue(extraExperiencesDao.getExtraExperienceById(foundExtraExperience.getExtraExperienceId()) == null);
   }
 
+  /**
+   * This is test for retrieving extra experience record with privacy control
+   */
   @Test
   public void getExtraExperienceWithPrivacyTest() {
     Assert.assertTrue(extraExperiencesDao.getExtraExperiencesWithPrivacy("001234567").size() == 1);

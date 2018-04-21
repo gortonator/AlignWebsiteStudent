@@ -11,7 +11,6 @@ import org.mehaexample.asdDemo.enums.DegreeCandidacy;
 import org.mehaexample.asdDemo.enums.EnrollmentStatus;
 import org.mehaexample.asdDemo.enums.Gender;
 import org.mehaexample.asdDemo.enums.Term;
-import org.mehaexample.asdDemo.model.alignadmin.TopElective;
 import org.mehaexample.asdDemo.model.alignprivate.Courses;
 import org.mehaexample.asdDemo.model.alignprivate.Electives;
 import org.mehaexample.asdDemo.model.alignprivate.Privacies;
@@ -33,19 +32,20 @@ public class ElectiveDaoTest {
     studentsDao = new StudentsDao(true);
     coursesDao = new CoursesDao(true);
     privaciesDao = new PrivaciesDao(true);
-
-//    electivesDao = new ElectivesDao();
-//    studentsDao = new StudentsDao();
-//    coursesDao = new CoursesDao();
-//    privaciesDao = new PrivaciesDao();
   }
 
+  /**
+   * This is test for adding null record into Electives
+   */
   @Test
   public void addNullElectivesTest() {
     Electives Electives = electivesDao.addElective(null);
     Assert.assertNull(Electives);
   }
 
+  /**
+   * This is test for updating non existent record
+   */
   @Test(expected = HibernateException.class)
   public void updateNonExistentElective() {
     Electives elective = new Electives();
@@ -53,6 +53,9 @@ public class ElectiveDaoTest {
     electivesDao.updateElectives(elective);
   }
 
+  /**
+   * This is test for adding elective for non existent student
+   */
   @Test(expected = HibernateException.class)
   public void addElectiveWithNonExistentNeuId() {
     Electives elective = new Electives();
@@ -60,11 +63,17 @@ public class ElectiveDaoTest {
     electivesDao.addElective(elective);
   }
 
+  /**
+   * This is test for deleting non existent record
+   */
   @Test(expected = HibernateException.class)
   public void deleteNonExistentElective() {
     electivesDao.deleteElectiveRecord(-200);
   }
 
+  /**
+   * This is test for adding new elective record
+   */
   @Test
   public void addElectivesTest() {
     String tempId = "1221";
@@ -80,22 +89,20 @@ public class ElectiveDaoTest {
     Courses newCourse = new Courses(tempId + "", "course2", "course description 2");
     Courses courses = coursesDao.createCourse(newCourse);
 
-//    Terms newTerm = new Terms(Term.FALL, tempId, TermType.QUARTER);
-//    Terms term = termsDao.addTerm(newTerm);
-
     Electives elective = new Electives();
     elective.setNeuId(newStudent.getNeuId());
     elective.setCourseId(newCourse.getCourseId());
-//    elective.setTerms(newTerm);
 
     Electives electivesNew = electivesDao.addElective(elective);
 
     electivesDao.deleteElectiveRecord(electivesNew.getElectiveId());
     coursesDao.deleteCourseById(tempId + "");
-//    termsDao.deleteTerm(term.getTermId());
     studentsDao.deleteStudent(tempId + "");
   }
 
+  /**
+   * This is test for deleting elective record
+   */
   @Test
   public void deleteElectivesTest() {
     String tempId = "289";
@@ -129,6 +136,9 @@ public class ElectiveDaoTest {
     studentsDao.deleteStudent(tempId + "");
   }
 
+  /**
+   * This is test for updating elective record
+   */
   @Test
   public void updateElectivesTest() {
     String tempId = "9187";
@@ -159,6 +169,9 @@ public class ElectiveDaoTest {
     studentsDao.deleteStudent(tempId + "");
   }
 
+  /**
+   * This is test for retrieving elective with privacy control
+   */
   @Test
   public void getElectivesWithPrivacyTest() {
     Students newStudent = new Students("11111111", "tomcat2e1kk3@gmail.com", "Tom3", "",

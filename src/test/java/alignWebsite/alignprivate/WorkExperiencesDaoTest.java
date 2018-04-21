@@ -5,15 +5,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mehaexample.asdDemo.dao.alignpublic.MultipleValueAggregatedDataDao;
 import org.mehaexample.asdDemo.enums.Campus;
 import org.mehaexample.asdDemo.enums.DegreeCandidacy;
 import org.mehaexample.asdDemo.enums.EnrollmentStatus;
 import org.mehaexample.asdDemo.enums.Gender;
 import org.mehaexample.asdDemo.enums.Term;
-import org.mehaexample.asdDemo.model.alignadmin.TopEmployer;
 import org.mehaexample.asdDemo.model.alignprivate.*;
-import org.mehaexample.asdDemo.model.alignpublic.MultipleValueAggregatedData;
 import org.mehaexample.asdDemo.dao.alignprivate.PrivaciesDao;
 import org.mehaexample.asdDemo.dao.alignprivate.StudentsDao;
 import org.mehaexample.asdDemo.dao.alignprivate.WorkExperiencesDao;
@@ -34,10 +31,6 @@ public class WorkExperiencesDaoTest {
     workExperiencesDao = new WorkExperiencesDao(true);
     studentsDao = new StudentsDao(true);
     privaciesDao = new PrivaciesDao(true);
-
-//    workExperiencesDao = new WorkExperiencesDao();
-//    studentsDao = new StudentsDao();
-//    privaciesDao = new PrivaciesDao();
   }
 
   @Before
@@ -82,11 +75,17 @@ public class WorkExperiencesDaoTest {
     studentsDao.deleteStudent("111234567");
   }
 
+  /**
+   * This is test for deleting non existent work experience
+   */
   @Test(expected = HibernateException.class)
   public void deleteNonExistWorkExperience() {
     workExperiencesDao.deleteWorkExperienceById(-200);
   }
 
+  /**
+   * This is test for updating non existent work experience
+   */
   @Test(expected = HibernateException.class)
   public void updateNonExistWorkExperience() {
     WorkExperiences newWorkExperience = new WorkExperiences();
@@ -94,6 +93,9 @@ public class WorkExperiencesDaoTest {
     workExperiencesDao.updateWorkExperience(newWorkExperience);
   }
 
+  /**
+   * This is test for retrieving work experience by its id
+   */
   @Test
   public void getWorkExperienceIdTest() {
     int tempId = workExperiencesDao.getWorkExperiencesByNeuId("001234567").get(0).getWorkExperienceId();
@@ -104,6 +106,9 @@ public class WorkExperiencesDaoTest {
     assertTrue(notFoundWorkExperience == null);
   }
 
+  /**
+   * This is test for retrieving work experience by student neu id
+   */
   @Test
   public void getWorkExperiencesByNeuIdTest() {
     List<WorkExperiences> listOfWorkExperiences = workExperiencesDao.getWorkExperiencesByNeuId("001234567");
@@ -112,6 +117,10 @@ public class WorkExperiencesDaoTest {
     assertTrue(workExperiencesDao.getWorkExperiencesByNeuId("00000000").size() == 0);
   }
 
+  /**
+   * This is test for creating, updating and deleting work experience
+   * @throws ParseException
+   */
   @Test
   public void createUpdateDeleteWorkExperience() throws ParseException {
     WorkExperiences newWorkExperience = new WorkExperiences();
@@ -142,6 +151,9 @@ public class WorkExperiencesDaoTest {
     assertTrue(workExperiencesDao.getWorkExperienceById(foundWorkExperience.getWorkExperienceId()) == null);
   }
 
+  /**
+   * This is test for retrieving work experience with privacy control
+   */
   @Test
   public void getWorkExperiencesWithPrivacyTest() {
     assertTrue(workExperiencesDao.getWorkExperiencesWithPrivacy("001234567").size()==1);

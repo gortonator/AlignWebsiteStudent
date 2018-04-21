@@ -2,23 +2,18 @@ package alignWebsite.alignprivate;
 
 import org.hibernate.HibernateException;
 import org.junit.*;
-import org.mehaexample.asdDemo.dao.alignpublic.MultipleValueAggregatedDataDao;
 import org.mehaexample.asdDemo.enums.Campus;
 import org.mehaexample.asdDemo.enums.DegreeCandidacy;
 import org.mehaexample.asdDemo.enums.EnrollmentStatus;
 import org.mehaexample.asdDemo.enums.Gender;
 import org.mehaexample.asdDemo.enums.Term;
-import org.mehaexample.asdDemo.model.alignadmin.StudentBachelorInstitution;
-import org.mehaexample.asdDemo.model.alignadmin.TopBachelor;
 import org.mehaexample.asdDemo.model.alignprivate.PriorEducations;
 import org.mehaexample.asdDemo.model.alignprivate.Students;
-import org.mehaexample.asdDemo.model.alignpublic.MultipleValueAggregatedData;
 import org.mehaexample.asdDemo.dao.alignprivate.PriorEducationsDao;
 import org.mehaexample.asdDemo.dao.alignprivate.StudentsDao;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -31,9 +26,6 @@ public class PriorEducationsDaoTest {
   public static void init() {
     priorEducationsDao = new PriorEducationsDao(true);
     studentsDao = new StudentsDao(true);
-
-//    priorEducationsDao = new PriorEducationsDao();
-//    studentsDao = new StudentsDao();
   }
 
   @Before
@@ -71,6 +63,9 @@ public class PriorEducationsDaoTest {
     studentsDao.deleteStudent("111234567");
   }
 
+  /**
+   * This is test for retrieving prior education by its id
+   */
   @Test
   public void getPriorEducationByIdTest() {
     int tempId = priorEducationsDao.getPriorEducationsByNeuId("001234567").get(0).getPriorEducationId();
@@ -81,6 +76,9 @@ public class PriorEducationsDaoTest {
     assertTrue(priorEducationsDao.getPriorEducationById(-20) == null);
   }
 
+  /**
+   * This is test for retrieving prior education by student neu id
+   */
   @Test
   public void getPriorEducationsByNeuIdTest() {
     List<PriorEducations> listOfPriorEducation = priorEducationsDao.getPriorEducationsByNeuId("001234567");
@@ -89,11 +87,17 @@ public class PriorEducationsDaoTest {
     assertTrue(priorEducationsDao.getPriorEducationsByNeuId("000000000").isEmpty());
   }
 
+  /**
+   * This is test for deleting non existent prior education
+   */
   @Test(expected = HibernateException.class)
   public void deleteNonExistentPriorEducation() {
     priorEducationsDao.deletePriorEducationById(-200);
   }
 
+  /**
+   * This is test for updating non existent prior education
+   */
   @Test(expected = HibernateException.class)
   public void updateNonExistentPriorEducation() {
     PriorEducations newPriorEducation = new PriorEducations();
@@ -101,6 +105,10 @@ public class PriorEducationsDaoTest {
     priorEducationsDao.updatePriorEducation(newPriorEducation);
   }
 
+  /**
+   * This is test for creating, updating and deleting prior education
+   * @throws ParseException
+   */
   @Test
   public void createUpdateDeletePriorEducation() throws ParseException {
     PriorEducations newPriorEducation = new PriorEducations();

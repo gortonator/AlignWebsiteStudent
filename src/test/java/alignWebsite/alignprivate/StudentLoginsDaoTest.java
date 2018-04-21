@@ -19,9 +19,6 @@ public class StudentLoginsDaoTest {
     studentLoginsDao = new StudentLoginsDao(true);
     studentsDao = new StudentsDao(true);
 
-//    studentLoginsDao = new StudentLoginsDao();
-//    studentsDao = new StudentsDao();
-
     Students newStudent = new Students("0000000", "tomcat@gmail.com", "Tom", "",
             "Cat", Gender.M, "F1", "1111111111",
             "401 Terry Ave", "WA", "Seattle", "98109", Term.FALL, 2015,
@@ -58,6 +55,9 @@ public class StudentLoginsDaoTest {
     studentsDao.deleteStudent("0000000");
   }
 
+  /**
+   * This is test for adding duplicate record
+   */
   @Test(expected = HibernateException.class)
   public void addDuplicate() {
     StudentLogins studentLogins = new StudentLogins("tomcat3@gmail.com",
@@ -69,6 +69,9 @@ public class StudentLoginsDaoTest {
     studentLoginsDao.createStudentLogin(studentLogins);
   }
 
+  /**
+   * This is test for updating non existent record
+   */
   @Test(expected = HibernateException.class)
   public void updateNonExistentStudentLogin() {
     StudentLogins studentLogins = new StudentLogins("tomcattttttt@gmail.com",
@@ -80,21 +83,33 @@ public class StudentLoginsDaoTest {
     studentLoginsDao.updateStudentLogin(studentLogins);
   }
 
+  /**
+   * This is test for deleting non existent record
+   */
   @Test(expected = HibernateException.class)
   public void deleteNonExistentStudentLoginEmail() {
     studentLoginsDao.deleteStudentLogin("jdoe@gmail.com");
   }
 
+  /**
+   * This is test for illegal argument
+   */
   @Test(expected = IllegalArgumentException.class)
   public void deleteNullArgument() {
     studentLoginsDao.deleteStudentLogin(null);
   }
 
+  /**
+   * This is test for  illegal argument
+   */
   @Test(expected = IllegalArgumentException.class)
   public void deleteEmptyArgument() {
     studentLoginsDao.deleteStudentLogin("");
   }
 
+  /**
+   * This is test for adding, updating and deleting student login record
+   */
   @Test
   public void StudentLoginIntegrationTest() {
     StudentLogins studentLogins = new StudentLogins("tomcat@gmail.com",

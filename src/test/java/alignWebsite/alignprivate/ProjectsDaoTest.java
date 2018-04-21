@@ -29,10 +29,6 @@ public class ProjectsDaoTest {
     studentsDao = new StudentsDao(true);
     projectsDao = new ProjectsDao(true);
     privaciesDao = new PrivaciesDao(true);
-
-//    studentsDao = new StudentsDao();
-//    projectsDao = new ProjectsDao();
-//    privaciesDao = new PrivaciesDao();
   }
 
   @Before
@@ -68,11 +64,17 @@ public class ProjectsDaoTest {
     studentsDao.deleteStudent("111234567");
   }
 
+  /**
+   * This is test for deleting non existent record
+   */
   @Test(expected = HibernateException.class)
   public void deleteNonExistentProject() {
     projectsDao.deleteProjectById(-200);
   }
 
+  /**
+   * This is test for updating non existent record
+   */
   @Test(expected = HibernateException.class)
   public void updateNonExistentProject() {
     Projects project = new Projects();
@@ -80,6 +82,9 @@ public class ProjectsDaoTest {
     projectsDao.updateProject(project);
   }
 
+  /**
+   * This is test for retrieving project by its id
+   */
   @Test
   public void getProjectById() {
     int tempId = projectsDao.getProjectsByNeuId("001234567").get(0).getProjectId();
@@ -90,6 +95,9 @@ public class ProjectsDaoTest {
     assertTrue(notFoundProject == null);
   }
 
+  /**
+   * This is test for retrieving project by student neu id
+   */
   @Test
   public void getProjectsByNeuId() {
     List<Projects> listOfProjects = projectsDao.getProjectsByNeuId("001234567");
@@ -98,6 +106,9 @@ public class ProjectsDaoTest {
     assertTrue(projectsDao.getProjectsByNeuId("00000000").size() == 0);
   }
 
+  /**
+   * This is test for creating, updating and deleting project
+   */
   @Test
   public void createUpdateDeleteProject() throws ParseException {
     Projects project = new Projects();
@@ -126,6 +137,9 @@ public class ProjectsDaoTest {
     assertTrue(projectsDao.getProjectById(foundProject.getProjectId()) == null);
   }
 
+  /**
+   * This is test for retrieving project with privacy control
+   */
   @Test
   public void getProjectWithPrivacyTest() {
     assertTrue(projectsDao.getProjectsWithPrivacy("001234567").size()==1);

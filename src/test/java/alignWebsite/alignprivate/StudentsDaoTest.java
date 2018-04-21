@@ -1,19 +1,16 @@
 package alignWebsite.alignprivate;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 import org.hibernate.HibernateException;
 import org.junit.*;
-import org.mehaexample.asdDemo.dao.alignpublic.MultipleValueAggregatedDataDao;
 import org.mehaexample.asdDemo.enums.Campus;
 import org.mehaexample.asdDemo.enums.DegreeCandidacy;
 import org.mehaexample.asdDemo.enums.EnrollmentStatus;
 import org.mehaexample.asdDemo.enums.Gender;
 import org.mehaexample.asdDemo.enums.Term;
 import org.mehaexample.asdDemo.model.alignprivate.*;
-import org.mehaexample.asdDemo.model.alignpublic.MultipleValueAggregatedData;
 import org.mehaexample.asdDemo.dao.alignprivate.*;
 
 public class StudentsDaoTest {
@@ -32,13 +29,6 @@ public class StudentsDaoTest {
     coursesDao = new CoursesDao(true);
     priorEducationsDao = new PriorEducationsDao(true);
     privaciesDao = new PrivaciesDao(true);
-
-//    studentdao = new StudentsDao();
-//    workExperiencesDao = new WorkExperiencesDao();
-//    electivesDao = new ElectivesDao();
-//    coursesDao = new CoursesDao();
-//    priorEducationsDao = new PriorEducationsDao();
-//    privaciesDao = new PrivaciesDao();
   }
 
   @Before
@@ -75,17 +65,17 @@ public class StudentsDaoTest {
     studentdao.deleteStudent("2222222");
   }
 
-  // need VPN for this
-//  @Test
-//  public void deploymentDatabaseConnectionTest() {
-//    new StudentsDao();
-//  }
-
+  /**
+   * This is test for deleting non existent student
+   */
   @Test(expected = HibernateException.class)
   public void deleteNonExistentNeuId() {
     studentdao.deleteStudent("0101010101");
   }
 
+  /**
+   * This is test for updating non existent student
+   */
   @Test(expected = HibernateException.class)
   public void updateNonExistentStudent() {
     Students student = new Students();
@@ -93,16 +83,25 @@ public class StudentsDaoTest {
     studentdao.updateStudentRecord(student);
   }
 
+  /**
+   * This is test for illegal argument for deleting record
+   */
   @Test(expected = IllegalArgumentException.class)
   public void deleteWithNullArgument() {
     studentdao.deleteStudent(null);
   }
 
+  /**
+   * This is test for illegal argument for deleting record
+   */
   @Test(expected = IllegalArgumentException.class)
   public void deleteWithEmptyArgument() {
     studentdao.deleteStudent("");
   }
 
+  /**
+   * This is test for adding duplicate record
+   */
   @Test(expected = HibernateException.class)
   public void addDuplicateStudent() {
     Students newStudent = new Students("10101010", "tomcat10@gmail.com", "Tom", "",
@@ -114,13 +113,18 @@ public class StudentsDaoTest {
     studentdao.addStudent(newStudent);
   }
 
-
+  /**
+   * This is test for searching for student record by email address
+   */
   @Test
   public void findStudentByEmailTest() {
     Assert.assertTrue(studentdao.getStudentRecordByEmailId("tomcat@gmail.com").getNeuId().equals("0000000"));
     Assert.assertTrue(studentdao.getStudentRecordByEmailId("tomcat4@gmail.com") == null);
   }
 
+  /**
+   * This is test for deleting student
+   */
   @Test
   public void deleteStudentRecord() {
     Students newStudent = new Students("3333333", "tomcat4@gmail.com", "Tom", "",
@@ -134,12 +138,18 @@ public class StudentsDaoTest {
     Assert.assertTrue(!studentdao.ifNuidExists("3333333"));
   }
 
+  /**
+   * This is test for getting all student record
+   */
   @Test
   public void getAllStudents() {
     List<Students> students = studentdao.getAllStudents();
     Assert.assertTrue(students.size() == 3);
   }
 
+  /**
+   * This is test for updating student record
+   */
   @Test
   public void updateStudentRecord() {
     Students student = studentdao.getStudentRecord("0000000");
@@ -151,7 +161,9 @@ public class StudentsDaoTest {
     Assert.assertTrue(student.getAddress().equals("225 Terry Ave"));
   }
 
-
+  /**
+   * This is test for getStudentFilteredStudents function
+   */
   @Test
   public void getStudentFilteredStudents() throws Exception {
     Privacies privacy1 = new Privacies();
