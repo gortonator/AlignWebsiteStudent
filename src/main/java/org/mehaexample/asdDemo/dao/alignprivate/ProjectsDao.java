@@ -71,6 +71,12 @@ public class ProjectsDao {
     }
   }
 
+  /**
+   * Get a list of projects with privacy control.
+   * If user choose not to show project information to others, it will return an empty list.
+   * @param neuId Student neu Id
+   * @return A list of projects
+   */
   public List<Projects> getProjectsWithPrivacy(String neuId) {
     Privacies privacy = privaciesDao.getPrivacyByNeuId(neuId);
     if (!privacy.isProject()) {
@@ -130,6 +136,11 @@ public class ProjectsDao {
     return true;
   }
 
+  /**
+   * Delete projects of a student
+   * @param neuId Student neu id
+   * @return true if delete successfully, false otherwise
+   */
   public synchronized boolean deleteProjectsByNeuId(String neuId) {
     Transaction tx = null;
 

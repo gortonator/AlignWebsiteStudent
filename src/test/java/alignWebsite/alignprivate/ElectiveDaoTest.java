@@ -160,69 +160,6 @@ public class ElectiveDaoTest {
   }
 
   @Test
-  public void getTopTenElectivesTest() {
-    String tempId = "289";
-
-    Students newStudent = new Students(tempId, "tomcat2e1kk3@gmail.com", "Tom3", "",
-            "Cat", Gender.M, "F1", "1111111111",
-            "401 Terry Ave", "WA", "Seattle", "98109",
-            Term.FALL, 2014, Term.SPRING, 2016,
-            EnrollmentStatus.FULL_TIME, Campus.SEATTLE, DegreeCandidacy.MASTERS, null, true);
-
-    studentsDao.addStudent(newStudent);
-
-    Courses newCourse = new Courses(tempId, "course2", "course description 2");
-    Courses courses = coursesDao.createCourse(newCourse);
-    Courses newCourse2 = new Courses("789", "course1", "course description 1");
-    Courses courses2 = coursesDao.createCourse(newCourse2);
-
-    Electives elective = new Electives();
-    elective.setNeuId(newStudent.getNeuId());
-    elective.setCourseName(newCourse.getCourseName());
-    elective.setCourseId(newCourse.getCourseId());
-    elective.setCourseTerm(Term.SPRING);
-    elective.setCourseYear(2017);
-
-    Electives electivesNew = electivesDao.addElective(elective);
-
-    List<TopElective> temp = electivesDao.getTopTenElectives(Campus.SEATTLE, 2016);
-    Assert.assertTrue(temp.size() == 1);
-    temp = electivesDao.getTopTenElectives(null, 2016);
-    Assert.assertTrue(temp.size() == 1);
-    temp = electivesDao.getTopTenElectives(Campus.SEATTLE, null);
-    Assert.assertTrue(temp.size() == 1);
-    temp = electivesDao.getTopTenElectives(Campus.SEATTLE, 2017);
-    Assert.assertTrue(temp.size() == 0);
-    temp = electivesDao.getTopTenElectives(Campus.BOSTON, 2017);
-    Assert.assertTrue(temp.size() == 0);
-    temp = electivesDao.getTopTenElectives(Campus.SEATTLE, 1994);
-    Assert.assertTrue(temp.size() == 0);
-    temp = electivesDao.getTopTenElectives(null, 1994);
-    Assert.assertTrue(temp.size() == 0);
-
-    Electives elective2 = new Electives();
-    elective2.setNeuId(newStudent.getNeuId());
-    elective.setCourseName(newCourse2.getCourseName());
-    elective2.setCourseId(newCourse2.getCourseId());
-    elective2.setCourseTerm(Term.SPRING);
-    elective2.setCourseYear(2017);
-    Electives electivesNew2 = electivesDao.addElective(elective2);
-
-    temp = electivesDao.getTopTenElectives(Campus.SEATTLE, 2016);
-    Assert.assertTrue(temp.size() == 2);
-    temp = electivesDao.getTopTenElectives(Campus.SEATTLE, 2017);
-    Assert.assertTrue(temp.isEmpty());
-    temp = electivesDao.getTopTenElectives(Campus.BOSTON, 2017);
-    Assert.assertTrue(temp.isEmpty());
-
-    electivesDao.deleteElectiveRecord(electivesNew2.getElectiveId());
-    electivesDao.deleteElectiveRecord(electivesNew.getElectiveId());
-    coursesDao.deleteCourseById("789");
-    coursesDao.deleteCourseById(tempId);
-    studentsDao.deleteStudent(tempId);
-  }
-
-  @Test
   public void getElectivesWithPrivacyTest() {
     Students newStudent = new Students("11111111", "tomcat2e1kk3@gmail.com", "Tom3", "",
             "Cat", Gender.M, "F1", "1111111111",

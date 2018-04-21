@@ -113,19 +113,6 @@ public class WorkExperiencesDao {
     return workExperience;
   }
 
-  // THIS IS THE SCRIPT FOR MACHINE LEARNING
-  // How many Align students get jobs?
-  public int getTotalStudentsGotJob() {
-    Session session = factory.openSession();
-    try {
-      org.hibernate.query.Query query = session.createQuery(
-              "SELECT COUNT(DISTINCT we.neuId) FROM WorkExperiences we WHERE we.coop = false ");
-      return ((Long) query.list().get(0)).intValue();
-    } finally {
-      session.close();
-    }
-  }
-
   /**
    * Delete a work experience in the private database.
    *
@@ -154,6 +141,11 @@ public class WorkExperiencesDao {
     return true;
   }
 
+  /**
+   * Delete work experiences of a student
+   * @param neuId Student neu id
+   * @return true if delete succss
+   */
   public synchronized boolean deleteWorkExperienceByNeuId(String neuId) {
     Transaction tx = null;
 
@@ -199,175 +191,5 @@ public class WorkExperiencesDao {
       throw new HibernateException("Work Experience ID does not exist");
     }
     return true;
-  }
-
-  public List<TopEmployer> getTopTenEmployers(Campus campus, Integer year) {
-    StringBuilder hql = new StringBuilder("SELECT NEW org.mehaexample.asdDemo.model.alignadmin.TopEmployer( " +
-            "we.companyName, Count(*) ) " +
-            "FROM Students s INNER JOIN WorkExperiences we " +
-            "ON s.neuId = we.neuId " +
-            "WHERE we.coop = false ");
-    if (campus != null) {
-      hql.append("AND s.campus = :campus ");
-    }
-    if (year != null) {
-      hql.append("AND s.expectedLastYear = :year ");
-    }
-    hql.append("GROUP BY s.neuId ");
-    hql.append("ORDER BY Count(*) DESC ");
-    Session session = factory.openSession();
-    try {
-      TypedQuery<TopEmployer> query = session.createQuery(hql.toString(), TopEmployer.class);
-      query.setMaxResults(10);
-      if (campus != null) {
-        query.setParameter("campus", campus);
-      }
-      if (year != null) {
-        query.setParameter("year", year);
-      }
-      return query.getResultList();
-    } finally {
-      session.close();
-    }
-  }
-
-  // THIS IS A SCRIPT FOR MACHINE LEARNING / PUBLIC FACING
-  // Who are the largest Align student employers?
-  public List<MultipleValueAggregatedData> getStudentEmployers() {
-    String hql = "SELECT NEW org.mehaexample.asdDemo.model.alignpublic.MultipleValueAggregatedData ( " +
-            "we.companyName, cast(Count(*) as integer) ) " +
-            "FROM WorkExperiences we " +
-            "WHERE we.coop = false " +
-            "GROUP BY we.companyName " +
-            "ORDER BY Count(*) DESC ";
-    Session session = factory.openSession();
-    try {
-      TypedQuery<MultipleValueAggregatedData> query = session.createQuery(hql, MultipleValueAggregatedData.class);
-      List<MultipleValueAggregatedData> list = query.getResultList();
-      for (MultipleValueAggregatedData data : list) {
-        data.setAnalyticTerm(MultipleValueAggregatedDataDao.LIST_OF_EMPLOYERS);
-      }
-      return list;
-    } finally {
-      session.close();
-    }
-  }
-
-  public List<StudentCoopList> getStudentCoopCompanies(Campus campus, Integer year) {
-    StringBuilder hql = new StringBuilder("SELECT DISTINCT NEW org.mehaexample.asdDemo.model.alignprivate.StudentCoopList( " +
-            "s.neuId, s.firstName, s.lastName ) " +
-            "FROM Students s INNER JOIN WorkExperiences we " +
-            "ON s.neuId = we.neuId " +
-            "WHERE we.coop = true ");
-    if (campus != null) {
-      hql.append("AND s.campus = :campus ");
-    }
-    if (year != null) {
-      hql.append("AND s.expectedLastYear = :year ");
-    }
-    Session session = factory.openSession();
-    try {
-      TypedQuery<StudentCoopList> query = session.createQuery(hql.toString(), StudentCoopList.class);
-      if (campus != null) {
-        query.setParameter("campus", campus);
-      }
-      if (year != null) {
-        query.setParameter("year", year);
-      }
-      List<StudentCoopList> studentCoopLists = query.getResultList();
-
-      for (StudentCoopList student : studentCoopLists) {
-        student.setCompanies(getCompaniesByNeuId(student.getNeuId()));
-      }
-      return studentCoopLists;
-    } finally {
-      session.close();
-    }
-  }
-
-  private List<String> getCompaniesByNeuId(String neuId) {
-    Session session = factory.openSession();
-    try {
-      org.hibernate.query.Query query = session.createQuery(
-              "SELECT we.companyName FROM WorkExperiences we WHERE we.neuId = :neuId");
-      query.setParameter("neuId", neuId);
-      return (List<String>) query.list();
-    } finally {
-      session.close();
-    }
-  }
-
-  public List<StudentBasicInfo> getStudentsWorkingInACompany(Campus campus, Integer year, String companyName) {
-    StringBuilder hql = new StringBuilder("SELECT DISTINCT NEW org.mehaexample.asdDemo.model.alignprivate.StudentBasicInfo( " +
-            "s.firstName, s.lastName, s.neuId ) " +
-            "FROM Students s INNER JOIN WorkExperiences we " +
-            "ON s.neuId = we.neuId " +
-            "WHERE we.companyName = :companyName " +
-            "AND we.coop = false ");
-    if (campus != null) {
-      hql.append("AND s.campus = :campus ");
-    }
-    if (year != null) {
-      hql.append("AND s.expectedLastYear = :year ");
-    }
-    Session session = factory.openSession();
-    try {
-      TypedQuery<StudentBasicInfo> query = session.createQuery(hql.toString(), StudentBasicInfo.class);
-      query.setParameter("companyName", companyName);
-      if (campus != null) {
-        query.setParameter("campus", campus);
-      }
-      if (year != null) {
-        query.setParameter("year", year);
-      }
-      return query.getResultList();
-    } finally {
-      session.close();
-    }
-  }
-
-  public List<StudentCoopList> getStudentCurrentCompanies(Campus campus, Integer year) {
-    StringBuilder hql = new StringBuilder("SELECT DISTINCT NEW org.mehaexample.asdDemo.model.alignprivate.StudentCoopList( " +
-            "s.neuId, s.firstName, s.lastName ) " +
-            "FROM Students s INNER JOIN WorkExperiences we " +
-            "ON s.neuId = we.neuId ");
-    hql.append("WHERE we.currentJob = true AND we.coop = false ");
-    if (campus != null) {
-      hql.append("AND s.campus = :campus ");
-    }
-    if (year != null) {
-      hql.append("AND ");
-      hql.append("s.expectedLastYear = :year ");
-    }
-    Session session = factory.openSession();
-    try {
-      TypedQuery<StudentCoopList> query = session.createQuery(hql.toString(), StudentCoopList.class);
-      if (campus != null) {
-        query.setParameter("campus", campus);
-      }
-      if (year != null) {
-        query.setParameter("year", year);
-      }
-      List<StudentCoopList> studentCoopLists = query.getResultList();
-
-      for (StudentCoopList student : studentCoopLists) {
-        student.setCompanies(getCurrentCompaniesByNeuId(student.getNeuId()));
-      }
-      return studentCoopLists;
-    } finally {
-      session.close();
-    }
-  }
-
-  private List<String> getCurrentCompaniesByNeuId(String neuId) {
-    Session session = factory.openSession();
-    try {
-      org.hibernate.query.Query query = session.createQuery(
-              "SELECT we.companyName FROM WorkExperiences we WHERE we.currentJob = true AND we.neuId = :neuId");
-      query.setParameter("neuId", neuId);
-      return (List<String>) query.list();
-    } finally {
-      session.close();
-    }
   }
 }

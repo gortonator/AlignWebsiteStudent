@@ -4,9 +4,6 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.mehaexample.asdDemo.enums.Campus;
-import org.mehaexample.asdDemo.model.alignadmin.TopElective;
-import org.mehaexample.asdDemo.model.alignadmin.TopEmployer;
 import org.mehaexample.asdDemo.model.alignprivate.Electives;
 import org.mehaexample.asdDemo.model.alignprivate.Privacies;
 
@@ -39,6 +36,11 @@ public class ElectivesDao {
     }
   }
 
+  /**
+   * Get a list of electives for a specified student
+   * @param neuId Student neu Id
+   * @return A list of electives
+   */
   public List<Electives> getElectivesByNeuId(String neuId) {
     Session session = factory.openSession();
     try {
@@ -50,6 +52,12 @@ public class ElectivesDao {
     }
   }
 
+  /**
+   * Get a list of electives with privacy control.
+   * If user choose not to show course information to others, it will return an empty list.
+   * @param neuId Student neu Id
+   * @return A list of electives
+   */
   public List<Electives> getElectivesWithPrivacy(String neuId) {
     Privacies privacy = privaciesDao.getPrivacyByNeuId(neuId);
     if (!privacy.isCourse()) {
@@ -59,6 +67,11 @@ public class ElectivesDao {
     }
   }
 
+  /**
+   * Get elective by id
+   * @param electiveId elective id
+   * @return An elective
+   */
   public Electives getElectiveById(int electiveId) {
     Session session = factory.openSession();
     try {
@@ -105,6 +118,11 @@ public class ElectivesDao {
     return elective;
   }
 
+  /**
+   * Update an elective
+   * @param elective an elective
+   * @return true if update successfully, false otherwise
+   */
   public synchronized boolean updateElectives(Electives elective) {
     if (getElectiveById(elective.getElectiveId()) == null) {
       throw new HibernateException("Elective does not exist.");
@@ -125,6 +143,11 @@ public class ElectivesDao {
     return true;
   }
 
+  /**
+   * Delete an elective record
+   * @param id elective id
+   * @return true if delete successfully, false otherwise
+   */
   public synchronized boolean deleteElectiveRecord(int id) {
     if (getElectiveById(id) == null) {
       throw new HibernateException("Elective does not exist.");
@@ -146,62 +169,5 @@ public class ElectivesDao {
     }
 
     return true;
-  }
-
-  public synchronized boolean deleteElectivesByNeuId(String neuId) {
-    Transaction tx = null;
-
-    Session session = factory.openSession();
-    try {
-      tx = session.beginTransaction();
-      org.hibernate.query.Query query = session.createQuery("DELETE FROM Electives " +
-              "WHERE neuId = :neuId ");
-      query.setParameter("neuId", neuId);
-      query.executeUpdate();
-      tx.commit();
-    } catch (HibernateException e) {
-      if (tx != null) tx.rollback();
-      throw new HibernateException(e);
-    } finally {
-      session.close();
-    }
-
-    return true;
-  }
-
-  public List<TopElective> getTopTenElectives(Campus campus, Integer year) {
-    StringBuilder hql = new StringBuilder("SELECT NEW org.mehaexample.asdDemo.model.alignadmin.TopElective( " +
-            "e.courseName, Count(*) ) " +
-            "FROM Students s INNER JOIN Electives e " +
-            "ON s.neuId = e.neuId ");
-    boolean first = true;
-    if (campus != null) {
-      hql.append("WHERE s.campus = :campus ");
-      first = false;
-    }
-    if (year != null) {
-      if (first) {
-        hql.append("WHERE ");
-      } else {
-        hql.append("AND ");
-      }
-      hql.append("s.expectedLastYear = :year ");
-    }
-    hql.append("GROUP BY e.courseName ");
-    hql.append("ORDER BY Count(*) DESC ");
-    Session session = factory.openSession();
-    try {
-      TypedQuery<TopElective> query = session.createQuery(hql.toString(), TopElective.class);
-      query.setMaxResults(10);
-      if (campus != null) {
-        query.setParameter("campus", campus);
-      }
-      if (year != null) {
-        query.setParameter("year", year);
-      }
-      return query.getResultList();
-    } finally {
-      session.close();
-    }
   }
 }

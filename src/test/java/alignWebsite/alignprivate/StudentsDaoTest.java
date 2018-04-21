@@ -114,164 +114,6 @@ public class StudentsDaoTest {
     studentdao.addStudent(newStudent);
   }
 
-//  @Test
-//  public void getRaceListTest() {
-//    List<MultipleValueAggregatedData> raceList = studentdao.getRaceList();
-//    Assert.assertTrue(raceList.size() == 2);
-//    Assert.assertTrue(raceList.get(0).getAnalyticKey().equals("White"));
-//    Assert.assertTrue(raceList.get(0).getAnalyticTerm().equals(MultipleValueAggregatedDataDao.LIST_OF_RACES));
-//    Assert.assertTrue(raceList.get(0).getAnalyticValue() == 1);
-//    Assert.assertTrue(raceList.get(1).getAnalyticKey().equals("Black"));
-//    Assert.assertTrue(raceList.get(1).getAnalyticValue() == 1);
-//    Assert.assertTrue(raceList.get(1).getAnalyticTerm().equals(MultipleValueAggregatedDataDao.LIST_OF_RACES));
-//  }
-
-  @Test
-  public void getStateListTest() {
-    List<MultipleValueAggregatedData> stateList = studentdao.getStateList();
-    Assert.assertTrue(stateList.size() == 2);
-    Assert.assertTrue(stateList.get(0).getAnalyticKey().equals("WA"));
-    Assert.assertTrue(stateList.get(0).getAnalyticTerm().equals(MultipleValueAggregatedDataDao.LIST_OF_STUDENTS_STATES));
-    Assert.assertTrue(stateList.get(0).getAnalyticValue() == 1);
-    Assert.assertTrue(stateList.get(1).getAnalyticKey().equals("MA"));
-    Assert.assertTrue(stateList.get(1).getAnalyticValue() == 1);
-    Assert.assertTrue(stateList.get(1).getAnalyticTerm().equals(MultipleValueAggregatedDataDao.LIST_OF_STUDENTS_STATES));
-  }
-
-  @Test
-  public void getTotalDropoutStudentsTest() {
-    Assert.assertTrue(studentdao.getTotalDropOutStudents() == 1);
-  }
-
-  @Test
-  public void getTotalFullTimeStudentsTest() {
-    Assert.assertTrue(studentdao.getTotalFullTimeStudents() == 1);
-  }
-
-  @Test
-  public void getTotalPartTimeStudentsTest() {
-    Assert.assertTrue(studentdao.getTotalPartTimeStudents() == 1);
-  }
-
-  @Test
-  public void getTotalStudentsWithScholarshipTest() {
-    Assert.assertTrue(studentdao.getTotalStudentsWithScholarship() == 1);
-  }
-
-  @Test
-  public void getTotalStudentInACampusTest() {
-    Assert.assertTrue(studentdao.getTotalCurrentStudentsInACampus(Campus.SEATTLE) == 1);
-    Assert.assertTrue(studentdao.getTotalCurrentStudentsInACampus(Campus.BOSTON) == 1);
-    Assert.assertTrue(studentdao.getTotalCurrentStudentsInACampus(Campus.CHARLOTTE) == 0);
-    Assert.assertTrue(studentdao.getTotalCurrentStudentsInACampus(Campus.SILICON_VALLEY) == 0);
-    Assert.assertTrue(studentdao.getTotalCurrentStudents() == 2);
-    Assert.assertTrue(studentdao.getTotalStudents() == 3);
-  }
-
-  @Test
-  public void getTotalGraduatedStudents() {
-    Assert.assertTrue(studentdao.getTotalGraduatedStudents() == 0);
-  }
-
-  @Test
-  public void getAdminFilteredStudentsTest() throws ParseException {
-    Students student1 = studentdao.getStudentRecord("0000000");
-    student1.setCampus(Campus.SEATTLE);
-    Students student2 = studentdao.getStudentRecord("1111111");
-    student2.setCampus(Campus.SEATTLE);
-    Students student3 = studentdao.getStudentRecord("2222222");
-    student3.setCampus(Campus.SEATTLE);
-
-    studentdao.updateStudentRecord(student1);
-    studentdao.updateStudentRecord(student2);
-    studentdao.updateStudentRecord(student3);
-
-    // add prior education
-    PriorEducations newPriorEducation = new PriorEducations();
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    newPriorEducation.setGraduationDate(dateFormat.parse("2015-01-01"));
-    newPriorEducation.setGpa(3.50f);
-    newPriorEducation.setDegreeCandidacy(DegreeCandidacy.BACHELORS);
-    newPriorEducation.setNeuId("0000000");
-    newPriorEducation.setMajorName("Computer Science");
-    newPriorEducation.setInstitutionName("University of Washington");
-
-    priorEducationsDao.createPriorEducation(newPriorEducation);
-
-    WorkExperiences newWorkExperience = new WorkExperiences();
-    dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    newWorkExperience.setStartDate(dateFormat.parse("2017-06-01"));
-    newWorkExperience.setEndDate(dateFormat.parse("2017-12-01"));
-    newWorkExperience.setCurrentJob(false);
-    newWorkExperience.setCoop(true);
-    newWorkExperience.setTitle("Title");
-    newWorkExperience.setDescription("Description");
-    newWorkExperience.setNeuId("1111111");
-    newWorkExperience.setCompanyName("Amazon");
-    workExperiencesDao.createWorkExperience(newWorkExperience);
-
-    // no filter case
-    Assert.assertTrue(studentdao.getAdminFilteredStudents(new HashMap<String, List<String>>(), 1, 3).size() == 3);
-
-    // first name = Tom
-    List<String> firstName = new ArrayList<>();
-    firstName.add("Tom");
-    List<String> campus = new ArrayList<>();
-    campus.add("SEATTLE");
-    Map<String, List<String>> filters = new HashMap<>();
-    filters.put("firstName", firstName);
-    filters.put("campus", campus);
-    List<Students> students = studentdao.getAdminFilteredStudents(filters, 1 , 2);
-    Assert.assertTrue(students.size() == 2);
-    Assert.assertTrue(students.get(0).getNeuId().equals("2222222"));
-    Assert.assertTrue(students.get(1).getNeuId().equals("0000000"));
-
-    students = studentdao.getAdminFilteredStudents(filters, 1 , 1);
-    Assert.assertTrue(students.size() == 1);
-    Assert.assertTrue(students.get(0).getNeuId().equals("2222222"));
-
-    students = studentdao.getAdminFilteredStudents(filters, 2 , 2);
-    Assert.assertTrue(students.size() == 1);
-    Assert.assertTrue(students.get(0).getNeuId().equals("0000000"));
-
-    students = studentdao.getAdminFilteredStudents(filters, 1 , 10);
-    Assert.assertTrue(students.size() == 2);
-    Assert.assertTrue(studentdao.getAdminFilteredStudentsCount(filters) == 2);
-
-    List<String> majorName = new ArrayList<>();
-    majorName.add("computer science");
-    List<String> institutionName = new ArrayList<>();
-    institutionName.add("university of washington");
-    List<String> gender = new ArrayList<>();
-    gender.add("M");
-    List<String> degreeCandidacy = new ArrayList<>();
-    degreeCandidacy.add("BACHELORS");
-    filters.put("majorName", majorName);
-    filters.put("institutionName", institutionName);
-    filters.put("gender", gender);
-    filters.put("degreeCandidacy", degreeCandidacy);
-    students = studentdao.getAdminFilteredStudents(filters, 1 , 10);
-    Assert.assertTrue(students.size() == 1);
-    Assert.assertTrue(students.get(0).getLastName().equals("Cat"));
-
-    // first name = Tom or Jerry, and company = Amazon
-    Map<String, List<String>> filters2 = new HashMap<>();
-    firstName.add("Jerry");
-    List<String> companyName = new ArrayList<>();
-    companyName.add("Amazon");
-    filters2.put("firstName", firstName);
-    filters2.put("companyName", companyName);
-    List<Students> students2 = studentdao.getAdminFilteredStudents(filters2, 1, 1);
-    Assert.assertTrue(students2.size() == 1);
-    Assert.assertTrue(students2.get(0).getNeuId().equals("1111111"));
-
-    // company = Apple
-    List<String> companyName2 = new ArrayList<>();
-    companyName2.add("Apple");
-    Map<String, List<String>> filters3 = new HashMap<>();
-    filters3.put("companyName", companyName2);
-    Assert.assertTrue(studentdao.getAdminFilteredStudents(filters3, 0, 2).isEmpty());
-  }
 
   @Test
   public void findStudentByEmailTest() {
@@ -296,30 +138,6 @@ public class StudentsDaoTest {
   public void getAllStudents() {
     List<Students> students = studentdao.getAllStudents();
     Assert.assertTrue(students.size() == 3);
-  }
-
-  @Test
-  public void getStudentRecord() {
-    Students student = studentdao.getStudentRecord("0000000");
-    Assert.assertTrue(studentdao.searchStudentRecord("Tom").size() == 2);
-    Assert.assertTrue(studentdao.searchStudentRecord("Tom").get(0).getNeuId().equals("0000000"));
-  }
-
-  @Test
-  public void countMaleAndFemaleStudents() {
-    int males = studentdao.countMaleStudents();
-    int females = studentdao.countFemaleStudents();
-    Assert.assertTrue(males == 1);
-    Assert.assertTrue(females == 1);
-  }
-
-  @Test
-  public void searchSimilarStudents() {
-    List<Students> students = studentdao.searchSimilarStudents(DegreeCandidacy.MASTERS);
-
-    for (Students s : students) {
-      Assert.assertTrue(s.getDegree().name().equals("MASTERS"));
-    }
   }
 
   @Test
@@ -375,7 +193,6 @@ public class StudentsDaoTest {
     campuses.addAll(Arrays.asList(new String[]{"SEATTLE", "BOSTON"}));
     map.put("campus", campuses);
     Assert.assertTrue(studentdao.getStudentFilteredStudents(map, 1, 20).size() == 2);
-    Assert.assertTrue(studentdao.getStudentFilteredStudentsCount(map) == 2);
     map.remove("campus");
 
     // filter by work experience - company name

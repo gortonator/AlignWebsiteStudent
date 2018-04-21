@@ -7,13 +7,15 @@ import org.hibernate.Transaction;
 import org.mehaexample.asdDemo.model.alignprivate.Photos;
 import org.mehaexample.asdDemo.model.alignprivate.Privacies;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class PhotosDao {
   private SessionFactory factory;
   private PrivaciesDao privaciesDao;
 
+  /**
+   * Default Constructor.
+   */
   public PhotosDao() {
     privaciesDao = new PrivaciesDao();
     this.factory = StudentSessionFactory.getFactory();
@@ -47,6 +49,12 @@ public class PhotosDao {
     }
   }
 
+  /**
+   * Get a photo with privacy control.
+   * If user choose not to show photo to others, it will return null.
+   * @param neuId Student neu Id
+   * @return A photo object
+   */
   public Photos getPhotoWithPrivacy(String neuId) {
     Privacies privacy = privaciesDao.getPrivacyByNeuId(neuId);
     if (!privacy.isPhoto()) {
@@ -57,37 +65,9 @@ public class PhotosDao {
   }
 
   /**
-   * Create photo record for a specific student.
-   *
-   * @param photo
-   * @return newly created photo
-   */
-  public synchronized Photos createPhoto(Photos photo) {
-    Transaction tx = null;
-
-    if (ifNuidExists(photo.getNeuId())) {
-      throw new HibernateException("Photo already exists.");
-    }
-
-    Session session = factory.openSession();
-    try {
-      tx = session.beginTransaction();
-      session.save(photo);
-      tx.commit();
-    } catch (HibernateException e) {
-      if (tx != null) tx.rollback();
-      throw new HibernateException(e);
-    } finally {
-      session.close();
-    }
-
-    return photo;
-  }
-
-  /**
    * Update photo record for a student.
    *
-   * @param photo
+   * @param photo an photo
    * @return true if updated successfully.
    */
   public synchronized boolean updatePhoto(Photos photo) {

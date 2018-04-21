@@ -11,6 +11,9 @@ import java.util.List;
 public class PrivaciesDao {
   private SessionFactory factory;
 
+  /**
+   * Default Constructor.
+   */
   public PrivaciesDao() {
     this.factory = StudentSessionFactory.getFactory();
   }

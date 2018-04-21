@@ -4,19 +4,14 @@ import java.util.*;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
-import org.mehaexample.asdDemo.dao.alignpublic.MultipleValueAggregatedDataDao;
 import org.mehaexample.asdDemo.enums.Campus;
 import org.mehaexample.asdDemo.enums.DegreeCandidacy;
-import org.mehaexample.asdDemo.enums.EnrollmentStatus;
 import org.mehaexample.asdDemo.enums.Gender;
 import org.mehaexample.asdDemo.model.alignprivate.Privacies;
 import org.mehaexample.asdDemo.model.alignprivate.Students;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.mehaexample.asdDemo.model.alignpublic.MultipleValueAggregatedData;
 import org.mehaexample.asdDemo.restModels.StudentCoopInfo;
-
-import javax.persistence.TypedQuery;
 
 public class StudentsDao {
 	private SessionFactory factory;
@@ -67,39 +62,6 @@ public class StudentsDao {
 		return student;
 	}
 
-	// THIS IS FOR MACHINE LEARNING AND PUBLIC SCRIPTS
-	// How many students are at the {Seattle|Boston|Silicon Valley|Charlotte) campus?
-	public int getTotalCurrentStudentsInACampus(Campus campus) {
-		Session session = factory.openSession();
-		try {
-			org.hibernate.query.Query query = session.createQuery(
-					"SELECT COUNT(*) FROM Students WHERE campus = :campus AND " +
-					"(enrollmentStatus = :enrollmentStatus1 OR enrollmentStatus = :enrollmentStatus2) ");
-			query.setParameter("campus", campus);
-			query.setParameter("enrollmentStatus1", EnrollmentStatus.FULL_TIME);
-			query.setParameter("enrollmentStatus2", EnrollmentStatus.PART_TIME);
-			return ((Long) query.list().get(0)).intValue();
-		} finally {
-			session.close();
-		}
-	}
-
-	// THIS IS FOR MACHINE LEARNING SCRIPTS
-	// How many students are in the ALIGN program?
-	public int getTotalCurrentStudents() {
-		Session session = factory.openSession();
-		try {
-			org.hibernate.query.Query query = session.createQuery(
-					"SELECT COUNT(*) FROM Students WHERE " +
-					"enrollmentStatus = :enrollmentStatus1 OR enrollmentStatus = :enrollmentStatus2");
-			query.setParameter("enrollmentStatus1", EnrollmentStatus.FULL_TIME);
-			query.setParameter("enrollmentStatus2", EnrollmentStatus.PART_TIME);
-			return ((Long) query.list().get(0)).intValue();
-		} finally {
-			session.close();
-		}
-	}
-
 	// THIS IS FOR PUBLIC SCRIPTS
 	public int getTotalStudents() {
 		Session session = factory.openSession();
@@ -110,37 +72,6 @@ public class StudentsDao {
 		} finally {
 			session.close();
 		}
-	}
-
-	// THIS IS FOR MACHINE LEARNING SCRIPTS
-	// HOW MANY STUDENTS GRADUATED FROM THE ALIGN PROGRAM?
-	public int getTotalGraduatedStudents() {
-		Session session = factory.openSession();
-		try {
-			org.hibernate.query.Query query = session.createQuery(
-					"SELECT COUNT(*) FROM Students WHERE enrollmentStatus = :enrollmentStatus ");
-			query.setParameter("enrollmentStatus", EnrollmentStatus.GRADUATED);
-			return ((Long) query.list().get(0)).intValue();
-		} finally {
-			session.close();
-		}
-	}
-
-	public List<Students> getAdminFilteredStudents(Map<String, List<String>> filters, int begin, int end) {
-		StringBuilder hql = new StringBuilder("SELECT Distinct s " +
-				"FROM Students s " +
-				"LEFT OUTER JOIN WorkExperiences we ON s.neuId = we.neuId " +
-				"LEFT OUTER JOIN PriorEducations pe ON s.neuId = pe.neuId ");
-		return (List<Students>) populateAdminFilterHql(hql, filters, begin, end);
-	}
-
-	public int getAdminFilteredStudentsCount(Map<String, List<String>> filters) {
-		StringBuilder hql = new StringBuilder("SELECT Count( Distinct s ) " +
-				"FROM Students s " +
-				"LEFT OUTER JOIN WorkExperiences we ON s.neuId = we.neuId " +
-				"LEFT OUTER JOIN PriorEducations pe ON s.neuId = pe.neuId ");
-		List<Long> count = (List<Long>) populateAdminFilterHql(hql, filters, null, null);
-		return count.get(0).intValue();
 	}
 
 	private List populateAdminFilterHql(StringBuilder hql, Map<String, List<String>> filters, Integer begin, Integer end) {
@@ -218,107 +149,6 @@ public class StudentsDao {
 		}
 	}
 
-	// THIS IS FOR MACHINE LEARNING SCRIPT
-	// What is the drop out rate for Align?
-	public int getTotalDropOutStudents() {
-		Session session = factory.openSession();
-		try {
-			org.hibernate.query.Query query = session.createQuery(
-					"SELECT COUNT(*) FROM Students WHERE enrollmentStatus = :enrollmentStatus");
-			query.setParameter("enrollmentStatus", EnrollmentStatus.DROPPED_OUT);
-			return ((Long) query.list().get(0)).intValue();
-		} finally {
-			session.close();
-		}
-	}
-
-	// THIS IS FOR PUBLIC FACING SCRIPT
-	// Total Full Time Students?
-	public int getTotalFullTimeStudents() {
-		Session session = factory.openSession();
-		try {
-			org.hibernate.query.Query query = session.createQuery(
-					"SELECT COUNT(*) FROM Students WHERE enrollmentStatus = :enrollmentStatus");
-			query.setParameter("enrollmentStatus", EnrollmentStatus.FULL_TIME);
-			return ((Long) query.list().get(0)).intValue();
-		} finally {
-			session.close();
-		}
-	}
-
-	// THIS IS FOR PUBLIC FACING SCRIPT
-	// Total Part Time Students?
-	public int getTotalPartTimeStudents() {
-		Session session = factory.openSession();
-		try {
-			org.hibernate.query.Query query = session.createQuery(
-					"SELECT COUNT(*) FROM Students WHERE enrollmentStatus = :enrollmentStatus");
-			query.setParameter("enrollmentStatus", EnrollmentStatus.PART_TIME);
-			return ((Long) query.list().get(0)).intValue();
-		} finally {
-			session.close();
-		}
-	}
-
-	// THIS IS FOR PUBLIC FACING SCRIPT
-	// Total Students With Scholarship?
-	public int getTotalStudentsWithScholarship() {
-		Session session = factory.openSession();
-		try {
-			org.hibernate.query.Query query = session.createQuery(
-					"SELECT COUNT(*) FROM Students " +
-							"WHERE scholarship = true AND " +
-					"(enrollmentStatus = 'FULL_TIME' OR enrollmentStatus = 'PART_TIME') ");
-			return ((Long) query.list().get(0)).intValue();
-		} finally {
-			session.close();
-		}
-	}
-
-//	// THIS IS FOR PUBLIC FACING SCRIPT
-//	// Race Breakdown?
-//	public List<MultipleValueAggregatedData> getRaceList() {
-//		String hql = "SELECT NEW org.mehaexample.asdDemo.model.alignpublic.MultipleValueAggregatedData ( " +
-//				"s.race, cast(Count(*) as integer) ) " +
-//				"FROM Students s " +
-//				"WHERE s.enrollmentStatus = 'FULL_TIME' OR s.enrollmentStatus = 'PART_TIME' " +
-//				"GROUP BY s.race " +
-//				"ORDER BY Count(*) DESC ";
-//		try {
-//			session = factory.openSession();
-//			TypedQuery<MultipleValueAggregatedData> query = session.createQuery(hql, MultipleValueAggregatedData.class);
-//			List<MultipleValueAggregatedData> list = query.getResultList();
-//			for (MultipleValueAggregatedData data : list) {
-//				data.setAnalyticTerm(MultipleValueAggregatedDataDao.LIST_OF_RACES);
-//			}
-//			return list;
-//		} finally {
-//			session.close();
-//		}
-//	}
-
-	// THIS IS FOR PUBLIC FACING SCRIPT
-	// State Breakdown?
-	public List<MultipleValueAggregatedData> getStateList() {
-		String hql = "SELECT NEW org.mehaexample.asdDemo.model.alignpublic.MultipleValueAggregatedData ( " +
-				"s.state, cast(Count(*) as integer) ) " +
-				"FROM Students s " +
-				"WHERE s.enrollmentStatus = 'FULL_TIME' OR s.enrollmentStatus = 'PART_TIME' " +
-				"GROUP BY s.state " +
-				"ORDER BY Count(*) DESC ";
-		Session session = factory.openSession();
-		try {
-			TypedQuery<MultipleValueAggregatedData> query = session.createQuery(hql, MultipleValueAggregatedData.class);
-			List<MultipleValueAggregatedData> list = query.getResultList();
-			for (MultipleValueAggregatedData data : list) {
-				data.setAnalyticTerm(MultipleValueAggregatedDataDao.LIST_OF_STUDENTS_STATES);
-			}
-			return list;
-		} finally {
-			session.close();
-		}
-	}
-
 	/**
 	 * Search for students by multiple properties. Each property have one or multiple values.
 	 *
@@ -379,12 +209,6 @@ public class StudentsDao {
 		List<StudentCoopInfo> result = (List<StudentCoopInfo>) populateStudentFilterHql2(hql, filters, begin, end);
 
 		return result;
-	}
-
-	public int getStudentFilteredStudentsCount(Map<String, List<String>> filters) {
-		StringBuilder hql = new StringBuilder("SELECT Count( Distinct s ) FROM Students s ");
-		List<Long> count = populateStudentFilterHql(hql, filters, null, null);
-		return count.get(0).intValue();
 	}
 
 	private List populateStudentFilterHql(StringBuilder hql, Map<String, List<String>> filters, Integer begin, Integer end) {
@@ -574,6 +398,14 @@ public class StudentsDao {
 		}
 	}
 
+	/**
+	 * Search a list of name alike students.
+	 *
+	 * @param firstName First name of student
+	 * @param middleName Middle name of student
+	 * @param lastName Last name of student
+	 * @return A list of students with similar name
+	 */
 	public List<Students> getStudentAutoFillSearch(String firstName, String middleName, String lastName) {
 		Session session = factory.openSession();
 		try {
@@ -708,23 +540,6 @@ public class StudentsDao {
 	}
 
 	/**
-	 * Get a list of students who have the same first name.
-	 *
-	 * @param firstName Student first name
-	 * @return A list of students
-	 */
-	public List<Students> searchStudentRecord(String firstName) {
-		Session session = factory.openSession();
-		try {
-			org.hibernate.query.Query query = session.createQuery("FROM Students WHERE firstName = :studentfirstName ");
-			query.setParameter("studentfirstName", firstName);
-			return (List<Students>) query.list();
-		} finally {
-			session.close();
-		}
-	}
-
-	/**
 	 * Get all the students records from database.
 	 *
 	 * @return A list of students
@@ -761,55 +576,6 @@ public class StudentsDao {
 		}
 
 		return find;
-	}
-
-	// THIS IS A SCRIPT FOR MACHINE LEARNING / PUBLIC
-	// GET TOTAL CURRENT MALE STUDENTS
-
-	/**
-	 * Get the total number of male students in database.
-	 *
-	 * @return the number of male students.
-	 */
-	public int countMaleStudents() {
-		Session session = factory.openSession();
-		org.hibernate.query.Query query = session.createQuery("FROM Students WHERE gender = 'M' AND " +
-				"(enrollmentStatus = 'FULL_TIME' OR enrollmentStatus = 'PART_TIME') ");
-		List<Students> list = query.list();
-		session.close();
-		return list.size();
-	}
-
-	// THIS IS A SCRIPT FOR MACHINE LEARNING / PUBLIC
-	// GET TOTAL CURRENT FEMALE STUDENTS
-
-	/**
-	 * Get the total number of female students in database.
-	 *
-	 * @return the number of female students.
-	 */
-	public int countFemaleStudents() {
-		Session session = factory.openSession();
-		org.hibernate.query.Query query = session.createQuery("FROM Students WHERE gender = 'F' AND " +
-				"(enrollmentStatus = 'FULL_TIME' OR enrollmentStatus = 'PART_TIME') ");
-		List<Students> list = query.list();
-		session.close();
-		return list.size();
-	}
-
-	/**
-	 * Get a list of similar students.
-	 *
-	 * @param degree The degree candidacy
-	 * @return a list of students with the same degree.
-	 */
-	public List<Students> searchSimilarStudents(DegreeCandidacy degree) {
-		Session session = factory.openSession();
-		org.hibernate.query.Query query = session.createQuery("FROM Students WHERE degree = :degree");
-		query.setParameter("degree", degree);
-		List<Students> list = query.list();
-		session.close();
-		return list;
 	}
 
 	/**

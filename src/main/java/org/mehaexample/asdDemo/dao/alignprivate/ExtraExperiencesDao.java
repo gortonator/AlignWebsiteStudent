@@ -54,7 +54,7 @@ public class ExtraExperiencesDao {
 	}
 
 	/**
-	 * Find extra experience records of a student in private DB.
+	 * Search for a list of extra experiences of a student in private DB.
 	 *
 	 * @param neuId the neu Id of a student; not null.
 	 * @return List of Extra Experiences.
@@ -71,6 +71,12 @@ public class ExtraExperiencesDao {
 		}
 	}
 
+	/**
+	 * Search for a list of extra experiences of a student in private DB.
+	 * If user choose not to show information to others, it will return an empty list.
+	 * @param neuId Student neu Id
+	 * @return A list of Extra Experiences
+	 */
 	public List<ExtraExperiences> getExtraExperiencesWithPrivacy(String neuId) {
 		Privacies privacy = privaciesDao.getPrivacyByNeuId(neuId);
 		if (!privacy.isExtraExperience()) {
@@ -132,6 +138,12 @@ public class ExtraExperiencesDao {
 		return true;
 	}
 
+	/**
+	 * Delete all extra experiences of a student
+	 *
+	 * @param neuId Student neu id
+	 * @return true if delete successfully, false otherwise.
+	 */
 	public synchronized boolean deleteExtraExperienceByNeuId(String neuId) {
 		Transaction tx = null;
 

@@ -4,14 +4,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.mehaexample.asdDemo.dao.alignpublic.MultipleValueAggregatedDataDao;
-import org.mehaexample.asdDemo.enums.Campus;
-import org.mehaexample.asdDemo.model.alignadmin.StudentBachelorInstitution;
-import org.mehaexample.asdDemo.model.alignadmin.TopBachelor;
 import org.mehaexample.asdDemo.model.alignprivate.PriorEducations;
-import org.mehaexample.asdDemo.model.alignpublic.MultipleValueAggregatedData;
 
-import javax.persistence.TypedQuery;
 import java.util.List;
 
 public class PriorEducationsDao {
@@ -98,51 +92,6 @@ public class PriorEducationsDao {
     return priorEducation;
   }
 
-  // THIS IS A SCRIPT FOR MACHINE LEARNING / PUBLIC FACING
-  // What bachelors majors do Align students have?
-  public List<MultipleValueAggregatedData> getStudentBachelorMajors() {
-    String hql = "SELECT NEW org.mehaexample.asdDemo.model.alignpublic.MultipleValueAggregatedData ( " +
-            "pe.majorName, cast(Count(*) as integer) ) " +
-            "FROM PriorEducations pe LEFT OUTER JOIN Students s ON pe.neuId = s.neuId " +
-            "WHERE pe.degreeCandidacy = 'BACHELORS' " +
-            "AND (s.enrollmentStatus = 'FULL_TIME' OR s.enrollmentStatus = 'PART_TIME') " +
-            "GROUP BY pe.majorName " +
-            "ORDER BY Count(*) DESC ";
-    Session session = factory.openSession();
-    try {
-      TypedQuery<MultipleValueAggregatedData> query = session.createQuery(hql, MultipleValueAggregatedData.class);
-      List<MultipleValueAggregatedData> list = query.getResultList();
-      for (MultipleValueAggregatedData data : list) {
-        data.setAnalyticTerm(MultipleValueAggregatedDataDao.LIST_OF_BACHELOR_DEGREES);
-      }
-      return list;
-    } finally {
-      session.close();
-    }
-  }
-
-  // THIS IS FOR PUBLIC FACING SCRIPT
-  // Degree Breakdown?
-  public List<MultipleValueAggregatedData> getDegreeList() {
-    String hql = "SELECT NEW org.mehaexample.asdDemo.model.alignpublic.MultipleValueAggregatedData ( " +
-            "cast(pe.degreeCandidacy as string ), cast(Count(*) as integer) ) " +
-            "FROM PriorEducations pe LEFT OUTER JOIN Students s ON pe.neuId = s.neuId " +
-            "WHERE s.enrollmentStatus = 'FULL_TIME' OR s.enrollmentStatus = 'PART_TIME'" +
-            "GROUP BY pe.degreeCandidacy " +
-            "ORDER BY Count(*) DESC ";
-    Session session = factory.openSession();
-    try {
-      TypedQuery<MultipleValueAggregatedData> query = session.createQuery(hql, MultipleValueAggregatedData.class);
-      List<MultipleValueAggregatedData> list = query.getResultList();
-      for (MultipleValueAggregatedData data : list) {
-        data.setAnalyticTerm(MultipleValueAggregatedDataDao.LIST_OF_DEGREES);
-      }
-      return list;
-    } finally {
-      session.close();
-    }
-  }
-
   /**
    * Delete a prior education in the private database.
    *
@@ -194,64 +143,5 @@ public class PriorEducationsDao {
       session.close();
     }
     return true;
-  }
-
-  public List<TopBachelor> getTopTenBachelors(List<Campus> campuses, Integer year) {
-    StringBuilder hql = new StringBuilder("SELECT NEW org.mehaexample.asdDemo.model.alignadmin.TopBachelor( " +
-            "pe.majorName, Count(*) ) " +
-            "FROM Students s INNER JOIN PriorEducations pe " +
-            "ON s.neuId = pe.neuId " +
-            "WHERE pe.degreeCandidacy = 'BACHELORS' ");
-    if (campuses != null) {
-      hql.append("AND s.campus IN (:campuses) ");
-    }
-    if (year != null) {
-      hql.append("AND s.expectedLastYear = :year ");
-    }
-    hql.append("GROUP BY pe.majorName ");
-    hql.append("ORDER BY Count(*) DESC ");
-    Session session = factory.openSession();
-    try {
-      TypedQuery<TopBachelor> query = session.createQuery(hql.toString(), TopBachelor.class);
-      query.setMaxResults(10);
-      if (campuses != null) {
-        query.setParameter("campuses", campuses);
-      }
-      if (year != null) {
-        query.setParameter("year", year);
-      }
-      return query.getResultList();
-    } finally {
-      session.close();
-    }
-  }
-
-  public List<StudentBachelorInstitution> getListOfBachelorInstitutions(Campus campus, Integer year) {
-    StringBuilder hql = new StringBuilder("SELECT NEW org.mehaexample.asdDemo.model.alignadmin.StudentBachelorInstitution( " +
-            "pe.institutionName, Count(*) ) " +
-            "FROM Students s INNER JOIN PriorEducations pe " +
-            "ON s.neuId = pe.neuId " +
-            "WHERE pe.degreeCandidacy = 'BACHELORS' ");
-    if (campus != null) {
-      hql.append("AND s.campus = :campus ");
-    }
-    if (year != null) {
-      hql.append("AND s.expectedLastYear = :year ");
-    }
-    hql.append("GROUP BY pe.institutionName ");
-    hql.append("ORDER BY Count(*) DESC ");
-    Session session = factory.openSession();
-    try {
-      TypedQuery<StudentBachelorInstitution> query = session.createQuery(hql.toString(), StudentBachelorInstitution.class);
-      if (campus != null) {
-        query.setParameter("campus", campus);
-      }
-      if (year != null) {
-        query.setParameter("year", year);
-      }
-      return query.getResultList();
-    } finally {
-      session.close();
-    }
   }
 }
