@@ -36,7 +36,5 @@
         <mapping resource="WorkExperiencesPublic.hbm.xml" />
         <mapping resource="UndergraduatesPublic.hbm.xml" />
         <mapping resource="StudentsPublic.hbm.xml" />
-        <mapping resource="SingleValueAggregatedData.hbm.xml" />
-        <mapping resource="MultipleValueAggregatedData.hbm.xml" />
     </session-factory>
 </hibernate-configuration>

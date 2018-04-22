@@ -4,17 +4,9 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.mehaexample.asdDemo.dao.alignpublic.MultipleValueAggregatedDataDao;
-import org.mehaexample.asdDemo.enums.Campus;
-import org.mehaexample.asdDemo.model.alignadmin.TopBachelor;
-import org.mehaexample.asdDemo.model.alignadmin.TopEmployer;
 import org.mehaexample.asdDemo.model.alignprivate.Privacies;
-import org.mehaexample.asdDemo.model.alignprivate.StudentBasicInfo;
-import org.mehaexample.asdDemo.model.alignprivate.StudentCoopList;
 import org.mehaexample.asdDemo.model.alignprivate.WorkExperiences;
-import org.mehaexample.asdDemo.model.alignpublic.MultipleValueAggregatedData;
 
-import javax.persistence.TypedQuery;
 import java.util.ArrayList;
 import java.util.List;
 
