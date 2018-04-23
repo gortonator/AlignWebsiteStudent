@@ -11,8 +11,8 @@ public class StudentCoopInfo {
 	private String FirstName;
 	private String LastName;
 
-	public StudentCoopInfo(String nuId, Campus campus, int enrollmentYear, int graduationYear, String coops,
-			String firstName, String lastName) {
+	public StudentCoopInfo(String firstName, String lastName, String nuId, Campus campus, int enrollmentYear, int graduationYear,
+			String coops) {
 		Nuid = nuId;
 		Campuses = campus;
 		EnrollmentYear = enrollmentYear;

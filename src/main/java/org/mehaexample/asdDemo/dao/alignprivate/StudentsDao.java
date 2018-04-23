@@ -199,10 +199,10 @@ public class StudentsDao {
 	public List<StudentCoopInfo> getStudentFilteredStudents2(Map<String, List<String>> filters, int begin, int end) {
 		StringBuilder hql =  new StringBuilder();
 		if (!filters.containsKey("companyName")) {
-			hql = hql.append("SELECT NEW org.mehaexample.asdDemo.restModels.StudentCoopInfo(s.neuId, " +
+			hql = hql.append("SELECT NEW org.mehaexample.asdDemo.restModels.StudentCoopInfo(s.firstName, s.lastName, s.neuId, " +
 							"s.campus, s.entryYear, s.expectedLastYear, '') FROM Students s ");
 		} else {
-			hql = hql.append("SELECT NEW org.mehaexample.asdDemo.restModels.StudentCoopInfo(s.neuId, " +
+			hql = hql.append("SELECT NEW org.mehaexample.asdDemo.restModels.StudentCoopInfo(s.firstName, s.lastName, s.neuId, " +
 							"s.campus, s.entryYear, s.expectedLastYear, we.companyName) FROM Students s ");
 		}
 

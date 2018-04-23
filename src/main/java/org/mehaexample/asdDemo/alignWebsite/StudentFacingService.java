@@ -214,7 +214,7 @@ public class StudentFacingService {
 		// adding the photo object
 		JSONObject photoObject = new JSONObject();
 		photo = photosDao.getPhotoWithPrivacy(nuid);
-				
+
 		if(photo != null){
 			photoObject.put("neuId", new String(Base64.getEncoder().encode(photo.getNeuId().getBytes())));
 			byte[] photoByte = photo.getPhoto();
@@ -1519,8 +1519,8 @@ public class StudentFacingService {
 
 		return Response.status(Response.Status.OK).entity("Privacies Updated Successfully!").build(); 
 	}
-	
-	
+
+
 	/**
 	 * This function filter students based on the criteria
 	 * 
@@ -1534,7 +1534,7 @@ public class StudentFacingService {
 	public Response filterStudent(StudentFilterInfo studentFilterInfo){
 		List<StudentCoopInfo> resultStudentInfo = new ArrayList<StudentCoopInfo>();
 		Map<String,List<String>> map = new HashMap<String,List<String>>();
-		
+
 		try{
 			if (studentFilterInfo.getCoops()!= null && !studentFilterInfo.getCoops().isEmpty()) { 
 				map.put("companyName",studentFilterInfo.getCoops());
@@ -1553,22 +1553,19 @@ public class StudentFacingService {
 			}
 
 		}catch (Exception e){
-			
+
 			return Response.status(Response.Status.BAD_REQUEST).entity(e).build();
 		}
 
 		try {
 			List<StudentCoopInfo> studentCoopInfoList = 
 					(ArrayList<StudentCoopInfo>) studentDao.getStudentFilteredStudents2(map, 0, 9999);
-			
+
 			if(studentCoopInfoList.size() == 0){
 				return Response.status(Response.Status.NOT_FOUND).entity("No students found for the filter entered").build();
 			}
 
 			for (StudentCoopInfo studentCoopInfoEach : studentCoopInfoList) {
-				Students student = studentDao.getStudentRecord(studentCoopInfoEach.getNuId());
-				studentCoopInfoEach.setFirstName(student.getFirstName());
-				studentCoopInfoEach.setLastName(student.getLastName()); 
 				studentCoopInfoEach.setNuId(new String(Base64.getEncoder().
 						encode(studentCoopInfoEach.getNuId().getBytes())));
 				resultStudentInfo.add(studentCoopInfoEach);
