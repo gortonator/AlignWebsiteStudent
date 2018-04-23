@@ -16,11 +16,11 @@
 			jdbc:mariadb://${database.ip}:${private.port}/AlignPrivate
 		</property>
 
-		<property name="hibernate.connection.autoReconnect">true</property>
+	<!-- <property name="hibernate.connection.autoReconnect">true</property>
 		<property name="hibernate.connection.useSSL">true</property>
 		<property name="hibernate.connection.verifyServerCertificate">true</property>
 		<property name="hibernate.connection.trustServerCertificate">false</property>
-		<property name="hibernate.connection.requireSSL">true</property>
+		<property name="hibernate.connection.requireSSL">true</property>  -->	
 
 		<property name="hibernate.connection.username">
 			${database.username}

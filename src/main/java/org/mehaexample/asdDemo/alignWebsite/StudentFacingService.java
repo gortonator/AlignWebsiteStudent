@@ -1566,6 +1566,9 @@ public class StudentFacingService {
 			}
 
 			for (StudentCoopInfo studentCoopInfoEach : studentCoopInfoList) {
+				Students student = studentDao.getStudentRecord(studentCoopInfoEach.getNuId());
+				studentCoopInfoEach.setFirstName(student.getFirstName());
+				studentCoopInfoEach.setLastName(student.getLastName()); 
 				studentCoopInfoEach.setNuId(new String(Base64.getEncoder().
 						encode(studentCoopInfoEach.getNuId().getBytes())));
 				resultStudentInfo.add(studentCoopInfoEach);
