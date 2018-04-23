@@ -1436,41 +1436,6 @@ public class StudentFacingService {
 	}
 
 	/**
-	 * This function adds privacy for a given student
-	 * 
-	 * @param privacy
-	 * @return 200 Response if the privacy is created successfully for the given student
-	 */
-	@POST
-	@Path("/students/{NUID}/privacies/")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response addPrivacy(@PathParam("NUID") String neuId, Privacies privacy){
-		neuId = new String(Base64.getDecoder().decode(neuId));
-		Privacies privacies = null;
-
-		Students student = studentDao.getStudentRecord(neuId);
-
-		if (!studentDao.ifNuidExists(neuId)) {
-
-			return Response.status(Response.Status.NOT_FOUND).entity(NUIDNOTFOUND).build();
-		}
-
-		privacy.setNeuId(student.getNeuId());
-		privacy.setPublicId(student.getPublicId()); 
-
-		try{
-			privacies = privaciesDao.createPrivacy(privacy);
-		}catch(Exception ex) {
-
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).
-					entity(ex).build();
-		}
-
-		return Response.status(Response.Status.OK).entity("Privacies added successfully!").build();
-	}
-
-	/**
 	 * This function gets the privacy setting for a student 
 	 * 
 	 * @param neuId
