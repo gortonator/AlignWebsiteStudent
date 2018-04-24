@@ -86,8 +86,8 @@ public class StudentFacingService {
 
 	public StudentFacingService(){} 
 
-
 	/**
+	 * Request 1:
 	 * This function gets the other student details by NUID
 	 * 	 
 	 * @param nuid
@@ -144,7 +144,6 @@ public class StudentFacingService {
 		for(WorkExperiences workExp : workExperiencesRecord){
 			JSONObject jsonObj = new JSONObject();
 			jsonObj.put("workExperienceId", workExp.getWorkExperienceId());
-			//			jsonObj.put("neuId", new String(Base64.getEncoder().encode(workExp.getNeuId().getBytes())));
 			jsonObj.put("companyName", workExp.getCompanyName());
 			jsonObj.put("startDate", workExp.getStartDate());
 			jsonObj.put("endDate", workExp.getEndDate());
@@ -163,7 +162,6 @@ public class StudentFacingService {
 			jsonObj.put("extraExperienceId", extraExperience.getExtraExperienceId());
 			jsonObj.put("startDate", extraExperience.getStartDate());
 			jsonObj.put("title", extraExperience.getTitle());
-			//			jsonObj.put("neuId", new String(Base64.getEncoder().encode(extraExperience.getNeuId().getBytes())));
 			extraExperienceObj.put(jsonObj); 
 		}
 
@@ -176,12 +174,10 @@ public class StudentFacingService {
 			jsonObj.put("endDate", project.getEndDate());
 			jsonObj.put("projectId", project.getProjectId());
 			jsonObj.put("startDate", project.getStartDate());
-			//			jsonObj.put("neuId", new String(Base64.getEncoder().encode(project.getNeuId().getBytes())));
 			projectObj.put(jsonObj); 
 		}
 
 		JSONObject studentObj = new JSONObject();
-		//		studentObj.put("neuId", new String(Base64.getEncoder().encode(studentRecord.getNeuId().getBytes())));
 		studentObj.put("publicId", studentRecord.getPublicId());
 		studentObj.put("email", studentRecord.getEmail());
 		studentObj.put("firstName", studentRecord.getFirstName());
@@ -236,9 +232,8 @@ public class StudentFacingService {
 	} 
 
 	/**
-	 * This function gets the student details by NUID
-	 * 
-	 * http://localhost:8080/student-facing-align-website/webapi/student-facing/students/001234123
+	 * Request 2:
+	 * This function gets a student's own profile details by NUID
 	 *
 	 * @param nuid
 	 * @return a student object
@@ -368,7 +363,6 @@ public class StudentFacingService {
 		studentObj.put("middleName", studentRecord.getMiddleName());
 		studentObj.put("lastName", studentRecord.getLastName());
 		studentObj.put("gender", studentRecord.getGender());
-		//		studentObj.put("race", studentRecord.getRace());
 		studentObj.put("scholarship", studentRecord.isScholarship());
 		studentObj.put("visa", studentRecord.getVisa());
 		studentObj.put("phoneNum", studentRecord.getPhoneNum());
@@ -419,6 +413,7 @@ public class StudentFacingService {
 
 
 	/**
+	 * Request 3: 
 	 * This function updates a student's photo
 	 * 
 	 * @param neuId
@@ -464,6 +459,7 @@ public class StudentFacingService {
 	}
 
 	/**
+	 * Request 4:
 	 * This function updates a student detail by NUID 
 	 * 
 	 * http://localhost:8181/webapi/student-facing/students/{NUID}
@@ -500,6 +496,7 @@ public class StudentFacingService {
 	}
 
 	/**
+	 * Request 5:
 	 * This function creates an Extra Experience for a student
 	 * 
 	 * @param neuId
@@ -550,6 +547,7 @@ public class StudentFacingService {
 	}
 
 	/**
+	 * Request 6:
 	 * This function creates a project for a given student 
 	 * 
 	 * @param neuId
@@ -599,6 +597,7 @@ public class StudentFacingService {
 	}
 
 	/**
+	 * Request 7
 	 * This function gets all the Extra Experiences of a student 
 	 * 
 	 * @param neuId
@@ -658,6 +657,7 @@ public class StudentFacingService {
 	}
 
 	/**
+	 * Request 8:
 	 * This function gets all the Work Experiences for a student
 	 * 
 	 * @param neuId
@@ -716,6 +716,7 @@ public class StudentFacingService {
 	}
 
 	/**
+	 * Request 9:
 	 * This function updates an Extra Experience of student for a given ID
 	 * 
 	 * @param neuId
@@ -775,6 +776,7 @@ public class StudentFacingService {
 	}
 
 	/**
+	 * Request 10:
 	 * This function updates a given project of a student 
 	 * 
 	 * @param neuId
@@ -835,6 +837,7 @@ public class StudentFacingService {
 
 
 	/**
+	 * Request 11:
 	 * This function deletes an Extra Experience of a student which they requested to delete
 	 * 
 	 * @param neuId
@@ -869,6 +872,7 @@ public class StudentFacingService {
 	}
 
 	/**
+	 * Request 12:
 	 * This function delete a given project of a student requested by them to be deleted 
 	 * 
 	 * @param neuId
@@ -906,6 +910,7 @@ public class StudentFacingService {
 	}
 
 	/**
+	 * Request 13:
 	 * This is the function to get all graduate years.
 	 * 
 	 * @return List of all graduate years
@@ -934,7 +939,7 @@ public class StudentFacingService {
 	}
 
 	/**
-	 * Request 6
+	 * Request 14:
 	 * This is a function to get list of ALL Coop companies
 	 * 	 
 	 * @return List of all Coops
@@ -959,6 +964,7 @@ public class StudentFacingService {
 	} 
 
 	/**
+	 * Request 15:
 	 * This is a function to get list of ALL Courses
 	 * 	 
 	 * @return List of all Coops
@@ -988,6 +994,7 @@ public class StudentFacingService {
 	}
 
 	/**
+	 * Request 16:
 	 * This is a function to get list of ALL Enrollment years
 	 * 	 
 	 * @return List of all Enrollment years
@@ -1014,6 +1021,7 @@ public class StudentFacingService {
 	}
 
 	/**
+	 * Request 17:
 	 * This is a function to get list of ALL the campuses
 	 *
 	 * @return List of campuses
@@ -1037,10 +1045,10 @@ public class StudentFacingService {
 	} 
 
 	/**
+	 * Request 18:
 	 * This is a function to login using student email and password
-	 * 
-	 * http://localhost:8080/webapi/login
-	 * @param passwordChangeObject
+	 * @param request
+	 * @param loginInput
 	 * @return the token if logged in successfully
 	 */
 	@POST
@@ -1107,11 +1115,12 @@ public class StudentFacingService {
 	}
 
 	/**
+	 * Request 19: 
 	 * This is a function to logout for Student
 	 * 
-	 * http://localhost:8080/webapi/logout
-	 * @param 
-	 * @return 200 OK
+	 * @param request
+	 * @param loginInput
+	 * @return 200 OK if the user logs out successfully
 	 */
 	@POST
 	@Path("/logout")
@@ -1141,10 +1150,8 @@ public class StudentFacingService {
 	}
 
 	/**
+	 * Request 20:
 	 * This function sends the registration email to a student only if he/she is present in the align database
-	 * 
-	 * http://localhost:8080/alignWebsite/webapi/student-facing/registration
-	 * test.alignstudent123@gmail.com
 	 * 
 	 * @param emailToRegister
 	 * @return 200 if Registration link is sent successfully
@@ -1226,6 +1233,7 @@ public class StudentFacingService {
 	}
 
 	/**
+	 * Request 21:
 	 * This function creates the password and registers the student
 	 * 
 	 * @param passwordCreateObject
@@ -1296,9 +1304,9 @@ public class StudentFacingService {
 	}
 
 	/**
+	 * Request 22:
 	 * This is a function to change an existing students password
 	 * 
-	 * http://localhost:8080/alignWebsite/webapi/student-facing/password-change
 	 * @param passwordChangeObject
 	 * @return 200 if password changed successfully else return 404
 	 */
@@ -1373,10 +1381,11 @@ public class StudentFacingService {
 	}
 
 	/**
+	 * Request 23:
 	 * This function sends email to Student's northeastern ID to reset the password.
 	 * 
 	 * @param adminEmail
-	 * @return 200 if password changed successfully else return 404
+	 * @return 200 if password changed successfully 
 	 */
 	@POST
 	@Path("/password-reset")
@@ -1438,6 +1447,7 @@ public class StudentFacingService {
 	}
 
 	/**
+	 * Request 24:
 	 * This function gets the privacy setting for a student 
 	 * 
 	 * @param neuId
@@ -1467,6 +1477,7 @@ public class StudentFacingService {
 	}
 
 	/**
+	 * Request 25:
 	 * This function updates an Extra Experience of student for a given ID
 	 * 
 	 * @param neuId
@@ -1524,6 +1535,7 @@ public class StudentFacingService {
 
 
 	/**
+	 * Request 26:
 	 * This function filter students based on the criteria
 	 * 
 	 * @param search
@@ -1586,6 +1598,7 @@ public class StudentFacingService {
 	}
 
 	/**
+	 * Request 27:
 	 * This function search for the other students
 	 * 
 	 * @param search
@@ -1649,7 +1662,7 @@ public class StudentFacingService {
 	}
 
 	/**
-	 * Request 11
+	 * Request 28:
 	 * This function is to search students by name
 	 *
 	 * @return List of students with matched name
