@@ -1194,7 +1194,8 @@ public class StudentFacingService {
 			studentLoginsNew.setEmail(studentEmail); 
 			studentLoginsNew.setStudentPassword("waitingForCreatePassword");
 			studentLoginsNew.setConfirmed(false);
-			studentLoginsNew.setRegistrationKey(registrationKey);
+			//			studentLoginsNew.setRegistrationKey(registrationKey);
+			studentLoginsNew.setRegistrationKey(SCryptUtil.scrypt(registrationKey, 16, 16, 16));
 			studentLoginsNew.setKeyExpiration(keyExpirationTime);
 
 			boolean success = false;
@@ -1251,7 +1252,8 @@ public class StudentFacingService {
 		Timestamp databaseTimestamp = studentLoginsExisting.getKeyExpiration();
 
 		// check if the entered registration key matches 
-		if((databaseRegistrationKey.equals(registrationKey))){
+		// if((databaseRegistrationKey.equals(registrationKey)))
+		if(SCryptUtil.check(registrationKey,databaseRegistrationKey)){
 			// if registration key matches, then check if its valid or not
 			Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
 
