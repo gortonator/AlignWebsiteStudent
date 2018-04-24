@@ -938,7 +938,7 @@ public class StudentFacingService {
 			years = studentsPublicDao.getListOfAllGraduationYears();
 
 			if (years == null) {
-				return Response.status(Response.Status.NOT_FOUND).entity("No graduation years are found").build();
+				return Response.status(Response.Status.NO_CONTENT).entity("No graduation years are found").build();
 			} 
 
 			for(Integer year : years){
@@ -967,7 +967,7 @@ public class StudentFacingService {
 			listOfAllCoopCompanies = workExperiencesPublicDao.getListOfAllCoopCompanies();
 
 			if (listOfAllCoopCompanies == null) {
-				return Response.status(Response.Status.NOT_FOUND).entity("No COOPS are found").build();
+				return Response.status(Response.Status.NO_CONTENT).entity("No COOPS are found").build();
 			} 
 
 		} catch (Exception e) {
@@ -994,7 +994,7 @@ public class StudentFacingService {
 			listOfAllCourses = coursesDao.getAllCourses();
 
 			if (listOfAllCourses == null) {
-				return Response.status(Response.Status.NOT_FOUND).entity("No courses found").build();
+				return Response.status(Response.Status.NO_CONTENT).entity("No courses found").build();
 			} 
 
 			for(Courses courses : listOfAllCourses){
@@ -1025,7 +1025,7 @@ public class StudentFacingService {
 			listOfAllEnrollmentYears = studentDao.getAllEntryYears();
 
 			if (listOfAllEnrollmentYears == null) {
-				return Response.status(Response.Status.NOT_FOUND).
+				return Response.status(Response.Status.NO_CONTENT).
 						entity("No Enrollment years are found").build();
 			} 
 
@@ -1052,7 +1052,7 @@ public class StudentFacingService {
 			listOfAllCampuses = studentDao.getAllCampuses();
 
 			if (listOfAllCampuses == null) {
-				return Response.status(Response.Status.NOT_FOUND).entity("No Campuses are found").build();
+				return Response.status(Response.Status.NO_CONTENT).entity("No Campuses are found").build();
 			} 
 		} catch (Exception e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).build();
@@ -1672,6 +1672,12 @@ public class StudentFacingService {
 
 		try {
 			studentRecords = (ArrayList<Students>) studentDao.getStudentFilteredStudents(map, 0, 9999);
+			
+			if(studentRecords.size() == 0){
+				return Response.status(Response.Status.NO_CONTENT).
+						entity("No students are found for the filter selected").build();
+			}
+			
 			for (Students student : studentRecords) {
 				student.setNeuId(new String(Base64.getEncoder().encode(student.getNeuId().getBytes())));
 				resultStudentRecords.add(student);
