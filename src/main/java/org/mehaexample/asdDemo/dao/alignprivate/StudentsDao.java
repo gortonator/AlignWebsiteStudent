@@ -198,13 +198,8 @@ public class StudentsDao {
 	 */
 	public List<StudentCoopInfo> getStudentFilteredStudents2(Map<String, List<String>> filters, int begin, int end) {
 		StringBuilder hql =  new StringBuilder();
-		if (!filters.containsKey("companyName")) {
-			hql = hql.append("SELECT NEW org.mehaexample.asdDemo.restModels.StudentCoopInfo(s.firstName, s.lastName, s.neuId, " +
-							"s.campus, s.entryYear, s.expectedLastYear, '') FROM Students s ");
-		} else {
-			hql = hql.append("SELECT NEW org.mehaexample.asdDemo.restModels.StudentCoopInfo(s.firstName, s.lastName, s.neuId, " +
-							"s.campus, s.entryYear, s.expectedLastYear, we.companyName) FROM Students s ");
-		}
+		hql = hql.append("SELECT NEW org.mehaexample.asdDemo.restModels.StudentCoopInfo(s.firstName, s.lastName, s.neuId, " +
+						"s.campus, s.entryYear, s.expectedLastYear, we.companyName) FROM Students s ");
 
 		List<StudentCoopInfo> result = (List<StudentCoopInfo>) populateStudentFilterHql2(hql, filters, begin, end);
 
@@ -293,6 +288,8 @@ public class StudentsDao {
 	private List populateStudentFilterHql2(StringBuilder hql, Map<String, List<String>> filters, Integer begin, Integer end) {
 		if (filters.containsKey("companyName")) {
 			hql.append("INNER JOIN WorkExperiences we ON s.neuId = we.neuId ");
+		} else {
+			hql.append("LEFT OUTER JOIN WorkExperiences we ON s.neuId = we.neuId ");
 		}
 
 		if (filters.containsKey("courseId")) {

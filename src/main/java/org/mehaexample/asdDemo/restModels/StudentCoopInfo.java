@@ -17,7 +17,12 @@ public class StudentCoopInfo {
 		Campuses = campus;
 		EnrollmentYear = enrollmentYear;
 		GraduationYear = graduationYear;
-		Coops = coops;
+
+		if(coops == null)
+			Coops = "";
+		else
+			Coops = coops;
+
 		FirstName = firstName;
 		LastName = lastName;
 	}
