@@ -88,6 +88,7 @@ public class StudentFacingService {
 
 	/**
 	 * Request 1:
+	 * URL: https://asd4.ccs.neu.edu:8082/students/{nuid}
 	 * This function gets the other student details by NUID
 	 * 	 
 	 * @param nuid
@@ -233,6 +234,7 @@ public class StudentFacingService {
 
 	/**
 	 * Request 2:
+	 * URL: https://asd4.ccs.neu.edu:8082/myProfile/{nuid}
 	 * This function gets a student's own profile details by NUID
 	 *
 	 * @param nuid
@@ -414,6 +416,7 @@ public class StudentFacingService {
 
 	/**
 	 * Request 3: 
+	 * URL: https://asd4.ccs.neu.edu:8082/students/{NUID}/photo
 	 * This function updates a student's photo
 	 * 
 	 * @param neuId
@@ -460,6 +463,7 @@ public class StudentFacingService {
 
 	/**
 	 * Request 4:
+	 * URL: https://asd4.ccs.neu.edu:8082/students/{NUID}
 	 * This function updates a student detail by NUID 
 	 * 
 	 * http://localhost:8181/webapi/student-facing/students/{NUID}
@@ -497,6 +501,7 @@ public class StudentFacingService {
 
 	/**
 	 * Request 5:
+	 * URL: https://asd4.ccs.neu.edu:8082/students/{NUID}/extraexperiences
 	 * This function creates an Extra Experience for a student
 	 * 
 	 * @param neuId
@@ -548,6 +553,7 @@ public class StudentFacingService {
 
 	/**
 	 * Request 6:
+	 * URL: https://asd4.ccs.neu.edu:8082/students/{NUID}/projects
 	 * This function creates a project for a given student 
 	 * 
 	 * @param neuId
@@ -598,6 +604,7 @@ public class StudentFacingService {
 
 	/**
 	 * Request 7
+	 * URL: https://asd4.ccs.neu.edu:8082/students/{NUID}/extraexperiences
 	 * This function gets all the Extra Experiences of a student 
 	 * 
 	 * @param neuId
@@ -658,6 +665,7 @@ public class StudentFacingService {
 
 	/**
 	 * Request 8:
+	 * URL: https://asd4.ccs.neu.edu:8082/students/{NUID}/workexperiences/
 	 * This function gets all the Work Experiences for a student
 	 * 
 	 * @param neuId
@@ -717,6 +725,7 @@ public class StudentFacingService {
 
 	/**
 	 * Request 9:
+	 * URL: https://asd4.ccs.neu.edu:8082/students/{NUID}/extraexperiences/{ID}
 	 * This function updates an Extra Experience of student for a given ID
 	 * 
 	 * @param neuId
@@ -777,6 +786,7 @@ public class StudentFacingService {
 
 	/**
 	 * Request 10:
+	 * URL: https://asd4.ccs.neu.edu:8082/students/{NUID}/projects/{ID}
 	 * This function updates a given project of a student 
 	 * 
 	 * @param neuId
@@ -838,6 +848,7 @@ public class StudentFacingService {
 
 	/**
 	 * Request 11:
+	 * URL: https://asd4.ccs.neu.edu:8082/students/{NUID}/extraexperiences/{ID}
 	 * This function deletes an Extra Experience of a student which they requested to delete
 	 * 
 	 * @param neuId
@@ -873,6 +884,7 @@ public class StudentFacingService {
 
 	/**
 	 * Request 12:
+	 * URL: https://asd4.ccs.neu.edu:8082/students/{NUID}/projects/{ID}
 	 * This function delete a given project of a student requested by them to be deleted 
 	 * 
 	 * @param neuId
@@ -911,6 +923,7 @@ public class StudentFacingService {
 
 	/**
 	 * Request 13:
+	 * URL: https://asd4.ccs.neu.edu:8082/graduationyears
 	 * This is the function to get all graduate years.
 	 * 
 	 * @return List of all graduate years
@@ -940,6 +953,7 @@ public class StudentFacingService {
 
 	/**
 	 * Request 14:
+	 * URL: https://asd4.ccs.neu.edu:8082/coops
 	 * This is a function to get list of ALL Coop companies
 	 * 	 
 	 * @return List of all Coops
@@ -965,6 +979,7 @@ public class StudentFacingService {
 
 	/**
 	 * Request 15:
+	 * URL: https://asd4.ccs.neu.edu:8082/courses
 	 * This is a function to get list of ALL Courses
 	 * 	 
 	 * @return List of all Coops
@@ -995,6 +1010,7 @@ public class StudentFacingService {
 
 	/**
 	 * Request 16:
+	 * URL: https://asd4.ccs.neu.edu:8082/enrollmentyears
 	 * This is a function to get list of ALL Enrollment years
 	 * 	 
 	 * @return List of all Enrollment years
@@ -1022,6 +1038,7 @@ public class StudentFacingService {
 
 	/**
 	 * Request 17:
+	 * URL: https://asd4.ccs.neu.edu:8082/campuses
 	 * This is a function to get list of ALL the campuses
 	 *
 	 * @return List of campuses
@@ -1046,6 +1063,7 @@ public class StudentFacingService {
 
 	/**
 	 * Request 18:
+	 * URL: https://asd4.ccs.neu.edu:8082/login
 	 * This is a function to login using student email and password
 	 * @param request
 	 * @param loginInput
@@ -1116,6 +1134,7 @@ public class StudentFacingService {
 
 	/**
 	 * Request 19: 
+	 * URL: https://asd4.ccs.neu.edu:8082/logout
 	 * This is a function to logout for Student
 	 * 
 	 * @param request
@@ -1151,6 +1170,7 @@ public class StudentFacingService {
 
 	/**
 	 * Request 20:
+	 * URL: https://asd4.ccs.neu.edu:8082/registration
 	 * This function sends the registration email to a student only if he/she is present in the align database
 	 * 
 	 * @param emailToRegister
@@ -1234,6 +1254,7 @@ public class StudentFacingService {
 
 	/**
 	 * Request 21:
+	 * URL: https://asd4.ccs.neu.edu:8082/password-create
 	 * This function creates the password and registers the student
 	 * 
 	 * @param passwordCreateObject
@@ -1305,6 +1326,7 @@ public class StudentFacingService {
 
 	/**
 	 * Request 22:
+	 * URL: https://asd4.ccs.neu.edu:8082/password-change
 	 * This is a function to change an existing students password
 	 * 
 	 * @param passwordChangeObject
@@ -1382,6 +1404,7 @@ public class StudentFacingService {
 
 	/**
 	 * Request 23:
+	 * URL: https://asd4.ccs.neu.edu:8082/password-reset
 	 * This function sends email to Student's northeastern ID to reset the password.
 	 * 
 	 * @param adminEmail
@@ -1448,6 +1471,7 @@ public class StudentFacingService {
 
 	/**
 	 * Request 24:
+	 * URL: https://asd4.ccs.neu.edu:8082/students/{NUID}/privacies/
 	 * This function gets the privacy setting for a student 
 	 * 
 	 * @param neuId
@@ -1478,6 +1502,7 @@ public class StudentFacingService {
 
 	/**
 	 * Request 25:
+	 * URL: https://asd4.ccs.neu.edu:8082/students/{NUID}/privacies/
 	 * This function updates an Extra Experience of student for a given ID
 	 * 
 	 * @param neuId
@@ -1536,6 +1561,7 @@ public class StudentFacingService {
 
 	/**
 	 * Request 26:
+	 * URL: https://asd4.ccs.neu.edu:8082/filterstudents
 	 * This function filter students based on the criteria
 	 * 
 	 * @param search
@@ -1599,6 +1625,7 @@ public class StudentFacingService {
 
 	/**
 	 * Request 27:
+	 * URL: https://asd4.ccs.neu.edu:8082/students
 	 * This function search for the other students
 	 * 
 	 * @param search
@@ -1663,6 +1690,7 @@ public class StudentFacingService {
 
 	/**
 	 * Request 28:
+	 * URL: https://asd4.ccs.neu.edu:8082/autofill-search
 	 * This function is to search students by name
 	 *
 	 * @return List of students with matched name
