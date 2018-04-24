@@ -1564,7 +1564,7 @@ public class StudentFacingService {
 					(ArrayList<StudentCoopInfo>) studentDao.getStudentFilteredStudents2(map, 0, 9999);
 
 			if(studentCoopInfoList.size() == 0){
-				return Response.status(Response.Status.NOT_FOUND).entity("No students found for the filter entered").build();
+				return Response.status(Response.Status.NO_CONTENT).entity("No students found for the filter entered").build();
 			}
 
 			for (StudentCoopInfo studentCoopInfoEach : studentCoopInfoList) {
