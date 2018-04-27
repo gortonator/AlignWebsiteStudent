@@ -26,6 +26,12 @@ public class StudentLoginsDao {
     }
   }
 
+  /**
+   * Find a student login based on their email.
+   *
+   * @param email Student's email.
+   * @return the Student login object if found; null otherwise.
+   */
   public StudentLogins findStudentLoginsByEmail(String email) {
     Session session = factory.openSession();
     try {
@@ -41,6 +47,15 @@ public class StudentLoginsDao {
     }
   }
 
+  /**
+   * Create a student login. This will only be successful if a student
+   * profile has been created in the student table with corresponding student
+   * email and profile.
+   *
+   * @param studentLogin object that wants to be created.
+   * @return newly created Student Login if sucessfull, throw a hibernate exception
+   * otherwise.
+   */
   public synchronized StudentLogins createStudentLogin(StudentLogins studentLogin) {
     Session session = factory.openSession();
     Transaction tx = null;
@@ -61,6 +76,12 @@ public class StudentLoginsDao {
     return studentLogin;
   }
 
+  /**
+   * Update a student login object in the private database.
+   *
+   * @param studentLogin updated student login object.
+   * @return true if updated; hibernate exception otherwise.
+   */
   public synchronized boolean updateStudentLogin(StudentLogins studentLogin) {
     Session session = factory.openSession();
     Transaction tx = null;
@@ -82,6 +103,13 @@ public class StudentLoginsDao {
     return true;
   }
 
+  /**
+   * Delete a student login based on the email.
+   *
+   * @param email corresponding email to the student login object that wants
+   *              to be deleted.
+   * @return true if deleted; hibernate exception otherwise.
+   */
   public synchronized boolean deleteStudentLogin(String email) {
     Session session = factory.openSession();
     if (email == null || email.trim().isEmpty()) {
