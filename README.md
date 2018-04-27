@@ -20,4 +20,5 @@ For the higher level For all 2 schemas (private and public), you can look at the
 ALIGN diagram pdf files in this repositories. For more details of the Database construction, 
 you can look inside the sql_scripts folder for the SQL Scripts to create the Databases.
 
-## Student Facing APIs Documentation:
+## Student Facing has the following APIs:
+
